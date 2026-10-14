@@ -22,4 +22,4 @@ Define the data contract and platform probe support, then implement local storag
 
 ## Licence
 
-The application licence is pending owner selection.
+The application is licensed under the GNU Affero General Public License version 3 only (`AGPL-3.0-only`). See [LICENSE](LICENSE).

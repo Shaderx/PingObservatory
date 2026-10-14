@@ -22,4 +22,4 @@ A standalone network latency map for Windows and Linux. This project is in the p
 
 ## Licence decision
 
-The application licence is pending owner selection.
+The application is licensed under the GNU Affero General Public License version 3 only (`AGPL-3.0-only`). See [LICENSE](../LICENSE).
