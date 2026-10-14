@@ -1,6 +1,6 @@
 # The Ping Observatory: Plan
 
-A standalone network latency map for Windows and Linux. This project is in the planning stage; no executable is released.
+A standalone network latency map for Windows and Linux. The MVP is implemented on `feature/mvp`; no executable release is published.
 
 ## Product requirements
 
@@ -15,10 +15,12 @@ A standalone network latency map for Windows and Linux. This project is in the p
 
 ## Milestone sequence
 
-1. **Data contract and platform probe support:** Define the data contract and probe support for Windows and Linux, including the distinction between gaps and normal probe failures.
-2. **Local storage and UI:** Implement local data storage, the background collector, and the local web UI in a single executable.
-3. **Catalogue updates:** Implement periodic fetching of the versioned, verified GitHub catalogue, the bundled starter catalogue, and the last-valid fallback.
-4. **Tests and packaging:** Test and package the application for Windows and Linux.
+1. **Data contract and platform probe support:** Implemented stable target IDs/revisions, actual attempt records and native Windows/Linux IPv4 probes. Missing minute buckets are N/A; attempted failures retain their explicit status.
+2. **Local storage and UI:** Implemented bounded local storage, one-minute staggered background collection, per-user settings and the embedded local map/history UI. The origin is configurable.
+3. **Catalogue updates:** Implemented periodic bounded GitHub JSON fetching, strict validation, bundled starter and last-valid fallback. The starter remains empty pending real owner-homelab endpoint verification evidence.
+4. **Tests and packaging:** Unit/integration tests and Windows/Linux amd64 native loopback checks pass. Single executable builds are prepared for Windows/Linux amd64/arm64. Arm64 runtime and successful unprivileged Linux ping sockets still require suitable test environments; no release is published.
+
+See [verification details](TESTING.md) and [third-party notices](THIRD_PARTY.md).
 
 ## Licence decision
 

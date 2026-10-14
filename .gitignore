@@ -1,0 +1,7 @@
+/build/
+/test-output/
+*.exe
+*.test
+**/node_modules/
+*.tsbuildinfo
+**/.cache/
