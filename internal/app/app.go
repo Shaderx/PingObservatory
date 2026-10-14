@@ -81,7 +81,8 @@ func (a *App) Close() error { return a.store.Close() }
 
 func (a *App) Targets() []model.Target {
 	a.mu.RLock()
-	manual := append([]model.Target(nil), a.config.ManualTargets...)
+	manual := make([]model.Target, len(a.config.ManualTargets), len(a.config.ManualTargets)+catalogue.MaxTargets)
+	copy(manual, a.config.ManualTargets)
 	a.mu.RUnlock()
 	cat, _ := a.catalogue.Snapshot()
 	return append(manual, cat.Targets...)
@@ -179,6 +180,9 @@ func (a *App) state(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fail(w, 500, err)
 		return
+	}
+	if latest == nil {
+		latest = []model.Measurement{}
 	}
 	a.mu.RLock()
 	c := a.config

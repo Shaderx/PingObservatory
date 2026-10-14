@@ -175,3 +175,25 @@ func TestHTTPRejectsBadHostCatalogueAndOversizedInput(t *testing.T) {
 		t.Fatal("public interface listener accepted")
 	}
 }
+
+func TestEmptyStateCollectionsAreArrays(t *testing.T) {
+	a, err := Open(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.Close()
+	a.Authority = "127.0.0.1:8742"
+	w := request(a, "GET", "/api/state", nil, "", "")
+	if w.Code != 200 {
+		t.Fatal(w.Body)
+	}
+	var state map[string]json.RawMessage
+	if err := json.Unmarshal(w.Body.Bytes(), &state); err != nil {
+		t.Fatal(err)
+	}
+	for _, field := range []string{"targets", "latest"} {
+		if string(state[field]) != "[]" {
+			t.Fatalf("%s should be an empty array, got %s", field, state[field])
+		}
+	}
+}
