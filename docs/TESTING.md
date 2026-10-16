@@ -8,7 +8,7 @@ On the resumed correction, Go 1.26.5 on Windows amd64 passes `go test -p 2 -coun
 
 Tests cover persistence, exact uneven-sample quantiles, population standard deviation, separate method/family/revision series, real sends versus unobservable outcomes, valid zero-duration baseline samples, completed history grids, explicit retention expiry, active-probe clock jumps, revision ledgers, catalogue rejection/fallback and local API boundaries. Test workers are bounded to two.
 
-Frontend TypeScript compilation, 15 Vitest tests and the production Vite build pass using existing pinned dependencies. The map assets and third-party notices remain embedded. Corrected packaged browser verification is still required.
+Frontend TypeScript compilation, 17 Vitest tests and the production Vite build pass using existing pinned dependencies. The map assets and third-party notices remain embedded. The packaged Windows browser checks pass for manual method settings, map/callouts/origin, provider/category/world-area filters, loss sorting, comparison limits, family switching, all history windows, explicit retention expiry, theme, motion and a 390-pixel mobile viewport. The isolated UI made no external requests and reported no browser errors. A separate loopback TCP fixture recorded a newer successful measurement after browser closure, confirming independent background collection. Temporary test processes were closed. A regression guards both family-switch history races and middle-target revision changes.
 
 ## Linux validation handoff
 
@@ -28,4 +28,4 @@ Do not set `PINGOBSERVATORY_NATIVE_TEST=1` on a host whose existing policy denie
 
 ## Remaining acceptance
 
-Verify mature full-catalogue retention and active journal/memory bounds, corrected packaged browser behavior and background collection, exact current catalogue evidence and admission, fresh cross-platform packaging, and independent source/publication review. Earlier scaffold-only Windows/WSL results do not establish completion of this correction. macOS is deferred.
+Verify mature full-catalogue retention and active journal/memory bounds, exact current catalogue evidence and admission, fresh cross-platform packaging, and independent source/publication review. Earlier scaffold-only Windows/WSL results do not establish completion of this correction. macOS is deferred.

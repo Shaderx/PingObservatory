@@ -44,6 +44,15 @@ export function presentTargets(state: State): Target[] {
 }
 export function comparable(selected: Target[], candidate: Target, family: Family) { return selected.length < 4 && candidate.measurement.families.includes(family) && selected.every(target => target.measurement.method === candidate.measurement.method && target.measurement.families.includes(family)); }
 export function historyPath(target: LocalTarget, family: Family, window: Window) { return `/api/history?target_id=${encodeURIComponent(target.id)}&revision=${target.revision}&method=${settings(target).method}&family=${family}&window=${window}`; }
+export function selectCompatibleHistories(histories: History[], targets: LocalTarget[], family: Family, window: Window) {
+  const selected: History[] = [];
+  for (const target of targets) {
+    const match = histories.find(history => history.family === family && history.window === window && history.target_id === target.id && history.target_revision === target.revision && history.method === settings(target).method);
+    if (!match) return [];
+    selected.push(match);
+  }
+  return selected;
+}
 export function presentHistory(target: LocalTarget, family: Family, window: Window, history: Omit<History, 'points'>): History {
   const spec = historyWindows[window];
   if (history.target_id !== target.id || history.target_revision !== target.revision || history.method !== settings(target).method || history.family !== family || history.window !== window || history.step_seconds !== spec.bucketSeconds || history.buckets.length > spec.count) throw new Error('Local history does not match this target, method, family and window.');

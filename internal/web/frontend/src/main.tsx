@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import type { Config, Family, History, Method, State, Target, Window } from './types';
-import { ageText, BASELINE_POLICY, comparable, elevatedTiming, historyPath, historySummary, isRTTMethod, lossLabel, lossValue, methods, metric, presentHistory, presentTargets, reading, rollingStatus, safeFavorites, statusLabel, statusOf, timingVariationLabel } from './model';
+import { ageText, BASELINE_POLICY, comparable, elevatedTiming, historyPath, historySummary, isRTTMethod, lossLabel, lossValue, methods, metric, presentHistory, presentTargets, reading, rollingStatus, safeFavorites, selectCompatibleHistories, statusLabel, statusOf, timingVariationLabel } from './model';
 import { getJSON, writeJSON } from './api';
 import { prepareConfig } from './config';
 import { LocalSettings } from './Settings';
@@ -23,7 +23,7 @@ export function App() {
   const arrivalTracker = useRef(createBatchArrivalTracker());
   const [sort, setSort] = useState('latency'), [onlyFavorites, setOnlyFavorites] = useState(false), [favorites, setFavorites] = useState<string[]>(() => safeFavorites(saved('ping-observatory-favorites')));
   const [comparison, setComparison] = useState<string[]>([]), [window, setWindow] = useState<Window>('1h'), [notice, setNotice] = useState('');
-  const [histories, setHistories] = useState<History[]>([]), [historyError, setHistoryError] = useState(''), [busy, setBusy] = useState(false);
+  const [receivedHistories, setHistories] = useState<History[]>([]), [historyError, setHistoryError] = useState(''), [busy, setBusy] = useState(false);
   const [theme, setTheme] = useState(() => saved('ping-observatory-theme') === 'light' ? 'light' : 'dark');
   const targets = useMemo(() => state ? presentTargets(state) : [], [state]);
   useEffect(() => { document.documentElement.dataset.theme = theme; try { localStorage.setItem('ping-observatory-theme', theme); } catch { /* Optional browser preferences. */ } }, [theme]);
@@ -51,6 +51,7 @@ export function App() {
   const chartTargets = useMemo(() => (comparison.length ? comparison.map(id => targets.find(item => item.id === id)).filter((item): item is Target => !!item) : target ? [target] : []).filter(item => item.measurement.families.includes(family)), [comparison, target, targets, family]);
   const chartSelection = JSON.stringify([family, window, chartTargets.map(item => [item.id, item.revision, item.measurement.method])]);
   const chartLabels = useMemo(() => chartTargets.map(item => item.region), [chartSelection]);
+  const histories = useMemo(() => selectCompatibleHistories(receivedHistories, chartTargets, family, window), [receivedHistories, chartSelection]);
   useEffect(() => {
     setHistories([]); setHistoryError(''); if (!chartTargets.length) return;
     const controller = new AbortController(); let refreshing = false;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { comparable, elevatedTiming, emptyObservation, historyPath, historySummary, lossValue, presentHistory, presentTargets, reading, settings, statusOf } from './model';
+import { comparable, elevatedTiming, emptyObservation, historyPath, historySummary, lossValue, presentHistory, presentTargets, reading, selectCompatibleHistories, settings, statusOf } from './model';
 import type { Bucket, History, LocalTarget, Observation, State } from './types';
 import { createHistoryChartOption } from './HistoryChart';
 
@@ -51,6 +51,24 @@ describe('local observation fidelity', () => {
   });
 });
 describe('bounded history view contract', () => {
+  it('excludes the previous comparison while a new family is loading', () => {
+    const compared = Array.from({ length: 4 }, (_, index) => ({ ...target, id: `manual-compare-${index}` }));
+    const previous = compared.map(item => history({ target_id: item.id }));
+    expect(selectCompatibleHistories(previous, compared, 'ipv4', '1h')).toHaveLength(4);
+    const selected = compared.slice(0, 1);
+    expect(selectCompatibleHistories(previous, selected, 'ipv6', '1h')).toEqual([]);
+    const refreshed = history({ target_id: selected[0].id, family: 'ipv6' });
+    expect(selectCompatibleHistories([...previous, refreshed], selected, 'ipv6', '1h')).toEqual([refreshed]);
+  });
+  it('withholds a partial comparison when a middle target revision changes', () => {
+    const compared = Array.from({ length: 3 }, (_, index) => ({ ...target, id: `manual-compare-${index}` }));
+    const previous = compared.map(item => history({ target_id: item.id }));
+    const updated = compared.map((item, index) => index === 1 ? { ...item, revision: item.revision + 1 } : item);
+    expect(selectCompatibleHistories(previous, updated, 'ipv4', '1h')).toEqual([]);
+    const next = history({ target_id: updated[1].id, target_revision: updated[1].revision });
+    const displayed = selectCompatibleHistories([...previous].reverse().concat(next), updated, 'ipv4', '1h');
+    expect(displayed.map(item => [item.target_id, item.target_revision])).toEqual(updated.map(item => [item.id, item.revision]));
+  });
   it('requests the exact method/family and all four named windows', () => {
     for (const window of ['1h', '24h', '7d', '30d'] as const) expect(historyPath(target, 'ipv4', window)).toContain(`method=icmp&family=ipv4&window=${window}`);
   });
