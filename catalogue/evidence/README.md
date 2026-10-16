@@ -24,7 +24,20 @@ definitions also use explicitly selected desktop spacing; it is not claimed as
 their recovered historical spacing. The success receipts verify the exact
 endpoint, method and family, rather than every desktop sampling parameter.
 
-Hostname-based families remain pending under the current numeric-peer evidence
-contract. Existing successful hostname probes do not disclose the numeric peer
-that was selected at that earlier time. No private target, station/origin record,
-raw registry, local path, credential or deployment configuration belongs here.
+`v3.json` adds 22 explicitly hostname-level receipts from the same saved October 9
+audit: 16 GameLift UDP family observations, four Fortnite IPv4 ICMP observations
+and two cdnjs HTTPS family observations. Each retains the configured public
+hostname, applicable port/path/method, matching successful batch and its exact
+recorded timestamp. `numeric_peer_recorded: false` states the evidence limit.
+The records contain no numeric destination and use no later DNS lookup. These
+receipts support hostname-level success, rather than a claim about an unrecorded
+historical IP. The version-3 manifest keeps the 116 earlier numeric receipts and
+admits these 22 hostname families; 58 families without matching saved success
+remain pending. Version 2 and its evidence remain immutable.
+
+Curator evidence is provenance. Clients resolve hostnames from their own network;
+neither a numeric receipt nor a provenance refresh supplies a global destination
+pin or a local measurement. Public source snapshots may later disappear; these
+sanitized, commit-pinned receipts preserve the selected observations and their
+limits. No private target, station/origin record, raw registry, local path,
+credential or deployment configuration belongs here.
