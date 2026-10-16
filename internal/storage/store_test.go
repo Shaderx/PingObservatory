@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"math"
@@ -332,6 +333,127 @@ func TestRolloverRetentionAndCompletedGrids(t *testing.T) {
 	}
 	if !h.RetainedFrom.Equal(now.Add(-24*time.Hour)) || !h.Buckets[0].RetentionExpired || h.Buckets[len(h.Buckets)-1].RetentionExpired {
 		t.Fatal("retention-expired coverage was not distinguished from ordinary gaps")
+	}
+}
+
+func TestMaintenanceReopenIsBoundedResumableAndLossless(t *testing.T) {
+	s, now := fixture(t)
+	base := now.Add(-25 * time.Hour).Truncate(time.Minute).Add(10 * time.Second)
+	const count = archiveBatch * 4
+	add(t, s, batch("target", base, []float64{1}, 1))
+	var id int64
+	if err := s.db.QueryRow("SELECT id FROM series WHERE target='target'").Scan(&id); err != nil {
+		t.Fatal(err)
+	}
+	tx, err := s.db.Begin()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := 1; i < count; i++ {
+		m := batch("target", base.Add(time.Duration(i)*time.Minute), []float64{float64(i + 1)}, 1)
+		data, err := encodeMeasurement(m)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if _, err = tx.Exec("INSERT INTO raw(series_id,minute,data) VALUES(?,?,?)", id, m.At.Unix()/60, data); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err = tx.Commit(); err != nil {
+		t.Fatal(err)
+	}
+	*now = now.Add(8 * time.Hour)
+	path := s.path
+	s.Close()
+	s, err = openStore(path, 30, func() time.Time { return *now })
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { s.Close() }()
+	if rowCount(t, s, "raw") != count {
+		t.Fatal("opening the profile drained pending maintenance")
+	}
+	pending, err := s.MaintenanceStep()
+	if err != nil || !pending || rowCount(t, s, "raw") != count-archiveBatch {
+		t.Fatalf("unbounded first step: pending=%v err=%v", pending, err)
+	}
+	// A newer record in a not-yet-archived minute replaces the raw record
+	// atomically, even while the backlog is only partly processed.
+	replacement := batch("target", base.Add((count-1)*time.Minute+5*time.Second), []float64{1000}, 1)
+	add(t, s, replacement)
+	check := func() {
+		h, err := s.History("target", 1, model.MethodICMP, model.FamilyIPv4, "7d", *now)
+		if err != nil {
+			t.Fatal(err)
+		}
+		sent, received := 0, 0
+		for _, b := range h.Buckets {
+			sent += b.Sent
+			received += b.Received
+		}
+		if sent != count || received != count {
+			t.Fatalf("cleanup altered or duplicated history: %d/%d", sent, received)
+		}
+	}
+	check()
+	s.Close()
+	s, err = openStore(path, 30, func() time.Time { return *now })
+	if err != nil {
+		t.Fatal(err)
+	}
+	for steps := 0; ; steps++ {
+		if steps > 10 {
+			t.Fatal("maintenance did not resume to completion")
+		}
+		pending, err = s.MaintenanceStep()
+		if err != nil {
+			t.Fatal(err)
+		}
+		check()
+		if !pending {
+			break
+		}
+	}
+	if rowCount(t, s, "raw") != 0 {
+		t.Fatal("raw archive backlog remains")
+	}
+	if err = s.SetRetention(1); err != nil {
+		t.Fatal(err)
+	}
+	if rowCount(t, s, "chunks") == 0 {
+		t.Fatal("retention update synchronously drained history")
+	}
+	h, err := s.History("target", 1, model.MethodICMP, model.FamilyIPv4, "7d", *now)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, b := range h.Buckets {
+		if b.Received != 0 || b.MedianMS != nil {
+			t.Fatal("expired data exposed while cleanup pending")
+		}
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	if err = s.RunMaintenance(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if rowCount(t, s, "chunks") == 0 {
+		t.Fatal("cancelled worker drained history")
+	}
+	for steps := 0; ; steps++ {
+		if steps > 10 {
+			t.Fatal("expired cleanup did not complete")
+		}
+		pending, err = s.MaintenanceStep()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !pending {
+			break
+		}
+	}
+	if rowCount(t, s, "chunks") != 0 || rowCount(t, s, "series") != 0 {
+		t.Fatal("expired rows or identities retained after cleanup")
 	}
 }
 

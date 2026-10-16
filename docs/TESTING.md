@@ -12,7 +12,11 @@ Frontend TypeScript compilation, 17 Vitest tests and the production Vite build p
 
 ## Linux validation handoff
 
-WSL is not used for this correction's resumed validation. Linux tests will run on the owner's separately approved cloud computer against an exact reviewed revision. The cloud environment denies ICMP datagram and raw sockets, so permission-denied behavior can be tested without changing policy. Successful Linux native ICMP and arm64 runtime behavior still require a suitable existing environment.
+WSL is not used for this correction's resumed validation. On the owner's separately approved cloud computer, exact commit `78f5e1a2a4c6328923fc1f2731c4a9e1b6785414` passes the full Go suite, vet, IPv4/IPv6 permission-denial tests, static Linux build, 17 frontend tests and the production build. Packaged HTTP/config, all four history grids, TCP loopback background collection, shutdown/reopen persistence and `--collect=false` pass. Chromium could not launch under the existing cloud sandbox, so Windows provides the current browser evidence. Successful Linux native ICMP and arm64 runtime behavior still require a suitable existing environment.
+
+The same cloud run measured a synthetic 342-series, 30-day profile with three successful samples per minute: 14,774,400 minute batches occupied 2,288,648,192 bytes (2.13 GiB). A 30-day series history took about 120 ms and all-series statistics about 1.07 seconds on that host. This scenario is not the final admitted catalogue workload. Extrapolation at the allowed maximum ICMP packet setting exceeds the 4 GiB cap for sufficiently many series; a universal 30-day capacity claim is not supported.
+
+That mature profile also exposed a 91.3-second synchronous one-day cleanup. The correction removes cleanup from profile opening and retention changes. The app runs resumable background maintenance, commits at most one 64-row modifying batch per step and yields the storage lock between steps. Reads enforce retention immediately, before physical deletion. A regression verifies reopening without draining, interrupted archival, atomic replacement without duplicate raw/chunk records, exact history and immediate expiry. The mature cloud profile must rerun against the corrected commit to establish observed startup/foreground latency and active journal/memory bounds.
 
 Run the ordinary suite and vet first, without the native-success flag:
 

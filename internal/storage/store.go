@@ -2,6 +2,7 @@
 package storage
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -36,12 +37,13 @@ var (
 )
 
 type Store struct {
-	mu         sync.Mutex
-	db         *sql.DB
-	path       string
-	retention  time.Duration
-	now        func() time.Time
-	maintained time.Time
+	mu              sync.Mutex
+	db              *sql.DB
+	path            string
+	retention       time.Duration
+	now             func() time.Time
+	maintained      time.Time
+	maintenanceWake chan struct{}
 }
 
 // Open uses one connection, an exclusive SQLite profile lock, an 8 MiB page
@@ -77,7 +79,7 @@ func openStore(path string, retentionDays int, now func() time.Time) (*Store, er
 	}
 	db.SetMaxOpenConns(1)
 	db.SetMaxIdleConns(1)
-	s := &Store{db: db, path: path, retention: time.Duration(retentionDays) * 24 * time.Hour, now: now}
+	s := &Store{db: db, path: path, retention: time.Duration(retentionDays) * 24 * time.Hour, now: now, maintenanceWake: make(chan struct{}, 1)}
 	fail := func(err error) (*Store, error) { db.Close(); return nil, err }
 	for _, pragma := range []string{
 		"PRAGMA busy_timeout=250", "PRAGMA page_size=4096", "PRAGMA auto_vacuum=INCREMENTAL",
@@ -120,9 +122,8 @@ COMMIT;`); err != nil {
 	if err = os.Chmod(path, 0600); err != nil {
 		return fail(err)
 	}
-	if err = s.maintainLocked(true); err != nil {
-		return fail(err)
-	}
+	// Expired data is excluded by every read immediately. Physical cleanup and
+	// archival resume in bounded background steps, never on the startup path.
 	return s, nil
 }
 
@@ -147,7 +148,12 @@ func (s *Store) SetRetention(days int) error {
 		return ErrClosed
 	}
 	s.retention = time.Duration(days) * 24 * time.Hour
-	return s.maintainLocked(true)
+	s.maintained = time.Time{}
+	select {
+	case s.maintenanceWake <- struct{}{}:
+	default:
+	}
+	return nil
 }
 
 // Add keeps the newest batch for each minute and exact series. It never infers
@@ -195,23 +201,26 @@ func (s *Store) Add(m model.Measurement) error {
 		return err
 	}
 	minute := m.At.Unix() / 60
+	var old []byte
+	err = tx.QueryRow("SELECT data FROM raw WHERE series_id=? AND minute=?", id, minute).Scan(&old)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return err
+	}
+	if err == nil {
+		previous, e := decodeMeasurement(old)
+		if e != nil {
+			return e
+		}
+		if previous.At.After(m.At) {
+			return nil
+		}
+	}
 	if m.At.Before(s.now().Add(-RawRetention)) {
 		err = putChunk(tx, id, minute, m)
-	} else {
-		var old []byte
-		err = tx.QueryRow("SELECT data FROM raw WHERE series_id=? AND minute=?", id, minute).Scan(&old)
-		if err != nil && !errors.Is(err, sql.ErrNoRows) {
-			return err
-		}
 		if err == nil {
-			previous, e := decodeMeasurement(old)
-			if e != nil {
-				return e
-			}
-			if previous.At.After(m.At) {
-				return nil
-			}
+			_, err = tx.Exec("DELETE FROM raw WHERE series_id=? AND minute=?", id, minute)
 		}
+	} else {
 		_, err = tx.Exec("INSERT INTO raw(series_id,minute,data) VALUES(?,?,?) ON CONFLICT(series_id,minute) DO UPDATE SET data=excluded.data", id, minute, encoded)
 	}
 	if err != nil {
@@ -264,10 +273,32 @@ func (s *Store) maintainLocked(force bool) error {
 		return nil
 	}
 	cutoff := now.Add(-s.retention)
-	// Move at most64 raw records per transaction. Each30-minute chunk contains
-	// at most30 original batches and is<=32KiB; journalling/memory is bounded
-	// independently of the number of targets or the length of a closed interval.
-	for {
+	// Free expired rows first, so a full database can reclaim space before
+	// archival. A call commits at most one 64-row transaction and releases the
+	// store lock. The remaining rows are the durable restart cursor.
+	for _, query := range []struct {
+		statement string
+		bound     int64
+	}{
+		{"DELETE FROM raw WHERE (series_id,minute) IN (SELECT series_id,minute FROM raw WHERE minute<? LIMIT 64)", cutoff.Unix() / 60},
+		{"DELETE FROM chunks WHERE (series_id,minute) IN (SELECT series_id,minute FROM chunks WHERE minute<? LIMIT 64)", cutoff.Unix()/60 - 30},
+		{"DELETE FROM series WHERE id IN (SELECT id FROM series WHERE latest_ns<? AND NOT EXISTS(SELECT 1 FROM raw WHERE series_id=series.id) AND NOT EXISTS(SELECT 1 FROM chunks WHERE series_id=series.id) LIMIT 64)", cutoff.UnixNano()},
+	} {
+		result, err := s.db.Exec(query.statement, query.bound)
+		if err != nil {
+			return capacityError(err)
+		}
+		n, err := result.RowsAffected()
+		if err != nil {
+			return err
+		}
+		if n > 0 {
+			return nil
+		}
+	}
+	// Each 30-minute chunk contains at most 30 original batches and is <=32KiB.
+	// Raw-to-chunk replacement is atomic; readers always see one original batch.
+	{
 		rows, err := s.db.Query("SELECT series_id,minute,data FROM raw WHERE minute<? ORDER BY minute LIMIT 64", now.Add(-RawRetention).Unix()/60)
 		if err != nil {
 			return err
@@ -291,7 +322,7 @@ func (s *Store) maintainLocked(force bool) error {
 			return err
 		}
 		if len(batch) == 0 {
-			break
+			goto complete
 		}
 		tx, err := s.db.Begin()
 		if err != nil {
@@ -317,44 +348,55 @@ func (s *Store) maintainLocked(force bool) error {
 		if err = tx.Commit(); err != nil {
 			return capacityError(err)
 		}
+		return nil
 	}
-	for _, statement := range []string{
-		"DELETE FROM raw WHERE (series_id,minute) IN (SELECT series_id,minute FROM raw WHERE minute<? LIMIT 64)",
-		"DELETE FROM chunks WHERE (series_id,minute) IN (SELECT series_id,minute FROM chunks WHERE minute<? LIMIT 64)",
-	} {
-		bound := cutoff.Unix() / 60
-		if strings.Contains(statement, "chunks") {
-			bound -= 30
-		} // reads filter boundary timestamps exactly
-		for {
-			result, err := s.db.Exec(statement, bound)
-			if err != nil {
-				return err
-			}
-			n, err := result.RowsAffected()
-			if err != nil {
-				return err
-			}
-			if n == 0 {
-				break
-			}
-		}
-	}
-	for {
-		result, err := s.db.Exec("DELETE FROM series WHERE id IN (SELECT id FROM series WHERE latest_ns<? AND NOT EXISTS(SELECT 1 FROM raw WHERE series_id=series.id) AND NOT EXISTS(SELECT 1 FROM chunks WHERE series_id=series.id) LIMIT 64)", cutoff.UnixNano())
-		if err != nil {
-			return err
-		}
-		n, _ := result.RowsAffected()
-		if n == 0 {
-			break
-		}
-	}
+complete:
 	if _, err := s.db.Exec("PRAGMA incremental_vacuum(256)"); err != nil {
 		return err
 	}
 	s.maintained = now.Truncate(time.Minute)
 	return nil
+}
+
+// MaintenanceStep performs one bounded transaction. Pending is true until all
+// currently due cleanup and archival is complete. Reads enforce retention even
+// while pending; no retained samples are dropped to accelerate cleanup.
+func (s *Store) MaintenanceStep() (pending bool, err error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.db == nil {
+		return false, ErrClosed
+	}
+	err = s.maintainLocked(false)
+	return !s.now().UTC().Truncate(time.Minute).Equal(s.maintained), err
+}
+
+// RunMaintenance yields the store lock between transactions so reopening a
+// mature profile does not block the local UI or collection behind a full drain.
+// Cancellation stops between atomic steps; the next run resumes from the rows.
+func (s *Store) RunMaintenance(ctx context.Context) error {
+	for {
+		if ctx.Err() != nil {
+			return nil
+		}
+		pending, err := s.MaintenanceStep()
+		if err != nil {
+			return err
+		}
+		delay := time.Minute
+		if pending {
+			delay = 10 * time.Millisecond
+		}
+		timer := time.NewTimer(delay)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			return nil
+		case <-s.maintenanceWake:
+			timer.Stop()
+		case <-timer.C:
+		}
+	}
 }
 
 func putChunk(tx *sql.Tx, id, minute int64, m model.Measurement) error {

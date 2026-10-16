@@ -112,6 +112,22 @@ func (a *App) Jobs() []collector.Job {
 
 func (a *App) Run(ctx context.Context) {
 	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for ctx.Err() == nil {
+			if err := a.store.RunMaintenance(ctx); err != nil {
+				a.collector.SetError("Local history maintenance: " + err.Error())
+			}
+			timer := time.NewTimer(time.Second)
+			select {
+			case <-ctx.Done():
+				timer.Stop()
+				return
+			case <-timer.C:
+			}
+		}
+	}()
 	if a.Collect {
 		wg.Add(1)
 		go func() { defer wg.Done(); a.collector.Run(ctx) }()
