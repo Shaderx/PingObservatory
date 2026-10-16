@@ -31,7 +31,7 @@ Configuration, identity history, the last-valid catalogue and measurements are s
 
 The starter catalogue is empty until actual owner-homelab verification evidence is available. User-provided targets are labelled separately and never claim catalogue verification. Updates run at startup and every six hours; an update failure retains the last-valid catalogue or bundled starter. Catalogue verification means reachable from the owner's homelab at the recorded time, and does not guarantee reachability from every client.
 
-Linux needs existing permission for ICMP ping sockets or raw sockets. If neither is available, the application records `permission_denied`; it does not change system settings. IPv6 probing is deferred. Storage retains up to the configured 1–30 days, subject to 100,000 rows and a 128 MiB database cap; compaction may temporarily use an additional bounded copy. UI history is limited to 24 hours.
+Linux needs existing permission for ICMP ping sockets or raw sockets. If neither is available, the application records `permission_denied`; it does not change system settings. The correction supports ICMP, GameLift UDP echo, TCP connect, HTTPS and DNS for IPv4 and IPv6. Packet loss applies to ICMP/UDP; other methods report failed network attempts. Pure-Go SQLite retains recent raw batches and exact timing samples in older 30-minute chunks, with 30-day default retention and a 4 GiB main-file limit. Capacity errors are visible rather than silently evicting unexpired history. The UI provides 1h, 24h, 7d and 30d history windows. Use `--collect=false` to inspect saved data without probing.
 
 ## Initial milestones
 

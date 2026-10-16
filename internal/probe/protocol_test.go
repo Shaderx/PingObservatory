@@ -379,3 +379,17 @@ func TestLocalErrorsAfterSendHaveNoInventedLoss(t *testing.T) {
 		}
 	}
 }
+
+func TestCatalogueAndNativePublicDestinationBoundaryAgree(t *testing.T) {
+	for _, text := range []string{"1.1.1.1", "2606:4700:4700::1111", "100.64.0.1", "192.0.2.1", "2001:db8::1", "127.0.0.1", "fe80::1"} {
+		addr := netip.MustParseAddr(text)
+		family := model.FamilyIPv6
+		if addr.Is4() {
+			family = model.FamilyIPv4
+		}
+		pinned, err := pinTargetAddress(context.Background(), text, family, nil, true)
+		if got := err == nil && pinned.IsValid(); got != model.PublicUnicast(addr) {
+			t.Fatalf("catalogue/native boundary differs for %s", text)
+		}
+	}
+}

@@ -249,7 +249,7 @@ func validateEvidence(t model.Target, family string, e model.Verification, publi
 }
 
 func publicAddress(ip netip.Addr) bool {
-	return ip.IsValid() && ip.Zone() == "" && !ip.Is4In6() && ip.IsGlobalUnicast() && !ip.IsPrivate() && !ip.IsLoopback() && !ip.IsLinkLocalUnicast()
+	return model.PublicUnicast(ip)
 }
 func validateHostV2(host string) error {
 	if ip, err := netip.ParseAddr(host); err == nil {

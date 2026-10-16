@@ -10,7 +10,7 @@ The embedded frontend uses the following third-party components. Their licence t
 | Natural Earth world geometry | 1:110 million | Public domain |
 | world-atlas geometry distribution | 2.0.2 | ISC |
 | Go standard library | Build toolchain version | BSD-3-Clause |
-| bbolt | 1.4.3 | MIT |
+| modernc.org/sqlite and compiled native dependencies | See go.mod and embedded notices | Individual licences in go-dependencies.txt |
 | golang.org/x/sys | See go.sum | BSD-3-Clause |
 
 Complete dependency licence and notice texts are bundled in [THIRD-PARTY-NOTICES.txt](../internal/web/frontend/public/THIRD-PARTY-NOTICES.txt), and the map terms are in [maps/LICENSE.txt](../internal/web/frontend/public/maps/LICENSE.txt). Both are available from the local web UI. Fonts come from the device; no font assets are downloaded.
