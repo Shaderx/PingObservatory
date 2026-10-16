@@ -1,0 +1,2407 @@
+{
+  "schema_version": 1,
+  "catalogue_version": 2,
+  "exported_at": "2026-10-16T19:34:13.865662Z",
+  "scope": "Historical ICMP/IPv4 endpoint success only; no current or desktop reachability guarantee.",
+  "records": [
+    {
+      "target_id": "mudfish-node-157",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "47.254.232.31",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "47.254.232.31",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-85",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "43.216.105.84",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "43.216.105.84",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-146",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "103.91.67.60",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "103.91.67.60",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-139",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "128.199.131.158",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "128.199.131.158",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-637",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "51.79.220.143",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "51.79.220.143",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-507",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "35.198.195.18",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "35.198.195.18",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-241",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "47.89.27.152",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "47.89.27.152",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-314",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "45.124.65.37",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "45.124.65.37",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-272",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "34.92.69.88",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "34.92.69.88",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-300",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "104.198.127.37",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "104.198.127.37",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-598",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "180.149.230.26",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "180.149.230.26",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-358",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "45.76.51.107",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "45.76.51.107",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-576",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "43.212.116.195",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "43.212.116.195",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-591",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "35.236.137.214",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "35.236.137.214",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-378",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "103.150.37.205",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "103.150.37.205",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-122",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "43.208.23.43",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "43.208.23.43",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-44",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "159.138.237.46",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "159.138.237.46",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-356",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "103.13.231.128",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "103.13.231.128",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-125",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "108.136.240.24",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "108.136.240.24",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-257",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "34.101.80.192",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "34.101.80.192",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-501",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "119.235.251.86",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "119.235.251.86",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-564",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "203.29.241.56",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "203.29.241.56",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-127",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "203.17.177.156",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "203.17.177.156",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-597",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "45.248.78.97",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "45.248.78.97",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-436",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "3.110.186.98",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "3.110.186.98",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-581",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "35.200.192.240",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "35.200.192.240",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-542",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "65.20.72.42",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "65.20.72.42",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-418",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "47.88.170.34",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "47.88.170.34",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-600",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "54.169.45.221",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "54.169.45.221",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-514",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "52.187.125.220",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "52.187.125.220",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-481",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "116.251.223.179",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "116.251.223.179",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-312",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "139.162.17.221",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "139.162.17.221",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-297",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "45.32.119.108",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "45.32.119.108",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-10",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "13.75.41.5",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "13.75.41.5",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-396",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "124.156.158.246",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "124.156.158.246",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-504",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "13.208.184.0",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "13.208.184.0",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-676",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "172.233.67.67",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "172.233.67.67",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-258",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "14.63.196.113",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "14.63.196.113",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-615",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "58.228.131.31",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "58.228.131.31",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-531",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "45.150.242.190",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "45.150.242.190",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-14",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "103.59.110.154",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "103.59.110.154",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-492",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "150.109.184.58",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "150.109.184.58",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-644",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "147.139.184.12",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "147.139.184.12",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-194",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "45.114.118.94",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "45.114.118.94",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-663",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "8.212.145.172",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "8.212.145.172",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-673",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "103.56.4.229",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "103.56.4.229",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-108",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "125.212.218.98",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "125.212.218.98",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-341",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "103.126.161.146",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "103.126.161.146",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-234",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "35.236.59.23",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "35.236.59.23",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-103",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "216.189.149.173",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "216.189.149.173",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-585",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "66.228.49.252",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "66.228.49.252",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-558",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "45.32.202.82",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "45.32.202.82",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-34",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "192.241.188.38",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "192.241.188.38",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-510",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "92.38.169.164",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "92.38.169.164",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-327",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "99.79.39.19",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "99.79.39.19",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-307",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "149.56.100.202",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "149.56.100.202",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-225",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "54.94.153.234",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "54.94.153.234",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-351",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "5.188.238.86",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "5.188.238.86",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-216",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "38.54.45.223",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "38.54.45.223",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-71",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "168.205.92.109",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "168.205.92.109",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-182",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "119.8.148.31",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "119.8.148.31",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-84",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "46.101.28.83",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "46.101.28.83",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-90",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "34.147.200.156",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "34.147.200.156",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-209",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "52.28.104.3",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "52.28.104.3",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-174",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "185.17.144.91",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "185.17.144.91",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-27",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "188.226.227.6",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "188.226.227.6",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-400",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "153.92.127.77",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "153.92.127.77",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-643",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "35.180.135.101",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "35.180.135.101",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-128",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "5.188.70.78",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "5.188.70.78",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-210",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "102.133.146.185",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "102.133.146.185",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-190",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "139.84.230.2",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "139.84.230.2",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-421",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "47.91.122.48",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "47.91.122.48",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-271",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "147.78.0.106",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "147.78.0.106",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-294",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "43.229.63.134",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "43.229.63.134",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-22",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "139.99.171.211",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "139.99.171.211",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-328",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "163.47.21.37",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "163.47.21.37",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-140",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "52.79.45.118",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "52.79.45.118",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-635",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "52.141.57.79",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "52.141.57.79",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-246",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "34.22.88.69",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "34.22.88.69",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-582",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "35.189.53.113",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "35.189.53.113",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-3",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "52.8.135.54",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "52.8.135.54",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-266",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "52.34.219.179",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "52.34.219.179",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-292",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "13.75.214.88",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "13.75.214.88",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-40",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "52.170.114.205",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "52.170.114.205",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-287",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "20.233.42.17",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "20.233.42.17",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-105",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "191.234.191.4",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "191.234.191.4",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-409",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "35.199.78.97",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "35.199.78.97",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-243",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "35.203.66.136",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "35.203.66.136",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-575",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "51.116.177.233",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "51.116.177.233",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-185",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "35.198.121.229",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "35.198.121.229",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-121",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "18.166.77.234",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "18.166.77.234",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-330",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "104.211.165.134",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "104.211.165.134",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-165",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "13.73.234.162",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "13.73.234.162",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-124",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "34.97.21.27",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "34.97.21.27",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-253",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "52.185.166.150",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "52.185.166.150",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-383",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "168.63.103.13",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "168.63.103.13",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-213",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "34.90.245.67",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "34.90.245.67",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-62",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "13.85.40.35",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "13.85.40.35",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-37",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "34.86.45.4",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "34.86.45.4",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-15",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "13.64.199.156",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "13.64.199.156",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-76",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "104.198.1.215",
+      "observed_at": "2026-10-09T10:12:02.307267045Z",
+      "source_url": "https://lg.pwnation.net/data/v1/generations/g-1791540828176961371/overview.json",
+      "basis": "literal_definition_and_contemporaneous_success",
+      "configured_literal": "104.198.1.215",
+      "source_observation": {
+        "method": "icmp",
+        "family": "ipv4",
+        "status": "ok",
+        "batch_started_at": "2026-10-09T10:11:54.420585514Z",
+        "observed_at": "2026-10-09T10:12:02.307267045Z",
+        "batch_sent": 3,
+        "batch_received": 3
+      }
+    },
+    {
+      "target_id": "mudfish-node-640",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "13.246.46.85",
+      "observed_at": "2026-10-09T10:30:13.139616+00:00",
+      "definition_source_url": "https://mudfish.net/api/staticnodes",
+      "basis": "saved_numeric_destination_and_success",
+      "validation_rounds": [
+        {
+          "destination": "13.246.46.85",
+          "started_at": "2026-10-09T10:27:52.558032+00:00",
+          "observed_at": "2026-10-09T10:27:56.893060+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "13.246.46.85",
+          "started_at": "2026-10-09T10:28:59.785422+00:00",
+          "observed_at": "2026-10-09T10:29:04.120296+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "13.246.46.85",
+          "started_at": "2026-10-09T10:30:08.806370+00:00",
+          "observed_at": "2026-10-09T10:30:13.139616+00:00",
+          "sent": 3,
+          "received": 3
+        }
+      ]
+    },
+    {
+      "target_id": "mudfish-node-322",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "34.18.43.176",
+      "observed_at": "2026-10-09T10:30:17.283156+00:00",
+      "definition_source_url": "https://mudfish.net/api/staticnodes",
+      "basis": "saved_numeric_destination_and_success",
+      "validation_rounds": [
+        {
+          "destination": "34.18.43.176",
+          "started_at": "2026-10-09T10:27:56.893205+00:00",
+          "observed_at": "2026-10-09T10:28:01.039734+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "34.18.43.176",
+          "started_at": "2026-10-09T10:29:04.120418+00:00",
+          "observed_at": "2026-10-09T10:29:08.265922+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "34.18.43.176",
+          "started_at": "2026-10-09T10:30:13.139807+00:00",
+          "observed_at": "2026-10-09T10:30:17.283156+00:00",
+          "sent": 3,
+          "received": 3
+        }
+      ]
+    },
+    {
+      "target_id": "mudfish-node-191",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "34.131.168.67",
+      "observed_at": "2026-10-09T10:30:21.405311+00:00",
+      "definition_source_url": "https://mudfish.net/api/staticnodes",
+      "basis": "saved_numeric_destination_and_success",
+      "validation_rounds": [
+        {
+          "destination": "34.131.168.67",
+          "started_at": "2026-10-09T10:28:01.040342+00:00",
+          "observed_at": "2026-10-09T10:28:05.155292+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "34.131.168.67",
+          "started_at": "2026-10-09T10:29:08.266067+00:00",
+          "observed_at": "2026-10-09T10:29:12.380817+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "34.131.168.67",
+          "started_at": "2026-10-09T10:30:17.283290+00:00",
+          "observed_at": "2026-10-09T10:30:21.405311+00:00",
+          "sent": 3,
+          "received": 3
+        }
+      ]
+    },
+    {
+      "target_id": "mudfish-node-365",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "78.12.154.242",
+      "observed_at": "2026-10-09T10:30:25.654500+00:00",
+      "definition_source_url": "https://mudfish.net/api/staticnodes",
+      "basis": "saved_numeric_destination_and_success",
+      "validation_rounds": [
+        {
+          "destination": "78.12.154.242",
+          "started_at": "2026-10-09T10:28:05.155428+00:00",
+          "observed_at": "2026-10-09T10:28:09.404212+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "78.12.154.242",
+          "started_at": "2026-10-09T10:29:12.380962+00:00",
+          "observed_at": "2026-10-09T10:29:16.634271+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "78.12.154.242",
+          "started_at": "2026-10-09T10:30:21.405435+00:00",
+          "observed_at": "2026-10-09T10:30:25.654500+00:00",
+          "sent": 3,
+          "received": 3
+        }
+      ]
+    },
+    {
+      "target_id": "mudfish-node-30",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "34.252.169.48",
+      "observed_at": "2026-10-09T10:30:29.848289+00:00",
+      "definition_source_url": "https://mudfish.net/api/staticnodes",
+      "basis": "saved_numeric_destination_and_success",
+      "validation_rounds": [
+        {
+          "destination": "34.252.169.48",
+          "started_at": "2026-10-09T10:28:09.404344+00:00",
+          "observed_at": "2026-10-09T10:28:13.600226+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "34.252.169.48",
+          "started_at": "2026-10-09T10:29:16.634336+00:00",
+          "observed_at": "2026-10-09T10:29:20.831058+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "34.252.169.48",
+          "started_at": "2026-10-09T10:30:25.654626+00:00",
+          "observed_at": "2026-10-09T10:30:29.848289+00:00",
+          "sent": 3,
+          "received": 3
+        }
+      ]
+    },
+    {
+      "target_id": "mudfish-node-440",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "18.60.87.24",
+      "observed_at": "2026-10-09T10:30:33.928346+00:00",
+      "definition_source_url": "https://mudfish.net/api/staticnodes",
+      "basis": "saved_numeric_destination_and_success",
+      "validation_rounds": [
+        {
+          "destination": "18.60.87.24",
+          "started_at": "2026-10-09T10:28:13.600346+00:00",
+          "observed_at": "2026-10-09T10:28:17.675782+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "18.60.87.24",
+          "started_at": "2026-10-09T10:29:20.831186+00:00",
+          "observed_at": "2026-10-09T10:29:24.908768+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "18.60.87.24",
+          "started_at": "2026-10-09T10:30:29.848479+00:00",
+          "observed_at": "2026-10-09T10:30:33.928346+00:00",
+          "sent": 3,
+          "received": 3
+        }
+      ]
+    },
+    {
+      "target_id": "mudfish-node-662",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "16.63.27.187",
+      "observed_at": "2026-10-09T10:30:38.133688+00:00",
+      "definition_source_url": "https://mudfish.net/api/staticnodes",
+      "basis": "saved_numeric_destination_and_success",
+      "validation_rounds": [
+        {
+          "destination": "16.63.27.187",
+          "started_at": "2026-10-09T10:28:17.675916+00:00",
+          "observed_at": "2026-10-09T10:28:21.884375+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "16.63.27.187",
+          "started_at": "2026-10-09T10:29:24.908915+00:00",
+          "observed_at": "2026-10-09T10:29:29.115141+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "16.63.27.187",
+          "started_at": "2026-10-09T10:30:33.928543+00:00",
+          "observed_at": "2026-10-09T10:30:38.133688+00:00",
+          "sent": 3,
+          "received": 3
+        }
+      ]
+    },
+    {
+      "target_id": "mudfish-node-350",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "16.50.103.34",
+      "observed_at": "2026-10-09T10:30:46.534598+00:00",
+      "definition_source_url": "https://mudfish.net/api/staticnodes",
+      "basis": "saved_numeric_destination_and_success",
+      "validation_rounds": [
+        {
+          "destination": "16.50.103.34",
+          "started_at": "2026-10-09T10:28:26.094378+00:00",
+          "observed_at": "2026-10-09T10:28:30.292007+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "16.50.103.34",
+          "started_at": "2026-10-09T10:29:35.121496+00:00",
+          "observed_at": "2026-10-09T10:29:39.316565+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "16.50.103.34",
+          "started_at": "2026-10-09T10:30:42.341308+00:00",
+          "observed_at": "2026-10-09T10:30:46.534598+00:00",
+          "sent": 3,
+          "received": 3
+        }
+      ]
+    },
+    {
+      "target_id": "mudfish-node-464",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "15.216.47.205",
+      "observed_at": "2026-10-09T10:30:50.745296+00:00",
+      "definition_source_url": "https://mudfish.net/api/staticnodes",
+      "basis": "saved_numeric_destination_and_success",
+      "validation_rounds": [
+        {
+          "destination": "15.216.47.205",
+          "started_at": "2026-10-09T10:28:30.292184+00:00",
+          "observed_at": "2026-10-09T10:28:34.503492+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "15.216.47.205",
+          "started_at": "2026-10-09T10:29:39.316746+00:00",
+          "observed_at": "2026-10-09T10:29:43.522479+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "15.216.47.205",
+          "started_at": "2026-10-09T10:30:46.535711+00:00",
+          "observed_at": "2026-10-09T10:30:50.745296+00:00",
+          "sent": 3,
+          "received": 3
+        }
+      ]
+    },
+    {
+      "target_id": "mudfish-node-289",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "35.152.90.160",
+      "observed_at": "2026-10-09T10:30:54.962481+00:00",
+      "definition_source_url": "https://mudfish.net/api/staticnodes",
+      "basis": "saved_numeric_destination_and_success",
+      "validation_rounds": [
+        {
+          "destination": "35.152.90.160",
+          "started_at": "2026-10-09T10:28:34.503627+00:00",
+          "observed_at": "2026-10-09T10:28:38.719543+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "35.152.90.160",
+          "started_at": "2026-10-09T10:29:43.522621+00:00",
+          "observed_at": "2026-10-09T10:29:47.741803+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "35.152.90.160",
+          "started_at": "2026-10-09T10:30:50.745433+00:00",
+          "observed_at": "2026-10-09T10:30:54.962481+00:00",
+          "sent": 3,
+          "received": 3
+        }
+      ]
+    },
+    {
+      "target_id": "mudfish-node-321",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "34.73.192.22",
+      "observed_at": "2026-10-09T10:30:59.225729+00:00",
+      "definition_source_url": "https://mudfish.net/api/staticnodes",
+      "basis": "saved_numeric_destination_and_success",
+      "validation_rounds": [
+        {
+          "destination": "34.73.192.22",
+          "started_at": "2026-10-09T10:28:38.719723+00:00",
+          "observed_at": "2026-10-09T10:28:42.984582+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "34.73.192.22",
+          "started_at": "2026-10-09T10:29:47.741989+00:00",
+          "observed_at": "2026-10-09T10:29:52.016428+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "34.73.192.22",
+          "started_at": "2026-10-09T10:30:54.962614+00:00",
+          "observed_at": "2026-10-09T10:30:59.225729+00:00",
+          "sent": 3,
+          "received": 3
+        }
+      ]
+    },
+    {
+      "target_id": "mudfish-node-302",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "35.187.161.32",
+      "observed_at": "2026-10-09T10:31:03.445151+00:00",
+      "definition_source_url": "https://mudfish.net/api/staticnodes",
+      "basis": "saved_numeric_destination_and_success",
+      "validation_rounds": [
+        {
+          "destination": "35.187.161.32",
+          "started_at": "2026-10-09T10:28:42.984772+00:00",
+          "observed_at": "2026-10-09T10:28:47.197926+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "35.187.161.32",
+          "started_at": "2026-10-09T10:29:52.018803+00:00",
+          "observed_at": "2026-10-09T10:29:56.226056+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "35.187.161.32",
+          "started_at": "2026-10-09T10:30:59.225858+00:00",
+          "observed_at": "2026-10-09T10:31:03.445151+00:00",
+          "sent": 3,
+          "received": 3
+        }
+      ]
+    },
+    {
+      "target_id": "mudfish-node-323",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "34.116.170.199",
+      "observed_at": "2026-10-09T10:31:07.675991+00:00",
+      "definition_source_url": "https://mudfish.net/api/staticnodes",
+      "basis": "saved_numeric_destination_and_success",
+      "validation_rounds": [
+        {
+          "destination": "34.116.170.199",
+          "started_at": "2026-10-09T10:28:47.198054+00:00",
+          "observed_at": "2026-10-09T10:28:51.425310+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "34.116.170.199",
+          "started_at": "2026-10-09T10:29:56.226180+00:00",
+          "observed_at": "2026-10-09T10:30:00.443145+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "34.116.170.199",
+          "started_at": "2026-10-09T10:31:03.445280+00:00",
+          "observed_at": "2026-10-09T10:31:07.675991+00:00",
+          "sent": 3,
+          "received": 3
+        }
+      ]
+    },
+    {
+      "target_id": "mudfish-node-267",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "3.104.65.18",
+      "observed_at": "2026-10-09T10:31:11.937941+00:00",
+      "definition_source_url": "https://mudfish.net/api/staticnodes",
+      "basis": "saved_numeric_destination_and_success",
+      "validation_rounds": [
+        {
+          "destination": "3.104.65.18",
+          "started_at": "2026-10-09T10:28:51.425453+00:00",
+          "observed_at": "2026-10-09T10:28:55.686228+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "3.104.65.18",
+          "started_at": "2026-10-09T10:30:00.443270+00:00",
+          "observed_at": "2026-10-09T10:30:04.704796+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "3.104.65.18",
+          "started_at": "2026-10-09T10:31:07.676115+00:00",
+          "observed_at": "2026-10-09T10:31:11.937941+00:00",
+          "sent": 3,
+          "received": 3
+        }
+      ]
+    },
+    {
+      "target_id": "mudfish-node-362",
+      "method": "icmp",
+      "family": "ipv4",
+      "destination": "13.112.189.146",
+      "observed_at": "2026-10-09T10:31:16.039982+00:00",
+      "definition_source_url": "https://mudfish.net/api/staticnodes",
+      "basis": "saved_numeric_destination_and_success",
+      "validation_rounds": [
+        {
+          "destination": "13.112.189.146",
+          "started_at": "2026-10-09T10:28:55.686351+00:00",
+          "observed_at": "2026-10-09T10:28:59.785283+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "13.112.189.146",
+          "started_at": "2026-10-09T10:30:04.705879+00:00",
+          "observed_at": "2026-10-09T10:30:08.806282+00:00",
+          "sent": 3,
+          "received": 3
+        },
+        {
+          "destination": "13.112.189.146",
+          "started_at": "2026-10-09T10:31:11.938083+00:00",
+          "observed_at": "2026-10-09T10:31:16.039982+00:00",
+          "sent": 3,
+          "received": 3
+        }
+      ]
+    }
+  ]
+}
