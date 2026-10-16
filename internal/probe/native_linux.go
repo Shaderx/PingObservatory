@@ -17,6 +17,10 @@ import (
 )
 
 func nativeProbe(ctx context.Context, addr netip.Addr) model.Measurement {
+	return nativeProbePayload(ctx, addr, 32)
+}
+
+func nativeProbePayload(ctx context.Context, addr netip.Addr, payloadBytes int) model.Measurement {
 	// Prefer an unprivileged Linux ping socket. If the existing group policy
 	// denies it, try a raw socket using only privileges already held by this
 	// process. Do not elevate, change capabilities, or modify host policy.
@@ -51,7 +55,10 @@ func nativeProbe(ctx context.Context, addr netip.Addr) model.Measurement {
 	if err := syscall.SetsockoptInt(fd, syscall.IPPROTO_IP, syscall.IP_RECVERR, 1); err != nil {
 		return linuxFailure(err)
 	}
-	nonce := make([]byte, 16)
+	if payloadBytes < 16 || payloadBytes > 300 {
+		return failure(model.StatusUnsupported, "ICMP payload must be 16..300 bytes")
+	}
+	nonce := make([]byte, payloadBytes)
 	if _, err := rand.Read(nonce); err != nil {
 		return failure(model.StatusError, "could not create ICMP request token")
 	}
@@ -90,7 +97,7 @@ func nativeProbe(ctx context.Context, addr netip.Addr) model.Measurement {
 	for {
 		n, err := f.Read(buffer)
 		if err != nil {
-			return linuxFailure(err)
+			return icmpAfterSend(linuxFailure(err))
 		}
 		packet := buffer[:n]
 		if raw {
@@ -98,11 +105,11 @@ func nativeProbe(ctx context.Context, addr netip.Addr) model.Measurement {
 		}
 		if matchesEchoReply(packet, identifier, 1, nonce) {
 			latency := float64(time.Since(started)) / float64(time.Millisecond)
-			return model.Measurement{Status: model.StatusOK, LatencyMS: &latency}
+			return model.Measurement{Status: model.StatusOK, LatencyMS: &latency, Sent: 1, Received: 1, HasObservation: true}
 		}
 		// Unrelated or malformed packets do not reset the absolute deadline.
 		if ctx.Err() != nil {
-			return failure(model.StatusTimeout, "ICMP reply deadline reached")
+			return icmpAfterSend(failure(model.StatusTimeout, "ICMP reply deadline reached"))
 		}
 	}
 }

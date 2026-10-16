@@ -30,7 +30,7 @@ export function freshCompletedAt(value: string | null, now: number): number | un
 }
 
 function canAnimate(target: Target, status: string) {
-  return target.enabled && status !== 'na' && status !== 'unsupported';
+  return target.enabled && !['na', 'unsupported', 'unverified', 'disabled', 'unavailable', 'suspended'].includes(status);
 }
 
 export function acceptPublishedSnapshot(

@@ -19,14 +19,15 @@ import (
 )
 
 const (
-	MaxTargets        = 64
-	MaxCatalogueBytes = 256 * 1024
+	MaxTargets        = 512
+	MaxFamilySlots    = 1024
+	MaxCatalogueBytes = 4 * 1024 * 1024
 	// The embedded web UI uses JavaScript numbers for IDs and catalogue counters.
 	MaxSafeInteger uint64 = 9007199254740991
 	// VerificationSource identifies actual probes from the owner's homelab. It
 	// does not promise that an endpoint will reply from every user's network.
 	VerificationSource = "owner-homelab"
-	DefaultURL         = "https://raw.githubusercontent.com/Shaderx/PingObservatory/main/catalogue/v1.json"
+	DefaultURL         = "https://raw.githubusercontent.com/Shaderx/PingObservatory/main/catalogue/v2.json"
 )
 
 var (
@@ -86,6 +87,9 @@ func Decode(data []byte) (model.Catalogue, error) {
 // Validate checks the data contract. A target revision covers its entire record,
 // including verification metadata; any record change requires a new revision.
 func Validate(c model.Catalogue) error {
+	if c.SchemaVersion == 2 {
+		return validateV2(c)
+	}
 	if c.SchemaVersion != 1 {
 		return errors.New("unsupported catalogue schema_version")
 	}
@@ -217,6 +221,14 @@ func normalize(c *model.Catalogue) {
 			at := c.Targets[i].VerifiedAt.UTC()
 			c.Targets[i].VerifiedAt = &at
 		}
+		for family, admission := range c.Targets[i].Admission {
+			if admission.Evidence != nil {
+				evidence := *admission.Evidence
+				evidence.ObservedAt = evidence.ObservedAt.UTC()
+				admission.Evidence = &evidence
+				c.Targets[i].Admission[family] = admission
+			}
+		}
 	}
 }
 
@@ -295,16 +307,28 @@ func requireCatalogueFields(data []byte) error {
 			return fmt.Errorf("missing catalogue field %q", key)
 		}
 	}
-	return requireTargetFields(root["targets"])
+	var schema int
+	if err := json.Unmarshal(root["schema_version"], &schema); err != nil {
+		return err
+	}
+	return requireTargetFieldsForSchema(root["targets"], schema)
 }
 
 func requireTargetFields(data []byte) error {
+	return requireTargetFieldsForSchema(data, 1)
+}
+
+func requireTargetFieldsForSchema(data []byte, schema int) error {
 	var targets []map[string]json.RawMessage
 	if err := json.Unmarshal(data, &targets); err != nil {
 		return err
 	}
 	for i, t := range targets {
-		for _, key := range []string{"id", "revision", "label", "host", "verified_at", "verification_source", "verification_method", "verification_family", "verification_destination"} {
+		keys := []string{"id", "revision", "label", "host", "verified_at", "verification_source", "verification_method", "verification_family", "verification_destination"}
+		if schema == 2 {
+			keys = []string{"id", "revision", "label", "host", "measurement", "admission"}
+		}
+		for _, key := range keys {
 			if _, ok := t[key]; !ok {
 				return fmt.Errorf("target %d missing field %q", i, key)
 			}

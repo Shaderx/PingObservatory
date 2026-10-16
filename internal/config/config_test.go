@@ -24,12 +24,12 @@ func TestConfigRoundTripAndHostValidation(t *testing.T) {
 	if err != nil || len(c.ManualTargets) != 1 || c.Origin.Latitude != 10 {
 		t.Fatalf("round trip: %+v %v", c, err)
 	}
-	for _, host := range []string{"127.0.0.1", "example.com", "one.example.test"} {
+	for _, host := range []string{"127.0.0.1", "::1", "example.com", "one.example.test"} {
 		if !ValidHost(host) {
 			t.Fatalf("valid host rejected %q", host)
 		}
 	}
-	for _, host := range []string{"", "::1", "https://example.com", "x;run", "-invalid.test", "foo..test", "a/b", "x\n"} {
+	for _, host := range []string{"", "0.0.0.0", "https://example.com", "x;run", "-invalid.test", "foo..test", "a/b", "x\n"} {
 		if ValidHost(host) {
 			t.Fatalf("invalid host accepted %q", host)
 		}

@@ -12,8 +12,8 @@ export function createHistoryChartOption(histories: History[], labels: string[],
   const light = theme === 'light';
   const reducedMotion = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
   const long = histories.some(history => historyWindows[history.window].long);
-  const starts = histories.map(history => Date.parse(history.points[0]?.at ?? ''));
-  const ends = histories.map(history => Date.parse(history.points.at(-1)?.at ?? ''));
+  const starts = histories.map(history => Date.parse(history.start));
+  const ends = histories.map(history => Date.parse(history.end));
   return {
     animation: !reducedMotion,
     color: light ? ['#507a09', '#177e9a', '#9552a0', '#a36917'] : colors,

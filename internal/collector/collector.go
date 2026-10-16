@@ -10,20 +10,67 @@ import (
 )
 
 type Status struct {
-	StartedAt    time.Time `json:"started_at"`
-	LastError    string    `json:"last_error,omitempty"`
-	ActiveProbes int       `json:"active_probes"`
+	StartedAt       time.Time `json:"started_at"`
+	LastError       string    `json:"last_error,omitempty"`
+	ActiveProbes    int       `json:"active_probes"`
+	SkippedSlots    int       `json:"skipped_slots"`
+	ScheduledSeries int       `json:"scheduled_series"`
+	MaxConcurrent   int       `json:"max_concurrent"`
+	Enabled         bool      `json:"enabled"`
+}
+
+type Job struct {
+	Target model.Target
+	Family string
+}
+
+func (j Job) Key() string {
+	return j.Target.ID + "/" + j.Family + "/" + model.Settings(j.Target).Method
 }
 
 type Collector struct {
-	Targets  func() []model.Target
-	Probe    func(context.Context, string, time.Duration) model.Measurement
-	Record   func(model.Measurement) error
-	Interval time.Duration
-	Timeout  time.Duration
-	Wake     chan struct{}
-	mu       sync.Mutex
-	status   Status
+	Targets     func() []model.Target
+	Probe       func(context.Context, string, time.Duration) model.Measurement
+	Jobs        func() []Job
+	ProbeTarget func(context.Context, model.Target, string) model.Measurement
+	Record      func(model.Measurement) error
+	Interval    time.Duration
+	Timeout     time.Duration
+	Wake        chan struct{}
+	mu          sync.Mutex
+	status      Status
+}
+
+func NextJob(now time.Time, jobs []Job, interval time.Duration) (Job, time.Time, bool) {
+	if len(jobs) == 0 || interval <= 0 {
+		return Job{}, time.Time{}, false
+	}
+	jobs = append([]Job(nil), jobs...)
+	sort.Slice(jobs, func(i, j int) bool { return jobs[i].Key() < jobs[j].Key() })
+	n := now.UnixNano()
+	base := n - n%int64(interval)
+	for i, j := range jobs {
+		slot := base + int64(interval)*int64(i)/int64(len(jobs))
+		if slot > n {
+			return j, time.Unix(0, slot), true
+		}
+	}
+	return jobs[0], time.Unix(0, base+int64(interval)), true
+}
+
+func (c *Collector) jobs() []Job {
+	if c.Jobs != nil {
+		return c.Jobs()
+	}
+	var jobs []Job
+	if c.Targets != nil {
+		for _, t := range c.Targets() {
+			for _, f := range model.Settings(t).Families {
+				jobs = append(jobs, Job{t, f})
+			}
+		}
+	}
+	return jobs
 }
 
 func (c *Collector) Snapshot() Status  { c.mu.Lock(); defer c.mu.Unlock(); return c.status }
@@ -59,13 +106,23 @@ func (c *Collector) Run(ctx context.Context) {
 	}
 	c.mu.Lock()
 	c.status.StartedAt = time.Now().UTC()
+	c.status.Enabled = true
 	c.mu.Unlock()
-	sem := make(chan struct{}, 4)
+	defer func() { c.mu.Lock(); c.status.Enabled = false; c.mu.Unlock() }()
+	const maxConcurrent = 64
+	sem := make(chan struct{}, maxConcurrent)
 	var workers sync.WaitGroup
 	defer workers.Wait()
 	last := map[string]int64{}
+	running := map[string]bool{}
+	var runningMu sync.Mutex
 	for {
-		t, due, ok := Next(time.Now(), c.Targets(), interval)
+		jobs := c.jobs()
+		c.mu.Lock()
+		c.status.ScheduledSeries = len(jobs)
+		c.status.MaxConcurrent = maxConcurrent
+		c.mu.Unlock()
+		job, due, ok := NextJob(time.Now(), jobs, interval)
 		if !ok {
 			select {
 			case <-ctx.Done():
@@ -91,38 +148,73 @@ func (c *Collector) Run(ctx context.Context) {
 		if now.UnixNano()-due.UnixNano() > int64(2*time.Second) {
 			continue
 		}
-		key := t.ID
+		key := job.Key()
 		cycle := due.UnixNano() / int64(interval)
 		if last[key] >= cycle {
 			continue
 		}
-		if len(last) > 160 {
-			last = map[string]int64{}
+		if len(last) > 2048 {
+			active := map[string]bool{}
+			for _, j := range jobs {
+				active[j.Key()] = true
+			}
+			for k := range last {
+				if !active[k] {
+					delete(last, k)
+				}
+			}
+		}
+		runningMu.Lock()
+		busy := running[key]
+		if !busy {
+			running[key] = true
+		}
+		runningMu.Unlock()
+		if busy {
+			c.mu.Lock()
+			c.status.SkippedSlots++
+			c.status.LastError = "previous batch is still active; skipped slot is N/A"
+			c.mu.Unlock()
+			continue
 		}
 		select {
 		case sem <- struct{}{}:
 		default:
-			c.SetError("probe concurrency limit reached; skipped slot is N/A")
+			runningMu.Lock()
+			delete(running, key)
+			runningMu.Unlock()
+			c.mu.Lock()
+			c.status.SkippedSlots++
+			c.status.LastError = "probe capacity limit reached; skipped slot is N/A"
+			c.mu.Unlock()
 			continue
 		}
 		last[key] = cycle
 		workers.Add(1)
-		go func(t model.Target) {
+		go func(job Job, key string) {
 			defer workers.Done()
 			defer func() { <-sem }()
+			defer func() { runningMu.Lock(); delete(running, key); runningMu.Unlock() }()
 			c.mu.Lock()
 			c.status.ActiveProbes++
 			c.mu.Unlock()
 			defer func() { c.mu.Lock(); c.status.ActiveProbes--; c.mu.Unlock() }()
-			m := c.Probe(ctx, t.Host, timeout)
+			var m model.Measurement
+			if c.ProbeTarget != nil {
+				m = c.ProbeTarget(ctx, job.Target, job.Family)
+			} else {
+				m = c.Probe(ctx, job.Target.Host, timeout)
+			}
 			if ctx.Err() != nil || m.At.IsZero() {
 				return
 			}
-			m.TargetID = t.ID
-			m.TargetRevision = t.Revision
+			m.TargetID = job.Target.ID
+			m.TargetRevision = job.Target.Revision
+			m.Method = model.Settings(job.Target).Method
+			m.Family = job.Family
 			if err := c.Record(m); err != nil {
 				c.SetError(err.Error())
 			}
-		}(t)
+		}(job, key)
 	}
 }

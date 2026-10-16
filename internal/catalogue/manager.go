@@ -21,7 +21,7 @@ import (
 
 const (
 	maxIdentities = 4096
-	maxCacheBytes = 2 * 1024 * 1024
+	maxCacheBytes = 16 * 1024 * 1024
 	fetchTimeout  = 15 * time.Second
 )
 
@@ -79,7 +79,7 @@ func New(cachePath, url string) (*Manager, error) {
 	identities := state.identitiesMap()
 	for _, target := range c.Targets {
 		old, ok := identities[target.ID]
-		if !ok || old.Revision < target.Revision || (old.Revision == target.Revision && !reflect.DeepEqual(old, target)) {
+		if !ok || old.Revision < target.Revision || (old.Revision == target.Revision && !sameProbeDefinition(old, target)) {
 			m.lastError = "catalogue cache ignored: inconsistent starter identity"
 			return m, nil
 		}
@@ -115,7 +115,7 @@ func (m *Manager) SetURL(raw string) error {
 	return nil
 }
 
-// Refresh fetches at most 256 KiB with a 15-second deadline, validates the entire
+// Refresh fetches at most 4 MiB with a 15-second deadline, validates the entire
 // document and revision ledger, and replaces the cache before exposing new data.
 // Fetch failures leave the previous catalogue and its source unchanged.
 func (m *Manager) Refresh(ctx context.Context) (err error) {
@@ -204,6 +204,9 @@ func validateTransition(current model.Catalogue, identities map[string]model.Tar
 	if next.Version < current.Version {
 		return errors.New("catalogue version downgrade rejected")
 	}
+	if next.SchemaVersion < current.SchemaVersion {
+		return errors.New("catalogue schema downgrade rejected")
+	}
 	if next.Version == current.Version && !reflect.DeepEqual(next, current) {
 		return errors.New("catalogue version equivocation rejected")
 	}
@@ -215,7 +218,11 @@ func validateTransition(current model.Catalogue, identities map[string]model.Tar
 			if target.Revision < old.Revision {
 				return fmt.Errorf("target %q revision downgrade rejected", target.ID)
 			}
-			if target.Revision == old.Revision && !reflect.DeepEqual(target, old) {
+			unchanged := sameProbeDefinition(target, old)
+			if next.SchemaVersion == 1 {
+				unchanged = reflect.DeepEqual(target, old)
+			}
+			if target.Revision == old.Revision && !unchanged {
 				return fmt.Errorf("target %q changed without a new revision", target.ID)
 			}
 		}
@@ -265,12 +272,12 @@ func readCache(path string) (cacheState, error) {
 	if err := json.Unmarshal(data, &raw); err != nil {
 		return state, err
 	}
-	if err := requireTargetFields(raw.Identities); err != nil {
-		return state, fmt.Errorf("invalid cached identities: %w", err)
-	}
 	state.Catalogue, err = Decode(raw.Catalogue)
 	if err != nil {
 		return state, err
+	}
+	if err := requireTargetFieldsForSchema(raw.Identities, state.Catalogue.SchemaVersion); err != nil {
+		return state, fmt.Errorf("invalid cached identities: %w", err)
 	}
 	seen := make(map[string]model.Target, len(state.Identities))
 	for i, target := range state.Identities {
@@ -279,7 +286,15 @@ func readCache(path string) (cacheState, error) {
 			target.VerifiedAt = &at
 			state.Identities[i] = target
 		}
-		if err := validateTarget(target, state.Catalogue.PublishedAt); err != nil {
+		var err error
+		if state.Catalogue.SchemaVersion == 2 {
+			normalizeTarget(&target)
+			state.Identities[i] = target
+			err = validateTargetV2(target, state.Catalogue.PublishedAt)
+		} else {
+			err = validateTarget(target, state.Catalogue.PublishedAt)
+		}
+		if err != nil {
 			return state, err
 		}
 		if _, ok := seen[target.ID]; ok {
@@ -354,5 +369,46 @@ func cloneTarget(t model.Target) model.Target {
 		at := *t.VerifiedAt
 		t.VerifiedAt = &at
 	}
+	t.Tags = append([]string(nil), t.Tags...)
+	t.Measurement.Families = append([]string(nil), t.Measurement.Families...)
+	t.Measurement.ExpectedStatusCodes = append([]int(nil), t.Measurement.ExpectedStatusCodes...)
+	t.Measurement.DNSExpectedAnswers = append([]string(nil), t.Measurement.DNSExpectedAnswers...)
+	if t.Measurement.ProviderIPv6Support != nil {
+		support := *t.Measurement.ProviderIPv6Support
+		t.Measurement.ProviderIPv6Support = &support
+	}
+	if t.Admission != nil {
+		admissions := make(map[string]model.Admission, len(t.Admission))
+		for family, admission := range t.Admission {
+			if admission.Evidence != nil {
+				evidence := *admission.Evidence
+				admission.Evidence = &evidence
+			}
+			admissions[family] = admission
+		}
+		t.Admission = admissions
+	}
 	return t
+}
+
+// Revision tracks the intrinsic probe definition. A higher catalogue version
+// can refresh display metadata or per-family admission/evidence at the same
+// target revision without splitting the user's measurement history.
+func sameProbeDefinition(a, b model.Target) bool {
+	return a.Host == b.Host && a.Port == b.Port && a.Scheme == b.Scheme && a.Path == b.Path && reflect.DeepEqual(a.Measurement, b.Measurement)
+}
+
+func normalizeTarget(t *model.Target) {
+	if t.VerifiedAt != nil {
+		at := t.VerifiedAt.UTC()
+		t.VerifiedAt = &at
+	}
+	for family, admission := range t.Admission {
+		if admission.Evidence != nil {
+			evidence := *admission.Evidence
+			evidence.ObservedAt = evidence.ObservedAt.UTC()
+			admission.Evidence = &evidence
+			t.Admission[family] = admission
+		}
+	}
 }

@@ -1,9 +1,8 @@
-// Package storage keeps bounded, per-minute probe history in a local database.
+// Package storage stores local observations and lossless historical chunks.
 package storage
 
 import (
-	"bytes"
-	"encoding/binary"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -16,175 +15,130 @@ import (
 	"unicode/utf8"
 
 	"github.com/Shaderx/PingObservatory/internal/model"
-	bolt "go.etcd.io/bbolt"
+	_ "modernc.org/sqlite"
 )
 
 const (
-	DefaultRetentionDays       = 7
+	DefaultRetentionDays       = 30
 	MaxRetentionDays           = 30
 	MaxQueryBuckets            = 1440
-	MaxRows                    = 100000
-	MaxDatabaseBytes     int64 = 128 << 20
-	maxRecordBytes             = 4096
+	MaxDatabaseBytes     int64 = 4 << 30
+	RawRetention               = 26 * time.Hour
+	archiveBatch               = 64
+	maxSamples                 = 32
 )
 
 var (
 	ErrClosed        = errors.New("storage is closed")
 	ErrInvalid       = errors.New("invalid storage input")
 	ErrQueryTooLarge = errors.New("history query exceeds 1440 minute buckets")
-	rowsBucket       = []byte("measurements")
-	timeBucket       = []byte("by_minute")
-	latestBucket     = []byte("latest")
-	metaBucket       = []byte("meta")
-	countKey         = []byte("count")
-	schemaKey        = []byte("schema")
+	ErrCapacity      = errors.New("local storage capacity exhausted; retained history was not evicted")
 )
 
-type limits struct {
-	rows            uint64
-	diskBytes       int64
-	headroom        int64
-	compactMinBytes int64
-}
-
-// Store serializes writes and database compaction. No network access is used.
 type Store struct {
-	mu        sync.RWMutex
-	db        *bolt.DB
-	lock      *bolt.DB
-	path      string
-	retention time.Duration
-	now       func() time.Time
-	limits    limits
+	mu         sync.Mutex
+	db         *sql.DB
+	path       string
+	retention  time.Duration
+	now        func() time.Time
+	maintained time.Time
 }
 
-// Open creates the parent directory if needed. Zero retention selects seven
-// days; otherwise retention must be between one and thirty days. Only this
-// store's schema is accepted when a database already exists.
+// Open uses one connection, an exclusive SQLite profile lock, an 8 MiB page
+// cache, rollback journals, incremental vacuum and a 4 GiB main-file limit.
+// Existing bbolt files are never opened or migrated by this SQLite store.
 func Open(path string, retentionDays int) (*Store, error) {
-	return openStore(path, retentionDays, time.Now, limits{
-		rows: MaxRows, diskBytes: MaxDatabaseBytes, headroom: 4 << 20,
-		compactMinBytes: 4 << 20,
-	})
+	return openStore(path, retentionDays, time.Now)
 }
 
-func openStore(path string, retentionDays int, now func() time.Time, bound limits) (*Store, error) {
+func openStore(path string, retentionDays int, now func() time.Time) (*Store, error) {
 	if strings.TrimSpace(path) == "" {
-		return nil, fmt.Errorf("%w: database path is empty", ErrInvalid)
+		return nil, fmt.Errorf("%w: empty database path", ErrInvalid)
 	}
 	if retentionDays == 0 {
 		retentionDays = DefaultRetentionDays
 	}
-	if retentionDays < 1 || retentionDays > MaxRetentionDays {
+	if retentionDays < 1 || retentionDays > 30 {
 		return nil, fmt.Errorf("%w: retention must be 1..30 days", ErrInvalid)
 	}
-	if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {
-		return nil, fmt.Errorf("create database directory: %w", err)
-	}
-	// Keep this OS-managed lock through compaction, when the main DB must be
-	// closed for replacement. A crash releases the lock automatically.
-	guard, err := openDB(path + ".lock")
+	path, err := filepath.Abs(path)
 	if err != nil {
-		return nil, fmt.Errorf("lock database: %w", err)
-	}
-	opened := false
-	defer func() {
-		if !opened {
-			guard.Close()
-		}
-	}()
-	// If compaction stopped after moving the original aside, recover it. The
-	// previous file is deleted only after the current database opens correctly.
-	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
-		if _, previousErr := os.Stat(path + ".previous"); previousErr == nil {
-			if err := os.Rename(path+".previous", path); err != nil {
-				return nil, fmt.Errorf("recover database: %w", err)
-			}
-		}
-	}
-	info, statErr := os.Stat(path)
-	if statErr != nil && !errors.Is(statErr, os.ErrNotExist) {
-		return nil, statErr
-	}
-	fresh := errors.Is(statErr, os.ErrNotExist)
-	if info != nil && info.Size() > bound.diskBytes {
-		return nil, fmt.Errorf("database exceeds %d byte storage limit", bound.diskBytes)
-	}
-	db, err := openDB(path)
-	if err != nil {
-		return nil, fmt.Errorf("open database: %w", err)
-	}
-	s := &Store{db: db, lock: guard, path: path, retention: time.Duration(retentionDays) * 24 * time.Hour, now: now, limits: bound}
-	if err := db.Update(func(tx *bolt.Tx) error {
-		if !fresh {
-			meta := tx.Bucket(metaBucket)
-			if meta == nil || !bytes.Equal(meta.Get(schemaKey), []byte{1}) {
-				return errors.New("unsupported database schema")
-			}
-			for _, name := range [][]byte{rowsBucket, timeBucket, latestBucket} {
-				if tx.Bucket(name) == nil {
-					return errors.New("incomplete database schema")
-				}
-			}
-			_, err := rowCount(tx)
-			return err
-		}
-		for _, name := range [][]byte{rowsBucket, timeBucket, latestBucket, metaBucket} {
-			if _, err := tx.CreateBucket(name); err != nil {
-				return err
-			}
-		}
-		if err := tx.Bucket(metaBucket).Put(schemaKey, []byte{1}); err != nil {
-			return err
-		}
-		return setCount(tx, 0)
-	}); err != nil {
-		db.Close()
 		return nil, err
 	}
-	for _, suffix := range []string{".previous", ".compact"} {
-		if err := removeIfExists(path + suffix); err != nil {
-			db.Close()
-			return nil, fmt.Errorf("remove completed compaction file: %w", err)
-		}
-	}
-	if err := s.maintainLocked(); err != nil {
-		s.Close()
+	if err = os.MkdirAll(filepath.Dir(path), 0700); err != nil {
 		return nil, err
 	}
-	opened = true
+	if info, err := os.Stat(path); err == nil && info.Size() > MaxDatabaseBytes {
+		return nil, ErrCapacity
+	}
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		return nil, err
+	}
+	db.SetMaxOpenConns(1)
+	db.SetMaxIdleConns(1)
+	s := &Store{db: db, path: path, retention: time.Duration(retentionDays) * 24 * time.Hour, now: now}
+	fail := func(err error) (*Store, error) { db.Close(); return nil, err }
+	for _, pragma := range []string{
+		"PRAGMA busy_timeout=250", "PRAGMA page_size=4096", "PRAGMA auto_vacuum=INCREMENTAL",
+		"PRAGMA journal_mode=DELETE", "PRAGMA locking_mode=EXCLUSIVE", "PRAGMA synchronous=FULL",
+		"PRAGMA cache_size=-8192", "PRAGMA mmap_size=0", "PRAGMA temp_store=MEMORY",
+		"PRAGMA journal_size_limit=16777216", "PRAGMA max_page_count=1048576", "PRAGMA foreign_keys=ON",
+	} {
+		if _, err = db.Exec(pragma); err != nil {
+			return fail(err)
+		}
+	}
+	var schema int
+	if err = db.QueryRow("PRAGMA user_version").Scan(&schema); err != nil {
+		return fail(err)
+	}
+	if schema != 0 && schema != 2 {
+		return fail(errors.New("unsupported SQLite history schema"))
+	}
+	if schema == 0 {
+		var tables int
+		if err = db.QueryRow("SELECT count(*) FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").Scan(&tables); err != nil {
+			return fail(err)
+		}
+		if tables != 0 {
+			return fail(errors.New("unrelated SQLite database schema"))
+		}
+	}
+	// The write transaction establishes the exclusive OS lock for this profile;
+	// it remains held by the retained connection until Close, including vacuum.
+	if _, err = db.Exec(`BEGIN EXCLUSIVE;
+CREATE TABLE IF NOT EXISTS series(id INTEGER PRIMARY KEY,target TEXT NOT NULL,revision INTEGER NOT NULL,method TEXT NOT NULL,family TEXT NOT NULL,latest BLOB,latest_ns INTEGER,last_success_ns INTEGER,UNIQUE(target,revision,method,family));
+CREATE TABLE IF NOT EXISTS raw(series_id INTEGER NOT NULL REFERENCES series(id),minute INTEGER NOT NULL,data BLOB NOT NULL,PRIMARY KEY(series_id,minute)) WITHOUT ROWID;
+CREATE INDEX IF NOT EXISTS raw_age ON raw(minute);
+CREATE TABLE IF NOT EXISTS chunks(series_id INTEGER NOT NULL REFERENCES series(id),minute INTEGER NOT NULL,data BLOB NOT NULL,PRIMARY KEY(series_id,minute)) WITHOUT ROWID;
+CREATE INDEX IF NOT EXISTS chunks_age ON chunks(minute);
+PRAGMA user_version=2;
+COMMIT;`); err != nil {
+		return fail(capacityError(err))
+	}
+	if err = os.Chmod(path, 0600); err != nil {
+		return fail(err)
+	}
+	if err = s.maintainLocked(true); err != nil {
+		return fail(err)
+	}
 	return s, nil
 }
 
-func openDB(path string) (*bolt.DB, error) {
-	db, err := bolt.Open(path, 0600, &bolt.Options{Timeout: 250 * time.Millisecond})
-	if err == nil {
-		// Bound allocation increments as well as the live row count.
-		db.AllocSize = 1 << 20
-	}
-	return db, err
-}
-
-// Close is safe to call more than once.
 func (s *Store) Close() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	var err error
-	if s.db != nil {
-		err = s.db.Close()
-		s.db = nil
+	if s.db == nil {
+		return nil
 	}
-	if s.lock != nil {
-		err = errors.Join(err, s.lock.Close())
-		s.lock = nil
-	}
+	err := s.db.Close()
+	s.db = nil
 	return err
 }
 
-// SetRetention changes the live retention period and immediately prunes expired
-// rows. Increasing retention cannot restore previously discarded history.
 func (s *Store) SetRetention(days int) error {
-	if days < 1 || days > MaxRetentionDays {
+	if days < 1 || days > 30 {
 		return fmt.Errorf("%w: retention must be 1..30 days", ErrInvalid)
 	}
 	s.mu.Lock()
@@ -193,19 +147,15 @@ func (s *Store) SetRetention(days int) error {
 		return ErrClosed
 	}
 	s.retention = time.Duration(days) * 24 * time.Hour
-	return s.maintainLocked()
+	return s.maintainLocked(true)
 }
 
-// Add retains the newest attempted measurement in a target revision's minute.
-// Expired measurements are ignored, and absence is never written as a failure.
+// Add keeps the newest batch for each minute and exact series. It never infers
+// sent packets from a timeout or a local error, and never creates gap records.
 func (s *Store) Add(m model.Measurement) error {
-	if err := validateMeasurement(m); err != nil {
+	m = normalize(m)
+	if err := validate(m); err != nil {
 		return err
-	}
-	m.At = m.At.UTC()
-	value, err := json.Marshal(m)
-	if err != nil || len(value) > maxRecordBytes {
-		return fmt.Errorf("%w: measurement encoding is too large", ErrInvalid)
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -213,355 +163,357 @@ func (s *Store) Add(m model.Measurement) error {
 		return ErrClosed
 	}
 	if m.At.After(s.now().Add(5 * time.Minute)) {
-		return fmt.Errorf("%w: measurement is more than five minutes in the future", ErrInvalid)
+		return fmt.Errorf("%w: future measurement", ErrInvalid)
 	}
-	if err := s.maintainLocked(); err != nil {
+	if err := s.maintainLocked(false); err != nil {
 		return err
 	}
-	if m.At.Truncate(time.Minute).Before(s.cutoff()) {
+	if m.At.Before(s.now().Add(-s.retention)) {
 		return nil
 	}
-	series := seriesKey(m.TargetID, m.TargetRevision)
-	key := measurementKey(series, m.At)
-	err = s.db.Update(func(tx *bolt.Tx) error {
-		rows := tx.Bucket(rowsBucket)
-		count, err := rowCount(tx)
+	encoded, err := encodeMeasurement(m)
+	if err != nil {
+		return err
+	}
+	latest, err := json.Marshal(m)
+	if err != nil {
+		return err
+	}
+	if len(latest) > 16384 {
+		return fmt.Errorf("%w: detailed measurement exceeds16KiB", ErrInvalid)
+	}
+	tx, err := s.db.Begin()
+	if err != nil {
+		return capacityError(err)
+	}
+	defer tx.Rollback()
+	if _, err = tx.Exec("INSERT INTO series(target,revision,method,family) VALUES(?,?,?,?) ON CONFLICT DO NOTHING", m.TargetID, m.TargetRevision, m.Method, m.Family); err != nil {
+		return capacityError(err)
+	}
+	var id int64
+	if err = tx.QueryRow("SELECT id FROM series WHERE target=? AND revision=? AND method=? AND family=?", m.TargetID, m.TargetRevision, m.Method, m.Family).Scan(&id); err != nil {
+		return err
+	}
+	minute := m.At.Unix() / 60
+	if m.At.Before(s.now().Add(-RawRetention)) {
+		err = putChunk(tx, id, minute, m)
+	} else {
+		var old []byte
+		err = tx.QueryRow("SELECT data FROM raw WHERE series_id=? AND minute=?", id, minute).Scan(&old)
+		if err != nil && !errors.Is(err, sql.ErrNoRows) {
+			return err
+		}
+		if err == nil {
+			previous, e := decodeMeasurement(old)
+			if e != nil {
+				return e
+			}
+			if previous.At.After(m.At) {
+				return nil
+			}
+		}
+		_, err = tx.Exec("INSERT INTO raw(series_id,minute,data) VALUES(?,?,?) ON CONFLICT(series_id,minute) DO UPDATE SET data=excluded.data", id, minute, encoded)
+	}
+	if err != nil {
+		return capacityError(err)
+	}
+	_, err = tx.Exec("UPDATE series SET latest=?,latest_ns=? WHERE id=? AND (latest_ns IS NULL OR latest_ns<=?)", latest, m.At.UnixNano(), id, m.At.UnixNano())
+	if err != nil {
+		return capacityError(err)
+	}
+	for _, sample := range m.Samples {
+		if !m.Discarded && m.HasObservation {
+			_, err = tx.Exec("UPDATE series SET last_success_ns=? WHERE id=? AND (last_success_ns IS NULL OR last_success_ns<?)", sample.At.UnixNano(), id, sample.At.UnixNano())
+			if err != nil {
+				return capacityError(err)
+			}
+		}
+	}
+	return capacityError(tx.Commit())
+}
+
+func (s *Store) Latest() ([]model.Measurement, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.db == nil {
+		return nil, ErrClosed
+	}
+	rows, err := s.db.Query("SELECT latest FROM series WHERE latest_ns>=? ORDER BY target,revision,method,family", s.now().Add(-s.retention).UnixNano())
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := make([]model.Measurement, 0)
+	for rows.Next() {
+		var data []byte
+		if err = rows.Scan(&data); err != nil {
+			return nil, err
+		}
+		var m model.Measurement
+		if err = json.Unmarshal(data, &m); err != nil {
+			return nil, err
+		}
+		out = append(out, m)
+	}
+	return out, rows.Err()
+}
+
+func (s *Store) maintainLocked(force bool) error {
+	now := s.now().UTC()
+	if !force && now.Truncate(time.Minute).Equal(s.maintained) {
+		return nil
+	}
+	cutoff := now.Add(-s.retention)
+	// Move at most64 raw records per transaction. Each30-minute chunk contains
+	// at most30 original batches and is<=32KiB; journalling/memory is bounded
+	// independently of the number of targets or the length of a closed interval.
+	for {
+		rows, err := s.db.Query("SELECT series_id,minute,data FROM raw WHERE minute<? ORDER BY minute LIMIT 64", now.Add(-RawRetention).Unix()/60)
 		if err != nil {
 			return err
 		}
-		if previous := rows.Get(key); previous != nil {
-			var old model.Measurement
-			if err := json.Unmarshal(previous, &old); err != nil {
-				return fmt.Errorf("decode stored measurement: %w", err)
+		type entry struct {
+			id, minute int64
+			data       []byte
+		}
+		batch := make([]entry, 0, archiveBatch)
+		for rows.Next() {
+			var e entry
+			if err = rows.Scan(&e.id, &e.minute, &e.data); err != nil {
+				rows.Close()
+				return err
 			}
+			batch = append(batch, e)
+		}
+		err = rows.Err()
+		rows.Close()
+		if err != nil {
+			return err
+		}
+		if len(batch) == 0 {
+			break
+		}
+		tx, err := s.db.Begin()
+		if err != nil {
+			return err
+		}
+		for _, e := range batch {
+			m, decodeErr := decodeMeasurement(e.data)
+			if decodeErr != nil {
+				tx.Rollback()
+				return decodeErr
+			}
+			if !m.At.Before(cutoff) {
+				if err = putChunk(tx, e.id, e.minute, m); err != nil {
+					tx.Rollback()
+					return capacityError(err)
+				}
+			}
+			if _, err = tx.Exec("DELETE FROM raw WHERE series_id=? AND minute=?", e.id, e.minute); err != nil {
+				tx.Rollback()
+				return err
+			}
+		}
+		if err = tx.Commit(); err != nil {
+			return capacityError(err)
+		}
+	}
+	for _, statement := range []string{
+		"DELETE FROM raw WHERE (series_id,minute) IN (SELECT series_id,minute FROM raw WHERE minute<? LIMIT 64)",
+		"DELETE FROM chunks WHERE (series_id,minute) IN (SELECT series_id,minute FROM chunks WHERE minute<? LIMIT 64)",
+	} {
+		bound := cutoff.Unix() / 60
+		if strings.Contains(statement, "chunks") {
+			bound -= 30
+		} // reads filter boundary timestamps exactly
+		for {
+			result, err := s.db.Exec(statement, bound)
+			if err != nil {
+				return err
+			}
+			n, err := result.RowsAffected()
+			if err != nil {
+				return err
+			}
+			if n == 0 {
+				break
+			}
+		}
+	}
+	for {
+		result, err := s.db.Exec("DELETE FROM series WHERE id IN (SELECT id FROM series WHERE latest_ns<? AND NOT EXISTS(SELECT 1 FROM raw WHERE series_id=series.id) AND NOT EXISTS(SELECT 1 FROM chunks WHERE series_id=series.id) LIMIT 64)", cutoff.UnixNano())
+		if err != nil {
+			return err
+		}
+		n, _ := result.RowsAffected()
+		if n == 0 {
+			break
+		}
+	}
+	if _, err := s.db.Exec("PRAGMA incremental_vacuum(256)"); err != nil {
+		return err
+	}
+	s.maintained = now.Truncate(time.Minute)
+	return nil
+}
+
+func putChunk(tx *sql.Tx, id, minute int64, m model.Measurement) error {
+	start := minute / 30 * 30
+	var raw []byte
+	err := tx.QueryRow("SELECT data FROM chunks WHERE series_id=? AND minute=?", id, start).Scan(&raw)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return err
+	}
+	var records []model.Measurement
+	if err == nil {
+		records, err = decodeChunk(raw)
+		if err != nil {
+			return err
+		}
+	}
+	found := false
+	for i, old := range records {
+		if old.At.Unix()/60 == minute {
 			if old.At.After(m.At) {
 				return nil
 			}
-		} else {
-			count++
-		}
-		if err := rows.Put(key, value); err != nil {
-			return err
-		}
-		if err := tx.Bucket(timeBucket).Put(timeKey(key), []byte{}); err != nil {
-			return err
-		}
-		latest := tx.Bucket(latestBucket)
-		if previous := latest.Get(series); previous == nil || bytes.Compare(key, previous) >= 0 {
-			if err := latest.Put(series, key); err != nil {
-				return err
-			}
-		}
-		if err := setCount(tx, count); err != nil {
-			return err
-		}
-		_, err = s.prune(tx, s.limits.rows, s.cutoff())
-		return err
-	})
-	if err != nil {
-		return err
-	}
-	return s.boundDiskLocked()
-}
-
-// Buckets returns UTC minutes in [start,end), after truncating both endpoints to
-// the minute. It returns at most 1440 buckets. Unattempted minutes have status
-// "na" and a nil Measurement; an attempted failure keeps its original status.
-func (s *Store) Buckets(targetID string, revision uint64, start, end time.Time) ([]model.Bucket, error) {
-	if err := validateSeries(targetID, revision); err != nil {
-		return nil, err
-	}
-	if !validTime(start) || !validTime(end) || end.Before(start) {
-		return nil, fmt.Errorf("%w: invalid history interval", ErrInvalid)
-	}
-	start, end = start.UTC().Truncate(time.Minute), end.UTC().Truncate(time.Minute)
-	if end.After(start.Add(MaxQueryBuckets * time.Minute)) {
-		return nil, ErrQueryTooLarge
-	}
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	if s.db == nil {
-		return nil, ErrClosed
-	}
-	result := make([]model.Bucket, 0, int(end.Sub(start)/time.Minute))
-	series, cutoff := seriesKey(targetID, revision), s.cutoff()
-	err := s.db.View(func(tx *bolt.Tx) error {
-		rows := tx.Bucket(rowsBucket)
-		for minute := start; minute.Before(end); minute = minute.Add(time.Minute) {
-			bucket := model.Bucket{Minute: minute, Status: "na"}
-			if !minute.Before(cutoff) {
-				if raw := rows.Get(measurementKey(series, minute)); raw != nil {
-					var m model.Measurement
-					if err := json.Unmarshal(raw, &m); err != nil {
-						return fmt.Errorf("decode stored measurement: %w", err)
-					}
-					bucket.Status, bucket.Measurement = m.Status, &m
-				}
-			}
-			result = append(result, bucket)
-		}
-		return nil
-	})
-	return result, err
-}
-
-// Latest returns one retained attempted measurement per target ID and revision.
-// Callers can select the catalogue's current revisions without merging history.
-func (s *Store) Latest() ([]model.Measurement, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	if s.db == nil {
-		return nil, ErrClosed
-	}
-	result := make([]model.Measurement, 0)
-	cutoff := s.cutoff()
-	err := s.db.View(func(tx *bolt.Tx) error {
-		return tx.Bucket(latestBucket).ForEach(func(_, key []byte) error {
-			raw := tx.Bucket(rowsBucket).Get(key)
-			if raw == nil {
-				return errors.New("database latest index is inconsistent")
-			}
-			var m model.Measurement
-			if err := json.Unmarshal(raw, &m); err != nil {
-				return fmt.Errorf("decode stored measurement: %w", err)
-			}
-			if !m.At.Truncate(time.Minute).Before(cutoff) {
-				result = append(result, m)
-			}
-			return nil
-		})
-	})
-	return result, err
-}
-
-func (s *Store) cutoff() time.Time {
-	return s.now().UTC().Add(-s.retention).Truncate(time.Minute)
-}
-
-func (s *Store) maintainLocked() error {
-	if err := s.db.Update(func(tx *bolt.Tx) error {
-		_, err := s.prune(tx, s.limits.rows, s.cutoff())
-		return err
-	}); err != nil {
-		return err
-	}
-	return s.boundDiskLocked()
-}
-
-func (s *Store) prune(tx *bolt.Tx, maxRows uint64, cutoff time.Time) (uint64, error) {
-	count, err := rowCount(tx)
-	if err != nil {
-		return 0, err
-	}
-	var removed uint64
-	index := tx.Bucket(timeBucket).Cursor()
-	cutoffMinute := uint64(cutoff.Unix() / 60)
-	for key, _ := index.First(); key != nil; key, _ = index.First() {
-		if len(key) < 26 {
-			return removed, errors.New("database time index is malformed")
-		}
-		if count <= maxRows && binary.BigEndian.Uint64(key[:8]) >= cutoffMinute {
+			records[i] = m
+			found = true
 			break
 		}
-		rowKey := append([]byte(nil), key[8:]...)
-		rows, latest := tx.Bucket(rowsBucket), tx.Bucket(latestBucket)
-		if rows.Get(rowKey) == nil || count == 0 {
-			return removed, errors.New("database time index is inconsistent")
-		}
-		if err := rows.Delete(rowKey); err != nil {
-			return removed, err
-		}
-		if err := index.Delete(); err != nil {
-			return removed, err
-		}
-		series := rowKey[:len(rowKey)-8]
-		if bytes.Equal(latest.Get(series), rowKey) {
-			// If the deleted row was the last one in its series, remove the
-			// latest entry too. Otherwise point it at the newest surviving row.
-			cursor := rows.Cursor()
-			seek := append(append([]byte(nil), series...), bytes.Repeat([]byte{255}, 8)...)
-			candidate, _ := cursor.Seek(seek)
-			if candidate == nil || bytes.Compare(candidate, seek) > 0 {
-				candidate, _ = cursor.Prev()
-			}
-			if bytes.HasPrefix(candidate, series) {
-				if err := latest.Put(series, candidate); err != nil {
-					return removed, err
-				}
-			} else if err := latest.Delete(series); err != nil {
-				return removed, err
-			}
-		}
-		count--
-		removed++
 	}
-	return removed, setCount(tx, count)
+	if !found {
+		records = append(records, m)
+	}
+	encoded, err := encodeChunk(records)
+	if err != nil {
+		return err
+	}
+	_, err = tx.Exec("INSERT INTO chunks(series_id,minute,data) VALUES(?,?,?) ON CONFLICT(series_id,minute) DO UPDATE SET data=excluded.data", id, start, encoded)
+	return err
 }
 
-func (s *Store) boundDiskLocked() error {
-	for {
-		info, err := os.Stat(s.path)
+func (s *Store) measurements(id string, revision uint64, method, family string, start, end time.Time) ([]model.Measurement, error) {
+	var series int64
+	err := s.db.QueryRow("SELECT id FROM series WHERE target=? AND revision=? AND method=? AND family=?", id, revision, method, family).Scan(&series)
+	if errors.Is(err, sql.ErrNoRows) {
+		return []model.Measurement{}, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	out := make([]model.Measurement, 0)
+	for _, q := range []struct {
+		table string
+		min   int64
+	}{{"raw", start.Unix() / 60}, {"chunks", start.Unix() / 1800 * 30}} {
+		rows, err := s.db.Query("SELECT data FROM "+q.table+" WHERE series_id=? AND minute>=? AND minute<? ORDER BY minute", series, q.min, (end.Unix()+59)/60)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		stats := s.db.Stats()
-		freeBytes := int64(stats.FreePageN+stats.PendingPageN) * int64(s.db.Info().PageSize)
-		pressure := info.Size() >= s.limits.diskBytes-s.limits.headroom
-		fragmented := info.Size() >= s.limits.compactMinBytes && freeBytes >= info.Size()/3
-		if !pressure && !fragmented {
-			return nil
-		}
-		if pressure {
-			if err := s.db.Update(func(tx *bolt.Tx) error {
-				count, err := rowCount(tx)
-				if err != nil {
-					return err
+		for rows.Next() {
+			var data []byte
+			if err = rows.Scan(&data); err != nil {
+				rows.Close()
+				return nil, err
+			}
+			var records []model.Measurement
+			if q.table == "raw" {
+				m, e := decodeMeasurement(data)
+				err = e
+				records = []model.Measurement{m}
+			} else {
+				records, err = decodeChunk(data)
+			}
+			if err != nil {
+				rows.Close()
+				return nil, err
+			}
+			for _, m := range records {
+				if !m.At.Before(start) && m.At.Before(end) {
+					m.TargetID = id
+					m.TargetRevision = revision
+					m.Method = method
+					m.Family = family
+					out = append(out, m)
 				}
-				if count == 0 {
-					return errors.New("database exceeds storage limit without measurements")
-				}
-				keep := count - count/10 - 1
-				_, err = s.prune(tx, keep, s.cutoff())
-				return err
-			}); err != nil {
-				return err
 			}
 		}
-		if err := s.compactLocked(); err != nil {
-			return err
-		}
-		if !pressure {
-			return nil
+		err = rows.Err()
+		rows.Close()
+		if err != nil {
+			return nil, err
 		}
 	}
+	return out, nil
 }
 
-// Compaction temporarily needs a second file no larger than the original.
-// The original is retained until the compacted replacement is safely opened.
-func (s *Store) compactLocked() error {
-	temporary, previous := s.path+".compact", s.path+".previous"
-	file, err := os.OpenFile(temporary, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
-	if err != nil {
-		return fmt.Errorf("create compact database: %w", err)
+func normalize(m model.Measurement) model.Measurement {
+	m.At = m.At.UTC()
+	if m.Method == "" {
+		m.Method = model.MethodICMP
 	}
-	if err := file.Close(); err != nil {
-		removeIfExists(temporary)
-		return err
+	if m.Family == "" {
+		m.Family = model.FamilyIPv4
 	}
-	dst, err := openDB(temporary)
-	if err != nil {
-		removeIfExists(temporary)
-		return err
+	if m.BatchStartedAt.IsZero() {
+		m.BatchStartedAt = m.At
 	}
-	err = bolt.Compact(dst, s.db, 1<<20)
-	closeErr := dst.Close()
+	if m.BatchEndedAt.IsZero() {
+		m.BatchEndedAt = m.At
+	}
+	// Legacy successful records contain direct response evidence. Legacy
+	// failures contain no send evidence and remain outside packet statistics.
+	if m.Status == model.StatusOK && m.LatencyMS != nil && m.Attempted == 0 && m.Sent == 0 && m.Received == 0 && len(m.Samples) == 0 {
+		m.Attempted = 1
+		m.Sent = 1
+		m.Received = 1
+		m.HasObservation = true
+		m.Samples = []model.RTTSample{{At: m.At, LatencyMS: *m.LatencyMS, Sequence: 1}}
+	}
+	return m
+}
+
+func validate(m model.Measurement) error {
+	if len(m.TargetID) == 0 || len(m.TargetID) > 128 || !utf8.ValidString(m.TargetID) || strings.TrimSpace(m.TargetID) != m.TargetID || m.TargetRevision == 0 || m.TargetRevision > 9007199254740991 {
+		return fmt.Errorf("%w: target identity", ErrInvalid)
+	}
+	if m.At.IsZero() || m.At.Year() < 1970 || m.At.Year() > 2261 || !m.Discarded && (m.BatchStartedAt.After(m.At) || m.BatchEndedAt.After(m.At) || m.BatchEndedAt.Before(m.BatchStartedAt) || m.At.Sub(m.BatchStartedAt) > 10*time.Minute) {
+		return fmt.Errorf("%w: batch timestamps", ErrInvalid)
+	}
+	if !validSeries(m.Method, m.Family) || statusCode(m.Status) == 0 || len(m.Detail) > 512 || !utf8.ValidString(m.Detail) {
+		return fmt.Errorf("%w: method, family, status or detail", ErrInvalid)
+	}
+	if m.Attempted < 0 || m.Attempted > maxSamples || m.Sent < 0 || m.Sent > m.Attempted || m.UnobservedSent < 0 || m.UnobservedSent > m.Sent || m.Received < 0 || m.Received > m.Sent-m.UnobservedSent || m.UnableToMeasure < 0 || m.UnableToMeasure > maxSamples || len(m.Samples) != m.Received || len(m.Samples) > maxSamples {
+		return fmt.Errorf("%w: observation counts", ErrInvalid)
+	}
+	if !m.HasObservation && (m.Sent != m.UnobservedSent || m.Received != 0) {
+		return fmt.Errorf("%w: absent observation has eligible counts", ErrInvalid)
+	}
+	seen := map[int]bool{}
+	for _, r := range m.Samples {
+		if r.At.IsZero() || r.At.Before(m.BatchStartedAt) || r.At.After(m.At) || !finite(r.LatencyMS) || r.LatencyMS < 0 || r.LatencyMS > 120000 || r.Sequence < 0 || r.Sequence > 65535 || seen[r.Sequence] {
+			return fmt.Errorf("%w: RTT sample", ErrInvalid)
+		}
+		seen[r.Sequence] = true
+	}
+	if m.LatencyMS != nil && (!finite(*m.LatencyMS) || *m.LatencyMS < 0 || *m.LatencyMS > 120000) {
+		return fmt.Errorf("%w: latency", ErrInvalid)
+	}
+	return nil
+}
+
+func finite(n float64) bool { return !math.IsNaN(n) && !math.IsInf(n, 0) }
+func validSeries(method, family string) bool {
+	return (family == model.FamilyIPv4 || family == model.FamilyIPv6) && (method == model.MethodICMP || method == model.MethodUDP || method == model.MethodTCP || method == model.MethodHTTPS || method == model.MethodDNS)
+}
+func capacityError(err error) error {
 	if err == nil {
-		err = closeErr
-	}
-	if err != nil {
-		removeIfExists(temporary)
-		return fmt.Errorf("compact database: %w", err)
-	}
-	if err := s.db.Close(); err != nil {
-		return err
-	}
-	s.db = nil
-	if err := os.Rename(s.path, previous); err != nil {
-		s.db, _ = openDB(s.path)
-		removeIfExists(temporary)
-		return fmt.Errorf("preserve database before compaction: %w", err)
-	}
-	if err := os.Rename(temporary, s.path); err != nil {
-		recoveryErr := os.Rename(previous, s.path)
-		s.db, _ = openDB(s.path)
-		return errors.Join(fmt.Errorf("replace compact database: %w", err), recoveryErr)
-	}
-	s.db, err = openDB(s.path)
-	if err != nil {
-		return fmt.Errorf("reopen compact database: %w", err)
-	}
-	return removeIfExists(previous)
-}
-
-func rowCount(tx *bolt.Tx) (uint64, error) {
-	raw := tx.Bucket(metaBucket).Get(countKey)
-	if len(raw) != 8 {
-		return 0, errors.New("database row count is malformed")
-	}
-	return binary.BigEndian.Uint64(raw), nil
-}
-
-func setCount(tx *bolt.Tx, count uint64) error {
-	var value [8]byte
-	binary.BigEndian.PutUint64(value[:], count)
-	return tx.Bucket(metaBucket).Put(countKey, value[:])
-}
-
-func seriesKey(targetID string, revision uint64) []byte {
-	key := make([]byte, 2+len(targetID)+8)
-	binary.BigEndian.PutUint16(key[:2], uint16(len(targetID)))
-	copy(key[2:], targetID)
-	binary.BigEndian.PutUint64(key[2+len(targetID):], revision)
-	return key
-}
-
-func measurementKey(series []byte, at time.Time) []byte {
-	key := make([]byte, len(series)+8)
-	copy(key, series)
-	binary.BigEndian.PutUint64(key[len(series):], uint64(at.Unix()/60))
-	return key
-}
-
-func timeKey(row []byte) []byte {
-	key := make([]byte, 8+len(row))
-	copy(key, row[len(row)-8:])
-	copy(key[8:], row)
-	return key
-}
-
-func validateSeries(id string, revision uint64) error {
-	if len(id) == 0 || len(id) > 128 || !utf8.ValidString(id) || strings.TrimSpace(id) != id || revision == 0 {
-		return fmt.Errorf("%w: target ID or revision", ErrInvalid)
-	}
-	for _, r := range id {
-		if r < 32 || r == 127 {
-			return fmt.Errorf("%w: target ID contains control characters", ErrInvalid)
-		}
-	}
-	return nil
-}
-
-func validTime(t time.Time) bool {
-	return !t.IsZero() && t.UTC().Year() >= 1970 && t.UTC().Year() <= 9999
-}
-
-func validateMeasurement(m model.Measurement) error {
-	if err := validateSeries(m.TargetID, m.TargetRevision); err != nil {
-		return err
-	}
-	if !validTime(m.At) || len(m.Detail) > 512 || !utf8.ValidString(m.Detail) {
-		return fmt.Errorf("%w: measurement time or detail", ErrInvalid)
-	}
-	switch m.Status {
-	case model.StatusOK:
-		if m.LatencyMS == nil || math.IsNaN(*m.LatencyMS) || math.IsInf(*m.LatencyMS, 0) || *m.LatencyMS < 0 || *m.LatencyMS > 60000 {
-			return fmt.Errorf("%w: successful probe requires latency in 0..60000 ms", ErrInvalid)
-		}
-	case model.StatusTimeout, model.StatusUnreachable, model.StatusDNS,
-		model.StatusPermission, model.StatusUnsupported, model.StatusError:
-		if m.LatencyMS != nil {
-			return fmt.Errorf("%w: failed probe cannot include a latency", ErrInvalid)
-		}
-	default:
-		return fmt.Errorf("%w: unknown attempted probe status", ErrInvalid)
-	}
-	return nil
-}
-
-func removeIfExists(path string) error {
-	err := os.Remove(path)
-	if errors.Is(err, os.ErrNotExist) {
 		return nil
+	}
+	var coded interface{ Code() int }
+	if errors.As(err, &coded) && coded.Code()&255 == 13 {
+		return errors.Join(ErrCapacity, err)
 	}
 	return err
 }

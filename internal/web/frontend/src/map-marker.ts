@@ -4,7 +4,7 @@ export type MarkerElement = {
   setAttribute(name: string, value: string): void;
 };
 
-const statusClasses = ['ok', 'na', 'timeout', 'unreachable', 'dns_error', 'permission_denied', 'unsupported', 'error', 'stale'];
+const statusClasses = ['ok', 'degraded', 'na', 'timeout', 'unreachable', 'dns_error', 'permission_denied', 'unsupported', 'error', 'stale', 'unavailable', 'unverified', 'disabled', 'suspended'];
 
 export function updateMarkerAppearance(element: MarkerElement, selected: boolean, status: string, label: string) {
   // Marker.addTo owns layout/anchor classes and its geographic transform.

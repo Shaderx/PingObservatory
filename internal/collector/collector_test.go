@@ -72,3 +72,36 @@ func TestCancelledWorkDoesNotCreateMeasurements(t *testing.T) {
 		t.Fatal("cancelled work stored as an attempt")
 	}
 }
+
+func TestJobFamiliesStaggerIndependently(t *testing.T) {
+	base := time.Date(2026, 1, 1, 12, 0, 0, 0, time.UTC)
+	target := model.Target{ID: "node", Revision: 1, Measurement: model.ProbeSettings{Method: model.MethodUDP, Families: []string{model.FamilyIPv4, model.FamilyIPv6}}}
+	jobs := []Job{{target, model.FamilyIPv6}, {target, model.FamilyIPv4}}
+	job, due, ok := NextJob(base.Add(time.Second), jobs, time.Minute)
+	if !ok || job.Family != model.FamilyIPv6 || !due.Equal(base.Add(30*time.Second)) {
+		t.Fatalf("families did not get separate slots: %+v %s", job, due)
+	}
+	job, due, ok = NextJob(base.Add(11*time.Minute+40*time.Second), jobs, time.Minute)
+	if !ok || job.Family != model.FamilyIPv4 || !due.Equal(base.Add(12*time.Minute)) {
+		t.Fatal("missed family cycles replayed")
+	}
+}
+
+func TestOverlappingBatchIsNotRepeated(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	var calls atomic.Int32
+	c := &Collector{Interval: 20 * time.Millisecond, Jobs: func() []Job { return []Job{{Target: model.Target{ID: "node", Revision: 1}, Family: model.FamilyIPv4}} }, ProbeTarget: func(ctx context.Context, t model.Target, f string) model.Measurement {
+		calls.Add(1)
+		<-ctx.Done()
+		return model.Measurement{}
+	}, Record: func(model.Measurement) error { return nil }}
+	done := make(chan struct{})
+	go func() { c.Run(ctx); close(done) }()
+	time.Sleep(150 * time.Millisecond)
+	cancel()
+	<-done
+	if calls.Load() != 1 || c.Snapshot().SkippedSlots == 0 {
+		t.Fatalf("overlapping batch repeated: %d %+v", calls.Load(), c.Snapshot())
+	}
+}

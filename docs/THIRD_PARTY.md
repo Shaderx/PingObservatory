@@ -25,4 +25,6 @@ The owner authorised reuse of the existing Looking Glass application frontend. T
 
 The imported map assets are `world.geojson` and `maps/LICENSE.txt`. The selected frontend dependency manifest and lock retain the pinned third-party dependencies. No target records or measurement histories are included in the frontend.
 
+The local adapters preserve the method-aware LG view contract: IPv4 and IPv6, provider/category/world-area filters, same-method comparisons, batch and rolling-hour statistics, positive 24-hour baselines, and one-hour, one-day, seven-day and thirty-day histories. Statistics come from the local collector and storage API. The one-hour grid uses one-minute buckets to match the desktop schedule; long windows retain the original five-minute, thirty-minute and two-hour presentation grids. No missing samples or catalogue verification are substituted for local observations. Coverage outside the configured retention period is labelled separately from N/A gaps.
+
 Brand names, fixed origin, publication endpoints, old data contracts, verification claims and publication-specific controls were removed or replaced. New local settings and API adapters provide configurable origin and manual targets. No original repository history, private configuration, credentials, deployment files or infrastructure records were imported.

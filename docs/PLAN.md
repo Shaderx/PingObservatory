@@ -1,6 +1,6 @@
 # The Ping Observatory: Plan
 
-A standalone network latency map for Windows and Linux. The MVP is implemented on `feature/mvp`; no executable release is published.
+A standalone network latency map for Windows and Linux. An initial scaffold is on `main`; the intended standalone LG-equivalent MVP is being corrected on `feature/mvp`. No executable release is published.
 
 ## Product requirements
 
@@ -21,6 +21,10 @@ A standalone network latency map for Windows and Linux. The MVP is implemented o
 4. **Tests and packaging:** Unit/integration tests and Windows/Linux amd64 native loopback checks pass. Single executable builds are prepared for Windows/Linux amd64/arm64. Arm64 runtime and successful unprivileged Linux ping sockets still require suitable test environments; no release is published.
 
 See [verification details](TESTING.md) and [third-party notices](THIRD_PARTY.md).
+
+## Vision correction in progress
+
+The initial implementation narrowed the supported protocols, statistics and history too far. Preserve the existing application views with actual local measurements: five methods, IPv4/IPv6, provider/category/region filters, real batch/rolling statistics and baselines, and 1h/24h/7d/30d history. Replace the 100,000-row storage policy with sufficient bounded raw storage and lossless rollups. Populate the full sanitized master manifest from exact matching successful verification evidence. An independent vision audit must pass before completion.
 
 ## Licence decision
 

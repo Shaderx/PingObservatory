@@ -15,12 +15,12 @@ import (
 	"github.com/Shaderx/PingObservatory/internal/model"
 )
 
-const DefaultCatalogueURL = "https://raw.githubusercontent.com/Shaderx/PingObservatory/main/catalogue/v1.json"
+const DefaultCatalogueURL = "https://raw.githubusercontent.com/Shaderx/PingObservatory/main/catalogue/v2.json"
 
 var idPattern = regexp.MustCompile(`^manual-[a-z0-9][a-z0-9_-]{0,47}$`)
 
 func Default() model.Config {
-	return model.Config{ManualTargets: []model.Target{}, CatalogueURL: DefaultCatalogueURL, RetentionDays: 7}
+	return model.Config{ManualTargets: []model.Target{}, CatalogueURL: DefaultCatalogueURL, RetentionDays: 30}
 }
 
 func Directory() (string, error) {
@@ -77,7 +77,10 @@ func Validate(c model.Config) error {
 		if t.Location != nil && !ValidPoint(*t.Location) {
 			return errors.New("target location is invalid")
 		}
-		if t.VerifiedAt != nil || t.VerificationSource != "" || t.VerificationMethod != "" || t.VerificationFamily != "" || t.VerificationDestination != "" {
+		if err := model.ValidateProbeTarget(t); err != nil {
+			return err
+		}
+		if t.VerifiedAt != nil || t.VerificationSource != "" || t.VerificationMethod != "" || t.VerificationFamily != "" || t.VerificationDestination != "" || len(t.Admission) > 0 {
 			return errors.New("user-provided targets cannot claim catalogue verification")
 		}
 	}
@@ -93,7 +96,7 @@ func ValidHost(s string) bool {
 		return false
 	}
 	if ip := net.ParseIP(s); ip != nil {
-		return ip.To4() != nil
+		return !ip.IsUnspecified() && !ip.IsMulticast()
 	}
 	if strings.ContainsAny(s, ":/\\@?* \t\r\n") {
 		return false

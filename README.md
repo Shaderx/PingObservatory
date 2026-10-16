@@ -4,7 +4,7 @@ A standalone network latency map for Windows and Linux.
 
 ## Status
 
-The MVP is implemented and available from source on `feature/mvp`. No executable release is published.
+The initial scaffold is available on `main`. Development on `feature/mvp` is correcting it to preserve the stable Looking Glass application's supported methods, families, filters, statistics and history views. The intended standalone MVP is not complete. No executable release is published.
 
 ## MVP
 
@@ -27,7 +27,7 @@ go build -trimpath -o PingObservatory ./cmd/pingobservatory
 
 On Windows, use `go build -trimpath -o PingObservatory.exe ./cmd/pingobservatory` and run `PingObservatory.exe`. The application opens `http://127.0.0.1:8742`. Keep the application process running; closing the browser does not stop its one-minute staggered collector. Use `--open-browser=false` to print the URL without opening a browser, or `--listen 127.0.0.1:0` for an available port.
 
-Configuration, identity history, the last-valid catalogue and measurements are stored in the per-user configuration directory under `PingObservatory` (Windows `%AppData%`, Linux `$XDG_CONFIG_HOME` or `~/.config`). Use `--data-dir` for a separate profile. Set the origin location and user-provided IPv4 targets in the UI. Target changes require a new revision.
+Configuration, identity history, the last-valid catalogue and measurements are stored in the per-user configuration directory under `PingObservatory` (Windows `%AppData%`, Linux `$XDG_CONFIG_HOME` or `~/.config`). Use `--data-dir` for a separate profile. Set the origin location and user-provided IPv4 or IPv6 targets in the UI. Target changes require a new revision.
 
 The starter catalogue is empty until actual owner-homelab verification evidence is available. User-provided targets are labelled separately and never claim catalogue verification. Updates run at startup and every six hours; an update failure retains the last-valid catalogue or bundled starter. Catalogue verification means reachable from the owner's homelab at the recorded time, and does not guarantee reachability from every client.
 

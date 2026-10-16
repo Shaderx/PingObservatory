@@ -1,29 +1,31 @@
-# MVP verification
+# Verification checkpoint
 
-## Automated checks
+The intended standalone MVP is not yet accepted as complete. The populated verified catalogue, mature storage-capacity evidence and final independent acceptance remain pending. No executable release is published.
+
+## Current Windows checks
+
+On the resumed correction, Go 1.26.5 on Windows amd64 passes `go test -p 2 -count=1 -timeout=90s ./...` and `go vet -p 2 ./...`, with `PINGOBSERVATORY_NATIVE_TEST=1`. Native ICMP IPv4 and IPv6 loopback bursts succeed. TCP, UDP echo, HTTPS and DNS use isolated IPv4/IPv6 loopback fixtures. No public endpoint probes or host policy changes are used.
+
+Tests cover persistence, exact uneven-sample quantiles, population standard deviation, separate method/family/revision series, real sends versus unobservable outcomes, valid zero-duration baseline samples, completed history grids, explicit retention expiry, active-probe clock jumps, revision ledgers, catalogue rejection/fallback and local API boundaries. Test workers are bounded to two.
+
+Frontend TypeScript compilation, 15 Vitest tests and the production Vite build pass using existing pinned dependencies. The map assets and third-party notices remain embedded. Corrected packaged browser verification is still required.
+
+## Linux validation handoff
+
+WSL is not used for this correction's resumed validation. Linux tests will run on the owner's separately approved cloud computer against an exact reviewed revision. The cloud environment denies ICMP datagram and raw sockets, so permission-denied behavior can be tested without changing policy. Successful Linux native ICMP and arm64 runtime behavior still require a suitable existing environment.
+
+Run the ordinary suite and vet first, without the native-success flag:
 
 ```sh
-go test -count=1 -timeout=90s ./...
-go vet ./...
+GOMAXPROCS=2 go test -p 2 -count=1 -timeout=90s ./...
+GOMAXPROCS=2 go vet -p 2 ./...
+PINGOBSERVATORY_PERMISSION_TEST=1 GOMAXPROCS=2 go test -p 2 -count=1 -timeout=30s ./internal/probe -run Permission
+CGO_ENABLED=0 go build -trimpath -o PingObservatory ./cmd/pingobservatory
+./PingObservatory --licenses
 ```
 
-The Windows amd64 suite passes, including storage reopen/pruning/compaction, revision history, actual failures versus N/A, scheduler missed-cycle selection, strict catalogue/fallback handling and local HTTP/configuration boundaries. Independent review reran these checks successfully and the reported core findings were fixed.
+Do not set `PINGOBSERVATORY_NATIVE_TEST=1` on a host whose existing policy denies ICMP. Permission denial must have no sent-packet loss denominator. For UI checks, use a temporary data directory and `--open-browser=false --collect=false --listen 127.0.0.1:0`; add only loopback fixture targets. The default verified catalogue is still pending.
 
-The same six package test executables pass under Ubuntu WSL on Linux amd64. The packaged Linux executable, running as the existing WSL root user, serves its embedded UI/licences and records native loopback success alongside N/A gaps in its local history.
+## Remaining acceptance
 
-The frontend passes TypeScript compilation and five Vitest checks covering revision-aware data, attempted failures versus gaps, user-provided target revision updates and faithful verification metadata. Build assets, map geometry and licence notices are committed and embedded. Rebuilding the frontend uses the pinned lock file in `internal/web/frontend`.
-
-Packaged Windows browser checks pass for settings, origin, map rendering under the content policy, directory selection, comparison, history and mobile layout. The isolated browser session made 16 local requests with no external UI requests or console/page errors. After browser closure, a newer successful loopback measurement was observed through the API, confirming that collection continues.
-
-## Native probe checks
-
-- Windows amd64, outside the tool's AppContainer sandbox: native ICMP loopback succeeds.
-- Linux amd64, Ubuntu WSL ordinary user: existing `ping_group_range` is `1 0`; the probe reports `permission_denied` as expected.
-- Linux amd64, the existing WSL root user: native raw ICMP fallback loopback succeeds. No capabilities, sysctls, firewall rules or other host settings were changed.
-- Windows/Linux arm64: cross-compilation succeeds; runtime behavior is not yet verified.
-
-Native integration tests are opt-in with `PINGOBSERVATORY_NATIVE_TEST=1`; a permission-denial check uses `PINGOBSERVATORY_PERMISSION_TEST=1`. They use loopback, not public targets or live Homelab services.
-
-## Remaining verification
-
-Successful Linux unprivileged ping sockets require a Linux environment whose existing policy permits them. Arm64 requires Windows/Linux devices or suitable runners. Owner-homelab endpoint verification evidence is required before populating the verified starter catalogue. No verification times are invented, and no executable release is published.
+Verify mature full-catalogue retention and active journal/memory bounds, corrected packaged browser behavior and background collection, exact current catalogue evidence and admission, fresh cross-platform packaging, and independent source/publication review. Earlier scaffold-only Windows/WSL results do not establish completion of this correction. macOS is deferred.

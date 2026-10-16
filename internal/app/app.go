@@ -41,6 +41,7 @@ type App struct {
 	catalogueError string
 	token          string
 	Authority      string
+	Collect        bool
 }
 
 func Open(dir string) (*App, error) {
@@ -59,7 +60,7 @@ func Open(dir string) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
-	s, err := storage.Open(filepath.Join(dir, "measurements.db"), c.RetentionDays)
+	s, err := storage.Open(filepath.Join(dir, "observations.sqlite"), c.RetentionDays)
 	if err != nil {
 		return nil, err
 	}
@@ -72,8 +73,8 @@ func Open(dir string) (*App, error) {
 		s.Close()
 		return nil, err
 	}
-	a := &App{config: c, configPath: path, ledger: ledger, store: s, catalogue: cat, token: hex.EncodeToString(b)}
-	a.collector = &collector.Collector{Targets: a.Targets, Probe: probe.Probe, Record: s.Add, Wake: make(chan struct{}, 1)}
+	a := &App{config: c, configPath: path, ledger: ledger, store: s, catalogue: cat, token: hex.EncodeToString(b), Collect: true}
+	a.collector = &collector.Collector{Jobs: a.Jobs, ProbeTarget: probe.ProbeTarget, Record: s.Add, Wake: make(chan struct{}, 1)}
 	return a, nil
 }
 
@@ -84,14 +85,37 @@ func (a *App) Targets() []model.Target {
 	manual := make([]model.Target, len(a.config.ManualTargets), len(a.config.ManualTargets)+catalogue.MaxTargets)
 	copy(manual, a.config.ManualTargets)
 	a.mu.RUnlock()
+	for i := range manual {
+		manual[i].Measurement = model.Settings(manual[i])
+		if manual[i].Provider == "" {
+			manual[i].Provider = "User-provided"
+		}
+		if manual[i].Category == "" {
+			manual[i].Category = "manual"
+		}
+	}
 	cat, _ := a.catalogue.Snapshot()
 	return append(manual, cat.Targets...)
 }
 
+func (a *App) Jobs() []collector.Job {
+	var jobs []collector.Job
+	for _, t := range a.Targets() {
+		for _, family := range model.Settings(t).Families {
+			if strings.HasPrefix(t.ID, "manual-") || t.Admission[family].State == "verified" {
+				jobs = append(jobs, collector.Job{Target: t, Family: family})
+			}
+		}
+	}
+	return jobs
+}
+
 func (a *App) Run(ctx context.Context) {
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() { defer wg.Done(); a.collector.Run(ctx) }()
+	if a.Collect {
+		wg.Add(1)
+		go func() { defer wg.Done(); a.collector.Run(ctx) }()
+	}
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -192,7 +216,16 @@ func (a *App) state(w http.ResponseWriter, r *http.Request) {
 	if lastError == "" {
 		lastError = a.catalogue.LastError()
 	}
-	JSON(w, 200, map[string]any{"config": c, "targets": a.Targets(), "latest": latest, "catalogue": map[string]any{"version": cat.Version, "source": source, "last_error": lastError}, "collector": a.collector.Snapshot(), "csrf_token": a.token, "limits": map[string]int{"manual_targets": 16, "catalogue_targets": 64, "max_rows": 100000, "history_minutes": 1440}})
+	targets := a.Targets()
+	statistics, err := a.store.Statistics(targets, time.Now().UTC())
+	if err != nil {
+		fail(w, 500, err)
+		return
+	}
+	if statistics == nil {
+		statistics = []model.SeriesStats{}
+	}
+	JSON(w, 200, map[string]any{"config": c, "targets": targets, "statistics": statistics, "latest": latest, "catalogue": map[string]any{"version": cat.Version, "source": source, "last_error": lastError}, "collector": a.collector.Snapshot(), "csrf_token": a.token, "limits": map[string]any{"manual_targets": 16, "catalogue_targets": catalogue.MaxTargets, "database_bytes": 4 * int64(1024*1024*1024), "history_windows": []string{"1h", "24h", "7d", "30d"}}})
 }
 
 func (a *App) history(w http.ResponseWriter, r *http.Request) {
@@ -201,6 +234,29 @@ func (a *App) history(w http.ResponseWriter, r *http.Request) {
 	rev, err := strconv.ParseUint(q.Get("revision"), 10, 64)
 	if err != nil || rev == 0 {
 		fail(w, 400, errors.New("revision must be positive"))
+		return
+	}
+	if q.Get("window") != "" {
+		method, family := q.Get("method"), q.Get("family")
+		if len(id) == 0 || len(id) > 128 || family != model.FamilyIPv4 && family != model.FamilyIPv6 {
+			fail(w, 400, errors.New("invalid target or family"))
+			return
+		}
+		if method != model.MethodICMP && method != model.MethodUDP && method != model.MethodTCP && method != model.MethodHTTPS && method != model.MethodDNS {
+			fail(w, 400, errors.New("invalid method"))
+			return
+		}
+		window := q.Get("window")
+		if window != "1h" && window != "24h" && window != "7d" && window != "30d" {
+			fail(w, 400, errors.New("invalid history window"))
+			return
+		}
+		history, err := a.store.History(id, rev, method, family, window, time.Now().UTC())
+		if err != nil {
+			fail(w, 500, err)
+			return
+		}
+		JSON(w, 200, history)
 		return
 	}
 	minutes := 60
@@ -259,7 +315,7 @@ func (a *App) updateConfig(w http.ResponseWriter, r *http.Request) {
 	}
 	for _, t := range c.ManualTargets {
 		if old, ok := ledger[t.ID]; ok {
-			if t.Revision < old.Revision || t.Revision == old.Revision && !reflect.DeepEqual(t, old) {
+			if t.Revision < old.Revision || t.Revision == old.Revision && !sameManualTarget(t, old) {
 				fail(w, 400, errors.New("target changes require a higher revision; revisions cannot decrease"))
 				return
 			}
@@ -291,6 +347,24 @@ func (a *App) updateConfig(w http.ResponseWriter, r *http.Request) {
 	default:
 	}
 	JSON(w, 200, c)
+}
+
+func sameManualTarget(a, b model.Target) bool {
+	a.Measurement = model.Settings(a)
+	b.Measurement = model.Settings(b)
+	if len(a.Measurement.ExpectedStatusCodes) == 0 {
+		a.Measurement.ExpectedStatusCodes = nil
+	}
+	if len(b.Measurement.ExpectedStatusCodes) == 0 {
+		b.Measurement.ExpectedStatusCodes = nil
+	}
+	if len(a.Measurement.DNSExpectedAnswers) == 0 {
+		a.Measurement.DNSExpectedAnswers = nil
+	}
+	if len(b.Measurement.DNSExpectedAnswers) == 0 {
+		b.Measurement.DNSExpectedAnswers = nil
+	}
+	return reflect.DeepEqual(a, b)
 }
 
 type settings struct {

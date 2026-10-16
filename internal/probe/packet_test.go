@@ -17,6 +17,25 @@ func TestChecksumKnownVector(t *testing.T) {
 	}
 }
 
+func TestICMPv6ChecksumAndIdentity(t *testing.T) {
+	address := netip.MustParseAddr("::1")
+	packet := []byte{129, 0, 0, 0, 0, 0, 0, 1}
+	if got := checksum6(packet, address, address); got != 0x7eba {
+		t.Fatalf("ICMPv6 checksum = %04x, want 7eba", got)
+	}
+	binary.BigEndian.PutUint16(packet[2:4], 0x7eba)
+	if !matchesEchoReply6(packet, 0, 1, nil, address, address) {
+		t.Fatal("valid ICMPv6 reply rejected")
+	}
+	if matchesEchoReply6(packet, 0, 2, nil, address, address) || matchesEchoReply6(packet, 0, 1, nil, address, netip.MustParseAddr("::2")) {
+		t.Fatal("unrelated ICMPv6 reply accepted")
+	}
+	request := echoRequest6(7, 1, []byte("nonce"))
+	if request[0] != 128 || request[2] != 0 || request[3] != 0 {
+		t.Fatalf("invalid kernel-checksummed ICMPv6 request: %x", request)
+	}
+}
+
 func TestRawIPv4HeaderValidation(t *testing.T) {
 	echo := echoRequest(123, 1, []byte("nonce"))
 	echo[0], echo[2], echo[3] = 0, 0, 0

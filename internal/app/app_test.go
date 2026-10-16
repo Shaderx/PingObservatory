@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/Shaderx/PingObservatory/internal/config"
 	"github.com/Shaderx/PingObservatory/internal/model"
@@ -191,9 +192,92 @@ func TestEmptyStateCollectionsAreArrays(t *testing.T) {
 	if err := json.Unmarshal(w.Body.Bytes(), &state); err != nil {
 		t.Fatal(err)
 	}
-	for _, field := range []string{"targets", "latest"} {
+	for _, field := range []string{"targets", "latest", "statistics"} {
 		if string(state[field]) != "[]" {
 			t.Fatalf("%s should be an empty array, got %s", field, state[field])
+		}
+	}
+}
+
+func TestManualDefaultsDoNotChangeIdentityAndJobsKeepFamilies(t *testing.T) {
+	a, err := Open(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.Close()
+	a.Authority = "127.0.0.1:8742"
+	c := config.Default()
+	c.ManualTargets = []model.Target{{ID: "manual-fixture", Revision: 1, Label: "Fixture", Host: "fixture.invalid"}}
+	b, _ := json.Marshal(c)
+	if w := request(a, "PUT", "/api/config", b, a.token, ""); w.Code != 200 {
+		t.Fatal(w.Body)
+	}
+	c.ManualTargets[0].Measurement = model.Settings(c.ManualTargets[0])
+	b, _ = json.Marshal(c)
+	if w := request(a, "PUT", "/api/config", b, a.token, ""); w.Code != 200 {
+		t.Fatalf("effective defaults changed identity: %s", w.Body)
+	}
+	c.ManualTargets[0].Measurement.Families = []string{model.FamilyIPv4, model.FamilyIPv6}
+	b, _ = json.Marshal(c)
+	if w := request(a, "PUT", "/api/config", b, a.token, ""); w.Code != 400 {
+		t.Fatal("family change accepted without revision")
+	}
+	c.ManualTargets[0].Revision = 2
+	b, _ = json.Marshal(c)
+	if w := request(a, "PUT", "/api/config", b, a.token, ""); w.Code != 200 {
+		t.Fatal(w.Body)
+	}
+	jobs := a.Jobs()
+	manualJobs := 0
+	for _, job := range jobs {
+		if job.Target.ID == "manual-fixture" {
+			manualJobs++
+			if job.Target.Revision != 2 || model.Settings(job.Target).Method != model.MethodICMP {
+				t.Fatal("job lost target identity")
+			}
+		} else if job.Target.Admission[job.Family].State != "verified" {
+			t.Fatal("unverified catalogue job scheduled")
+		}
+	}
+	if manualJobs != 2 {
+		t.Fatalf("expected both families, got %d", manualJobs)
+	}
+}
+
+func TestNamedHistoryWindowsHaveAlignedEmptyCoverage(t *testing.T) {
+	a, err := Open(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.Close()
+	a.Authority = "127.0.0.1:8742"
+	for _, tt := range []struct {
+		window      string
+		count, step int
+	}{{"1h", 60, 60}, {"24h", 288, 300}, {"7d", 336, 1800}, {"30d", 360, 7200}} {
+		w := request(a, "GET", "/api/history?target_id=manual-new&revision=1&method=icmp&family=ipv6&window="+tt.window, nil, "", "")
+		if w.Code != 200 {
+			t.Fatal(w.Body)
+		}
+		var h model.History
+		if err := json.Unmarshal(w.Body.Bytes(), &h); err != nil {
+			t.Fatal(err)
+		}
+		if h.Method != model.MethodICMP || h.Family != model.FamilyIPv6 || h.Window != tt.window || h.StepSeconds != tt.step || len(h.Buckets) != tt.count {
+			t.Fatalf("wrong %s grid: %+v", tt.window, h)
+		}
+		if h.End.Sub(h.Start) != time.Duration(tt.count*tt.step)*time.Second || h.End.After(h.AsOf) {
+			t.Fatalf("unaligned or incomplete grid: %s", tt.window)
+		}
+		for _, b := range h.Buckets {
+			if b.Status != "na" || b.Sent != 0 || b.LossPct != nil || b.MedianMS != nil {
+				t.Fatalf("invented measurement: %+v", b)
+			}
+		}
+	}
+	for _, suffix := range []string{"method=udp&family=ipv4&window=1h", "method=icmp&family=ipv5&window=1h", "method=icmp&family=ipv4&window=90d"} {
+		if w := request(a, "GET", "/api/history?target_id=x&revision=1&"+suffix, nil, "", ""); w.Code != 400 {
+			t.Fatalf("invalid series/window accepted: %s", suffix)
 		}
 	}
 }

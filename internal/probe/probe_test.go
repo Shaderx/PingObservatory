@@ -154,3 +154,16 @@ func TestNativeLoopback(t *testing.T) {
 	}
 	t.Logf("native loopback: status=%s latency_ms=%.3f", m.Status, *m.LatencyMS)
 }
+
+func TestNativeLoopback6(t *testing.T) {
+	if os.Getenv("PINGOBSERVATORY_NATIVE6_TEST") != "1" {
+		t.Skip("set PINGOBSERVATORY_NATIVE6_TEST=1 to test native loopback ICMPv6")
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	m := nativeProbe6(ctx, netip.MustParseAddr("::1"))
+	if m.Status != model.StatusOK || m.LatencyMS == nil || *m.LatencyMS < 0 {
+		t.Fatalf("native IPv6 loopback = %+v", m)
+	}
+	t.Logf("native IPv6 loopback: status=%s latency_ms=%.3f", m.Status, *m.LatencyMS)
+}

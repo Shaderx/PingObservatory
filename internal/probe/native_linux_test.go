@@ -42,3 +42,17 @@ func TestNativePermissionDenied(t *testing.T) {
 	}
 	t.Logf("native denied policy: status=%s detail=%s", m.Status, m.Detail)
 }
+
+func TestNativeTargetPermissionDeniedFamilies(t *testing.T) {
+	if os.Getenv("PINGOBSERVATORY_PERMISSION_TEST") != "1" {
+		t.Skip("requires an existing policy that denies ICMP sockets")
+	}
+	for _, family := range []string{model.FamilyIPv4, model.FamilyIPv6} {
+		t.Run(family, func(t *testing.T) {
+			m := ProbeTarget(context.Background(), model.Target{Host: fixtureAddress(family).String(), Measurement: fixtureSettings(model.MethodICMP, family)}, family)
+			if m.Status != model.StatusPermission || m.Sent != 0 || m.Received != 0 || m.HasObservation || m.UnableToMeasure == 0 || len(m.Samples) != 0 {
+				t.Fatalf("permission denial became a network failure: %+v", m)
+			}
+		})
+	}
+}

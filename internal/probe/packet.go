@@ -16,6 +16,30 @@ func echoRequest(identifier, sequence uint16, payload []byte) []byte {
 	return packet
 }
 
+func echoRequest6(identifier, sequence uint16, payload []byte) []byte {
+	packet := echoRequest(identifier, sequence, payload)
+	packet[0], packet[2], packet[3] = 128, 0, 0
+	return packet
+}
+
+func checksum6(packet []byte, source, destination netip.Addr) uint16 {
+	buffer := make([]byte, 40+len(packet))
+	src, dst := source.As16(), destination.As16()
+	copy(buffer[:16], src[:])
+	copy(buffer[16:32], dst[:])
+	binary.BigEndian.PutUint32(buffer[32:36], uint32(len(packet)))
+	buffer[39] = 58 // IPv6 next-header: ICMPv6.
+	copy(buffer[40:], packet)
+	return checksum(buffer)
+}
+
+func matchesEchoReply6(packet []byte, identifier, sequence uint16, payload []byte, source, destination netip.Addr) bool {
+	return len(packet) == 8+len(payload) && packet[0] == 129 && packet[1] == 0 &&
+		binary.BigEndian.Uint16(packet[4:6]) == identifier &&
+		binary.BigEndian.Uint16(packet[6:8]) == sequence &&
+		checksum6(packet, source, destination) == 0 && bytes.Equal(packet[8:], payload)
+}
+
 func matchesEchoReply(packet []byte, identifier, sequence uint16, payload []byte) bool {
 	return len(packet) == 8+len(payload) && packet[0] == 0 && packet[1] == 0 &&
 		binary.BigEndian.Uint16(packet[4:6]) == identifier &&

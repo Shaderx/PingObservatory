@@ -4,6 +4,7 @@ package probe
 
 import (
 	"context"
+	"crypto/rand"
 	"encoding/binary"
 	"fmt"
 	"net/netip"
@@ -25,6 +26,10 @@ var (
 )
 
 func nativeProbe(ctx context.Context, addr netip.Addr) model.Measurement {
+	return nativeProbePayload(ctx, addr, 32)
+}
+
+func nativeProbePayload(ctx context.Context, addr netip.Addr, payloadBytes int) model.Measurement {
 	for _, proc := range []*syscall.LazyProc{icmpCreate, icmpSend, icmpClose} {
 		if err := proc.Find(); err != nil {
 			return failure(model.StatusUnsupported, "Windows IPv4 ICMP API unavailable")
@@ -47,11 +52,17 @@ func nativeProbe(ctx context.Context, addr netip.Addr) model.Measurement {
 	// buffers on cancellation: the call always finishes within this budget,
 	// with at most one millisecond rounding for the Windows API.
 	milliseconds := uint32((remaining + time.Millisecond - 1) / time.Millisecond)
-	request := []byte("PingObservatory")
+	if payloadBytes < 16 || payloadBytes > 300 {
+		return failure(model.StatusUnsupported, "ICMP payload must be 16..300 bytes")
+	}
+	request := make([]byte, payloadBytes)
+	if _, err := rand.Read(request); err != nil {
+		return failure(model.StatusError, "could not generate ICMP payload")
+	}
 	// This accommodates either native or ICMP_ECHO_REPLY32 header layout, the
 	// payload and the extra 8 bytes documented for an ICMP error message. Only
 	// the first three DWORD fields are read, at identical offsets on both ABIs.
-	reply := make([]byte, 256)
+	reply := make([]byte, payloadBytes+128)
 	ip := addr.As4()
 	count, _, sendErr := icmpSend.Call(handle,
 		uintptr(binary.LittleEndian.Uint32(ip[:])),
@@ -60,14 +71,21 @@ func nativeProbe(ctx context.Context, addr netip.Addr) model.Measurement {
 	runtime.KeepAlive(request)
 	runtime.KeepAlive(reply)
 	if count == 0 {
-		return windowsFailure(uint32(sendErr.(syscall.Errno)))
+		code := uint32(sendErr.(syscall.Errno))
+		m := windowsFailure(code)
+		// These codes report an echo timeout or a received network ICMP
+		// failure. Local route, setup, and permission errors prove no send.
+		if code == 11010 || code >= 11002 && code <= 11005 || code == 11013 || code == 11014 {
+			return icmpAfterSend(m)
+		}
+		return m
 	}
 	status := binary.LittleEndian.Uint32(reply[4:8])
 	if status != 0 {
-		return windowsFailure(status)
+		return icmpAfterSend(windowsFailure(status))
 	}
 	latency := float64(binary.LittleEndian.Uint32(reply[8:12]))
-	return model.Measurement{Status: model.StatusOK, LatencyMS: &latency}
+	return model.Measurement{Status: model.StatusOK, LatencyMS: &latency, Sent: 1, Received: 1, HasObservation: true}
 }
 
 func windowsFailure(code uint32) model.Measurement {

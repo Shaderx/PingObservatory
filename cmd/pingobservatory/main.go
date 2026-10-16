@@ -30,6 +30,7 @@ func run() error {
 	address := flag.String("listen", "127.0.0.1:8742", "loopback HTTP listen address")
 	open := flag.Bool("open-browser", true, "open the local UI after startup")
 	licenses := flag.Bool("licenses", false, "print embedded licence notices and exit")
+	collect := flag.Bool("collect", true, "run the background collector (false serves saved local data only)")
 	flag.Parse()
 	if *licenses {
 		fmt.Print(legal.Text())
@@ -49,6 +50,7 @@ func run() error {
 	if err != nil {
 		return err
 	}
+	a.Collect = *collect
 	defer a.Close()
 	listener, err := app.Listen(*address)
 	if err != nil {
@@ -57,6 +59,9 @@ func run() error {
 	a.Authority = listener.Addr().String()
 	url := "http://" + a.Authority
 	fmt.Printf("The Ping Observatory\nUI: %s\nData: %s\nKeep this application running to collect. Closing the browser does not stop collection.\n", url, *dir)
+	if !*collect {
+		fmt.Println("Collection is paused; the UI serves saved local data.")
+	}
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 	var workers sync.WaitGroup

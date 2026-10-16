@@ -12,3 +12,7 @@ import (
 func nativeProbe(context.Context, netip.Addr) model.Measurement {
 	return failure(model.StatusUnsupported, "native ICMP probing supports Windows and Linux; macOS is deferred")
 }
+
+func nativeProbePayload(ctx context.Context, addr netip.Addr, _ int) model.Measurement {
+	return nativeProbe(ctx, addr)
+}

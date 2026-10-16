@@ -6,402 +6,477 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/Shaderx/PingObservatory/internal/model"
-	bolt "go.etcd.io/bbolt"
 )
 
-var testNow = time.Date(2026, 10, 15, 12, 0, 0, 0, time.UTC)
+var fixtureNow = time.Date(2026, 10, 15, 12, 0, 0, 0, time.UTC)
 
-func testLimits() limits {
-	return limits{rows: MaxRows, diskBytes: MaxDatabaseBytes, headroom: 4 << 20, compactMinBytes: 4 << 20}
-}
-
-func newTestStore(t *testing.T, days int) (*Store, *time.Time) {
+func fixture(t *testing.T) (*Store, *time.Time) {
 	t.Helper()
-	now := testNow
-	s, err := openStore(filepath.Join(t.TempDir(), "history.db"), days, func() time.Time { return now }, testLimits())
-	if err != nil {
-		t.Fatal(err)
+	now := fixtureNow
+	s, e := openStore(filepath.Join(t.TempDir(), "observations.sqlite"), 30, func() time.Time { return now })
+	if e != nil {
+		t.Fatal(e)
 	}
 	t.Cleanup(func() { s.Close() })
 	return s, &now
 }
-
-func measurement(id string, revision uint64, at time.Time, status string) model.Measurement {
-	m := model.Measurement{TargetID: id, TargetRevision: revision, At: at, Status: status}
-	if status == model.StatusOK {
-		latency := 12.5
-		m.LatencyMS = &latency
+func batch(id string, at time.Time, values []float64, sent int) model.Measurement {
+	m := model.Measurement{TargetID: id, TargetRevision: 1, Method: model.MethodICMP, Family: model.FamilyIPv4, At: at, BatchStartedAt: at.Add(-4 * time.Second), BatchEndedAt: at, Attempted: sent, Sent: sent, Received: len(values), HasObservation: true, Status: model.StatusOK}
+	if len(values) == 0 {
+		m.Status = model.StatusTimeout
+	} else if len(values) < sent {
+		m.Status = model.StatusDegraded
+	}
+	for i, v := range values {
+		m.Samples = append(m.Samples, model.RTTSample{At: at.Add(-time.Duration(len(values)-i-1) * 100 * time.Millisecond), LatencyMS: v, Sequence: i + 1})
+	}
+	if len(values) > 0 {
+		v := quantile(values, .5)
+		m.LatencyMS = &v
 	}
 	return m
 }
-
-func mustAdd(t *testing.T, s *Store, m model.Measurement) {
+func target(id string) model.Target {
+	return model.Target{ID: id, Revision: 1, Measurement: model.ProbeSettings{Method: model.MethodICMP, Families: []string{model.FamilyIPv4}}}
+}
+func add(t *testing.T, s *Store, m model.Measurement) {
 	t.Helper()
-	if err := s.Add(m); err != nil {
-		t.Fatal(err)
+	if e := s.Add(m); e != nil {
+		t.Fatal(e)
 	}
 }
-
-func countRows(t *testing.T, s *Store) uint64 {
+func near(t *testing.T, got *float64, want float64) {
 	t.Helper()
-	var count uint64
-	if err := s.db.View(func(tx *bolt.Tx) error {
-		var err error
-		count, err = rowCount(tx)
-		if err == nil && int(count) != tx.Bucket(rowsBucket).Stats().KeyN {
-			return errors.New("row counter differs from stored rows")
-		}
-		if err == nil && int(count) != tx.Bucket(timeBucket).Stats().KeyN {
-			return errors.New("time index differs from stored rows")
-		}
-		return err
-	}); err != nil {
-		t.Fatal(err)
-	}
-	return count
-}
-
-func TestPersistenceGapsFailuresAndRevisionHistory(t *testing.T) {
-	s, now := newTestStore(t, 7)
-	base := now.Add(-time.Hour)
-	m := measurement("test-target", 1, base.Add(18*time.Second).In(time.FixedZone("test", 3600)), model.StatusOK)
-	m.Detail = "reply received"
-	mustAdd(t, s, m)
-	mustAdd(t, s, measurement("test-target", 1, base.Add(time.Minute), model.StatusTimeout))
-	mustAdd(t, s, measurement("test-target", 2, base, model.StatusDNS))
-	path := s.path
-	if err := s.Close(); err != nil {
-		t.Fatal(err)
-	}
-	reopened, err := openStore(path, 7, func() time.Time { return *now }, testLimits())
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer reopened.Close()
-	buckets, err := reopened.Buckets("test-target", 1, base.Add(-time.Minute), base.Add(3*time.Minute))
-	if err != nil {
-		t.Fatal(err)
-	}
-	want := []string{"na", model.StatusOK, model.StatusTimeout, "na"}
-	for i, status := range want {
-		if buckets[i].Status != status {
-			t.Fatalf("bucket %d: got %q, want %q", i, buckets[i].Status, status)
-		}
-		if (buckets[i].Measurement == nil) != (status == "na") {
-			t.Fatalf("bucket %d: incorrect absence marker", i)
-		}
-		if buckets[i].Minute.Location() != time.UTC {
-			t.Fatalf("bucket %d is not UTC", i)
-		}
-	}
-	if got := buckets[1].Measurement; got.Detail != m.Detail || *got.LatencyMS != *m.LatencyMS || !got.At.Equal(m.At) || got.At.Location() != time.UTC {
-		t.Fatalf("measurement did not survive reopen: %+v", got)
-	}
-	revision2, err := reopened.Buckets("test-target", 2, base, base.Add(time.Minute))
-	if err != nil || revision2[0].Status != model.StatusDNS {
-		t.Fatalf("revision history was merged: %v %+v", err, revision2)
-	}
-	latest, err := reopened.Latest()
-	if err != nil || len(latest) != 2 {
-		t.Fatalf("latest: %v %+v", err, latest)
-	}
-	if latest[0].TargetRevision != 1 || latest[0].Status != model.StatusTimeout || latest[1].TargetRevision != 2 || latest[1].Status != model.StatusDNS {
-		t.Fatalf("latest does not preserve revisions: %+v", latest)
+	if got == nil || math.Abs(*got-want) > 1e-9 {
+		t.Fatalf("got %v want %.12g", got, want)
 	}
 }
-
-func TestNewestAttemptPerMinute(t *testing.T) {
-	s, now := newTestStore(t, 7)
-	base := now.Add(-time.Hour)
-	mustAdd(t, s, measurement("target", 1, base.Add(40*time.Second), model.StatusTimeout))
-	mustAdd(t, s, measurement("target", 1, base.Add(10*time.Second), model.StatusOK))
-	latest, _ := s.Latest()
-	if len(latest) != 1 || latest[0].Status != model.StatusTimeout {
-		t.Fatalf("older attempt replaced latest: %+v", latest)
+func rowCount(t *testing.T, s *Store, table string) int {
+	t.Helper()
+	var n int
+	if e := s.db.QueryRow("SELECT count(*) FROM " + table).Scan(&n); e != nil {
+		t.Fatal(e)
 	}
-	mustAdd(t, s, measurement("target", 1, base.Add(50*time.Second), model.StatusOK))
-	latest, _ = s.Latest()
-	if len(latest) != 1 || latest[0].Status != model.StatusOK || countRows(t, s) != 1 {
-		t.Fatalf("minute replacement duplicated rows: %+v", latest)
-	}
+	return n
 }
 
-func TestRetentionChangesAndExpiredRows(t *testing.T) {
-	s, now := newTestStore(t, 7)
-	old := now.Add(-5 * 24 * time.Hour)
-	recent := now.Add(-12 * time.Hour)
-	mustAdd(t, s, measurement("old", 1, old, model.StatusTimeout))
-	mustAdd(t, s, measurement("recent", 1, recent, model.StatusOK))
-	if err := s.SetRetention(1); err != nil {
-		t.Fatal(err)
-	}
-	if countRows(t, s) != 1 {
-		t.Fatal("retention change did not prune expired rows")
-	}
-	buckets, err := s.Buckets("old", 1, old, old.Add(time.Minute))
-	if err != nil || buckets[0].Status != "na" || buckets[0].Measurement != nil {
-		t.Fatalf("expired row is not absent: %v %+v", err, buckets)
-	}
-	mustAdd(t, s, measurement("old", 1, old, model.StatusDNS))
-	if countRows(t, s) != 1 {
-		t.Fatal("expired import was retained")
-	}
-	*now = now.Add(2 * 24 * time.Hour)
-	latest, err := s.Latest()
-	if err != nil || len(latest) != 0 {
-		t.Fatalf("read returned expired history: %v %+v", err, latest)
-	}
-	mustAdd(t, s, measurement("new", 1, *now, model.StatusOK))
-	if countRows(t, s) != 1 {
-		t.Fatal("write did not prune expired rows")
-	}
-}
-
-func TestRowLimitPrunesOldestAndLatestIndex(t *testing.T) {
-	s, now := newTestStore(t, 7)
-	s.limits.rows = 3
-	base := now.Add(-time.Hour)
-	for i := 0; i < 4; i++ {
-		mustAdd(t, s, measurement(fmt.Sprintf("target-%d", i), 1, base.Add(time.Duration(i)*time.Minute), model.StatusOK))
-	}
-	if countRows(t, s) != 3 {
-		t.Fatal("row cap was not enforced")
-	}
-	latest, err := s.Latest()
-	if err != nil || len(latest) != 3 {
-		t.Fatalf("pruned latest entry survived: %v %+v", err, latest)
-	}
-	buckets, err := s.Buckets("target-0", 1, base, base.Add(time.Minute))
-	if err != nil || buckets[0].Status != "na" {
-		t.Fatalf("oldest row was not pruned: %v %+v", err, buckets)
-	}
-}
-
-func TestInputAndWindowBounds(t *testing.T) {
-	s, now := newTestStore(t, 0)
-	if s.retention != 7*24*time.Hour {
-		t.Fatal("incorrect default retention")
-	}
-	valid := measurement("target", 1, *now, model.StatusOK)
-	invalid := []model.Measurement{valid, valid, valid, valid, valid, valid, valid, valid, valid, valid}
-	invalid[0].TargetID = ""
-	invalid[1].TargetID = strings.Repeat("x", 129)
-	invalid[2].TargetRevision = 0
-	invalid[3].At = time.Time{}
-	invalid[4].Detail = strings.Repeat("x", 513)
-	invalid[5].Status = "na"
-	invalid[6].Status = model.StatusTimeout
-	invalid[7].LatencyMS = nil
-	nan := math.NaN()
-	invalid[8].LatencyMS = &nan
-	invalid[9].At = now.Add(6 * time.Minute)
-	for i, m := range invalid {
-		if err := s.Add(m); !errors.Is(err, ErrInvalid) {
-			t.Errorf("invalid measurement %d: %v", i, err)
-		}
-	}
-	for _, days := range []int{-1, 31} {
-		if _, err := Open(filepath.Join(t.TempDir(), "bad.db"), days); !errors.Is(err, ErrInvalid) {
-			t.Errorf("invalid open retention %d: %v", days, err)
-		}
-	}
-	for _, days := range []int{0, -1, 31} {
-		if err := s.SetRetention(days); !errors.Is(err, ErrInvalid) {
-			t.Errorf("invalid live retention %d: %v", days, err)
-		}
-	}
-	if _, err := Open("", 7); !errors.Is(err, ErrInvalid) {
-		t.Fatalf("empty path accepted: %v", err)
-	}
-	if _, err := s.Buckets("target", 1, *now, now.Add(1441*time.Minute)); !errors.Is(err, ErrQueryTooLarge) {
-		t.Fatalf("large query accepted: %v", err)
-	}
-	if _, err := s.Buckets("target", 1, *now, now.Add(-time.Minute)); !errors.Is(err, ErrInvalid) {
-		t.Fatalf("reversed query accepted: %v", err)
-	}
-	if _, err := s.Buckets("target", 1, time.Time{}, *now); !errors.Is(err, ErrInvalid) {
-		t.Fatalf("zero query accepted: %v", err)
-	}
-	buckets, err := s.Buckets("target", 1, *now, now.Add(1440*time.Minute))
-	if err != nil || len(buckets) != 1440 {
-		t.Fatalf("maximum bounded query rejected: %v, len %d", err, len(buckets))
-	}
-}
-
-func TestCloseAndExclusiveAccess(t *testing.T) {
-	s, now := newTestStore(t, 7)
-	started := time.Now()
-	if other, err := Open(s.path, 7); err == nil {
-		other.Close()
-		t.Fatal("second process could open locked storage")
-	}
-	if time.Since(started) > 5*time.Second {
-		t.Fatal("database lock timeout was not bounded")
-	}
-	if err := s.Close(); err != nil {
-		t.Fatal(err)
-	}
-	if err := s.Close(); err != nil {
-		t.Fatal("close was not idempotent:", err)
-	}
-	if err := s.Add(measurement("target", 1, *now, model.StatusOK)); !errors.Is(err, ErrClosed) {
-		t.Fatalf("add after close: %v", err)
-	}
-	if err := s.SetRetention(1); !errors.Is(err, ErrClosed) {
-		t.Fatalf("retention after close: %v", err)
-	}
-	if _, err := s.Latest(); !errors.Is(err, ErrClosed) {
-		t.Fatalf("latest after close: %v", err)
-	}
-	if _, err := s.Buckets("target", 1, *now, now.Add(time.Minute)); !errors.Is(err, ErrClosed) {
-		t.Fatalf("history after close: %v", err)
-	}
-	reopened, err := Open(s.path, 7)
-	if err != nil {
-		t.Fatal("closed lock was not released:", err)
-	}
-	reopened.Close()
-}
-
-func TestDiskBoundAndCompaction(t *testing.T) {
-	now := testNow
-	bound := limits{rows: MaxRows, diskBytes: 512 << 10, headroom: 64 << 10, compactMinBytes: 64 << 10}
-	s, err := openStore(filepath.Join(t.TempDir(), "bounded.db"), 7, func() time.Time { return now }, bound)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer s.Close()
-	base := now.Add(-10 * time.Hour)
-	for i := 0; i < 600; i++ {
-		m := measurement("target", 1, base.Add(time.Duration(i)*time.Minute), model.StatusOK)
-		m.Detail = strings.Repeat("x", 512)
-		mustAdd(t, s, m)
-		info, err := os.Stat(s.path)
-		if err != nil || info.Size() > bound.diskBytes {
-			t.Fatalf("disk cap exceeded on write %d: %v %+v", i, err, info)
-		}
-	}
-	if countRows(t, s) >= 600 {
-		t.Fatal("disk pressure did not prune rows")
-	}
-	latest, err := s.Latest()
-	if err != nil || len(latest) != 1 || !latest[0].At.Equal(base.Add(599*time.Minute)) {
-		t.Fatalf("compaction lost newest row: %v %+v", err, latest)
-	}
-	now = now.Add(2 * 24 * time.Hour)
-	if err := s.SetRetention(1); err != nil {
-		t.Fatal(err)
-	}
-	if countRows(t, s) != 0 {
-		t.Fatal("expired rows survived compaction")
-	}
-	info, err := os.Stat(s.path)
-	if err != nil || info.Size() >= bound.compactMinBytes {
-		t.Fatalf("empty database high-water size was not reclaimed: %v %+v", err, info)
-	}
-	for _, suffix := range []string{".compact", ".previous"} {
-		if _, err := os.Stat(s.path + suffix); !errors.Is(err, os.ErrNotExist) {
-			t.Fatalf("temporary compaction file remains: %s %v", suffix, err)
-		}
-	}
-}
-
-func TestInterruptedCompactionRecovery(t *testing.T) {
-	s, now := newTestStore(t, 7)
-	mustAdd(t, s, measurement("target", 1, *now, model.StatusTimeout))
+func TestPersistenceMissingVersusFailuresAndSeries(t *testing.T) {
+	s, now := fixture(t)
+	at := now.Add(-time.Hour)
+	add(t, s, batch("target", at.Add(10*time.Second), []float64{12.345678901}, 1))
+	add(t, s, batch("target", at.Add(time.Minute+10*time.Second), nil, 1))
+	local := batch("target", at.Add(2*time.Minute+10*time.Second), nil, 0)
+	local.Status = model.StatusDNS
+	local.HasObservation = false
+	local.UnableToMeasure = 1
+	add(t, s, local)
+	v6 := batch("target", at.Add(10*time.Second), []float64{99}, 1)
+	v6.Family = model.FamilyIPv6
+	add(t, s, v6)
+	revised := batch("target", at.Add(10*time.Second), []float64{123}, 1)
+	revised.TargetRevision = 2
+	add(t, s, revised)
 	path := s.path
 	s.Close()
-	if err := os.Rename(path, path+".previous"); err != nil {
-		t.Fatal(err)
+	reopened, e := openStore(path, 30, func() time.Time { return *now })
+	if e != nil {
+		t.Fatal(e)
 	}
-	if err := os.WriteFile(path+".compact", []byte("incomplete"), 0600); err != nil {
-		t.Fatal(err)
+	defer reopened.Close()
+	points, e := reopened.Buckets("target", 1, at.Add(-time.Minute), at.Add(4*time.Minute))
+	if e != nil {
+		t.Fatal(e)
 	}
-	recovered, err := openStore(path, 7, func() time.Time { return *now }, testLimits())
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer recovered.Close()
-	latest, err := recovered.Latest()
-	if err != nil || len(latest) != 1 || latest[0].Status != model.StatusTimeout {
-		t.Fatalf("interrupted compaction lost original data: %v %+v", err, latest)
-	}
-}
-
-func TestUnknownSchemaAndCorruptRecordErrors(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "unrelated.db")
-	db, err := openDB(path)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucket([]byte("unrelated"))
-		return err
-	}); err != nil {
-		t.Fatal(err)
-	}
-	db.Close()
-	if other, err := Open(path, 7); err == nil {
-		other.Close()
-		t.Fatal("unrelated database schema was accepted")
-	}
-	db, err = openDB(path)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := db.View(func(tx *bolt.Tx) error {
-		if tx.Bucket([]byte("unrelated")) == nil || tx.Bucket(metaBucket) != nil {
-			return errors.New("unrelated database was modified")
+	want := []string{"na", model.StatusOK, model.StatusTimeout, model.StatusDNS, "na"}
+	for i, status := range want {
+		if points[i].Status != status {
+			t.Fatalf("point%d: %+v", i, points[i])
 		}
-		return nil
-	}); err != nil {
-		t.Fatal(err)
+		if (points[i].Measurement == nil) != (status == "na") {
+			t.Fatal("absence represented as a probe")
+		}
 	}
-	db.Close()
-	s, now := newTestStore(t, 7)
-	mustAdd(t, s, measurement("target", 1, *now, model.StatusOK))
-	if err := s.db.Update(func(tx *bolt.Tx) error {
-		key := measurementKey(seriesKey("target", 1), *now)
-		return tx.Bucket(rowsBucket).Put(key, []byte("invalid-json"))
-	}); err != nil {
-		t.Fatal(err)
+	near(t, points[1].MedianMS, 12.345678901)
+	near(t, points[2].LossPct, 100)
+	if points[3].LossPct != nil || points[3].MedianMS != nil || points[3].UnableToMeasure != 1 {
+		t.Fatal("DNS/local error entered loss statistics")
 	}
-	if _, err := s.Latest(); err == nil {
-		t.Fatal("latest suppressed a corrupt record")
+	other, e := reopened.History("target", 1, model.MethodICMP, model.FamilyIPv6, "24h", *now)
+	if e != nil {
+		t.Fatal(e)
 	}
-	if _, err := s.Buckets("target", 1, *now, now.Add(time.Minute)); err == nil {
-		t.Fatal("history suppressed a corrupt record")
+	found := false
+	for _, b := range other.Buckets {
+		if b.MedianMS != nil {
+			near(t, b.MedianMS, 99)
+			found = true
+		}
+	}
+	if !found {
+		t.Fatal("IPv6 series lost")
+	}
+	latest, e := reopened.Latest()
+	if e != nil || len(latest) != 3 {
+		t.Fatalf("latest series/revisions %v %+v", e, latest)
 	}
 }
 
-func TestConcurrentWritersAndReaders(t *testing.T) {
-	s, now := newTestStore(t, 7)
-	var group sync.WaitGroup
-	errorsCh := make(chan error, 20)
+func TestExactStatisticsEligibilityAndBaseline(t *testing.T) {
+	s, now := fixture(t)
+	add(t, s, batch("target", now.Add(-30*time.Minute+10*time.Second), []float64{1, 2, 3}, 3))
+	add(t, s, batch("target", now.Add(-20*time.Minute+10*time.Second), []float64{4, 100}, 3))
+	partial := batch("target", now.Add(-10*time.Minute+10*time.Second), []float64{5}, 2)
+	partial.Attempted = 3
+	partial.UnobservedSent = 1
+	partial.UnableToMeasure = 1
+	add(t, s, partial)
+	unknown := batch("target", now.Add(-5*time.Minute+10*time.Second), nil, 1)
+	unknown.HasObservation = false
+	unknown.UnobservedSent = 1
+	unknown.UnableToMeasure = 1
+	unknown.Status = model.StatusError
+	add(t, s, unknown)
+	discarded := batch("target", now.Add(-4*time.Minute+10*time.Second), []float64{9999}, 1)
+	discarded.Discarded = true
+	discarded.Status = model.StatusSuspended
+	add(t, s, discarded)
+	local := batch("target", now.Add(-time.Minute+10*time.Second), nil, 0)
+	local.HasObservation = false
+	local.UnableToMeasure = 1
+	local.Status = model.StatusPermission
+	add(t, s, local)
+	stats, e := s.Statistics([]model.Target{target("target")}, *now)
+	if e != nil {
+		t.Fatal(e)
+	}
+	o := stats[0].Observation
+	if o.MedianMS != nil || o.Status != model.StatusPermission {
+		t.Fatalf("latest failure invented current RTT: %+v", o)
+	}
+	if o.Rolling1hSent != 9 || o.Rolling1hUnobservedSent != 2 || o.Rolling1hReceived != 6 {
+		t.Fatalf("partial/local/discarded denominator: %+v", o)
+	}
+	near(t, o.LossPct, 100./7)
+	near(t, o.P95MS, 76.25)
+	near(t, o.BaselineMS, 3.5)
+	near(t, o.StddevMS, stddev([]float64{1, 2, 3, 4, 5, 100}))
+	if o.FailurePct != nil || o.BaselineSampleCount != 6 || o.LastSuccessAt == nil || o.RollingAsOf == nil {
+		t.Fatalf("incorrect statistics metadata: %+v", o)
+	}
+	zero := batch("zero", now.Add(-10*time.Minute), []float64{0, 0, 1, 2, 3, 4}, 6)
+	add(t, s, zero)
+	stats, e = s.Statistics([]model.Target{target("zero")}, *now)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if stats[0].Observation.BaselineSampleCount != 6 {
+		t.Fatal("valid zero-duration successes were excluded")
+	}
+	near(t, stats[0].Observation.BaselineMS, 1.5)
+	add(t, s, batch("zero", now.Add(-time.Minute), []float64{5}, 1))
+	stats, _ = s.Statistics([]model.Target{target("zero")}, *now)
+	near(t, stats[0].Observation.BaselineMS, 2)
+	add(t, s, batch("mixed-zero", now.Add(-time.Minute), []float64{0, 0, 0, 0, 0, 10, 10, 20, 30, 40}, 10))
+	stats, _ = s.Statistics([]model.Target{target("mixed-zero")}, *now)
+	near(t, stats[0].Observation.BaselineMS, 5)
+	add(t, s, batch("all-zero", now.Add(-time.Minute), []float64{0, 0, 0, 0, 0}, 5))
+	stats, _ = s.Statistics([]model.Target{target("all-zero")}, *now)
+	if stats[0].Observation.BaselineMS != nil || stats[0].Observation.BaselineSampleCount != 5 {
+		t.Fatal("a zero baseline must remain unusable without excluding valid successes")
+	}
+}
+
+func TestDiscardedClockReversalIsAnOperationalRecordOnly(t *testing.T) {
+	s, now := fixture(t)
+	m := model.Measurement{TargetID: "clock-jump", TargetRevision: 1, At: now.Add(-time.Minute), BatchStartedAt: now.Add(time.Hour), BatchEndedAt: now.Add(-time.Minute), Method: model.MethodICMP, Family: model.FamilyIPv4, Status: model.StatusSuspended, Discarded: true, UnableToMeasure: 1}
+	add(t, s, m)
+	h, err := s.History("clock-jump", 1, model.MethodICMP, model.FamilyIPv4, "1h", *now)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, b := range h.Buckets {
+		if b.Status != "na" || b.Sent != 0 || b.MedianMS != nil || b.LossPct != nil {
+			t.Fatal("discarded clock reversal contributed measurement statistics")
+		}
+	}
+}
+
+func TestNonPacketFailureRateAndUnsentNull(t *testing.T) {
+	s, now := fixture(t)
+	for i := 0; i < 2; i++ {
+		m := batch("tcp", now.Add(time.Duration(-2+i)*time.Minute), nil, 1)
+		m.Method = model.MethodTCP
+		if i == 0 {
+			m = batch("tcp", m.At, []float64{20}, 1)
+			m.Method = model.MethodTCP
+		}
+		add(t, s, m)
+	}
+	tg := target("tcp")
+	tg.Measurement.Method = model.MethodTCP
+	stats, e := s.Statistics([]model.Target{tg}, *now)
+	if e != nil {
+		t.Fatal(e)
+	}
+	near(t, stats[0].Observation.FailurePct, 50)
+	if stats[0].Observation.LossPct != nil {
+		t.Fatal("TCP attempts labelled packet loss")
+	}
+	m := batch("unsent", now.Add(-time.Minute), nil, 1)
+	m.UnobservedSent = 1
+	m.HasObservation = false
+	m.UnableToMeasure = 1
+	add(t, s, m)
+	stats, e = s.Statistics([]model.Target{target("unsent")}, *now)
+	if e != nil {
+		t.Fatal(e)
+	}
+	o := stats[0].Observation
+	if o.Rolling1hSent != 1 || o.Rolling1hUnobservedSent != 1 || o.LossPct != nil || o.MedianMS != nil {
+		t.Fatalf("unobserved send became loss: %+v", o)
+	}
+}
+
+func TestLosslessArchivedUnevenQuantiles(t *testing.T) {
+	s, now := fixture(t)
+	base := now.Add(-50 * time.Hour)
+	first := batch("target", base.Add(time.Minute), []float64{1000}, 1)
+	second := batch("target", base.Add(40*time.Minute), []float64{0, 1, 2, 3, 4, 5, 6, 7, 8}, 9)
+	add(t, s, first)
+	add(t, s, second)
+	if rowCount(t, s, "raw") != 0 || rowCount(t, s, "chunks") != 2 {
+		t.Fatal("older batches were not compacted")
+	}
+	h, e := s.History("target", 1, model.MethodICMP, model.FamilyIPv4, "30d", *now)
+	if e != nil {
+		t.Fatal(e)
+	}
+	index := int(base.Sub(h.Start) / (2 * time.Hour))
+	b := h.Buckets[index]
+	near(t, b.MedianMS, 4.5)
+	near(t, b.P95MS, 553.6)
+	near(t, b.StddevMS, stddev([]float64{0, 1, 2, 3, 4, 5, 6, 7, 8, 1000}))
+	near(t, b.LossPct, 0)
+	if math.Abs(*b.MedianMS-(1000+4)/2.) < 1 {
+		t.Fatal("combined median was averaged from bucket medians")
+	}
+	if math.Abs(*b.P95MS-(1000+7.6)/2.) < 1 {
+		t.Fatal("combined percentile was averaged from bucket percentiles")
+	}
+	data, e := encodeMeasurement(first)
+	if e != nil {
+		t.Fatal(e)
+	}
+	decoded, e := decodeMeasurement(data)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if !reflect.DeepEqual(first.Samples, decoded.Samples) {
+		t.Fatal("codec altered timing values/timestamps/sequences")
+	}
+}
+
+func TestRolloverRetentionAndCompletedGrids(t *testing.T) {
+	s, now := fixture(t)
+	at := now.Add(-25*time.Hour - 50*time.Minute + 10*time.Second)
+	add(t, s, batch("target", at, []float64{12.123456789}, 1))
+	if rowCount(t, s, "raw") != 1 {
+		t.Fatal("recent26h not raw")
+	}
+	*now = now.Add(20 * time.Minute)
+	add(t, s, batch("new", now.Add(-10*time.Second), []float64{20}, 1))
+	if rowCount(t, s, "chunks") != 1 {
+		t.Fatal("raw expiry lost original batch instead of archiving")
+	}
+	for window, w := range historyWindows {
+		h, e := s.History("target", 1, model.MethodICMP, model.FamilyIPv4, window, now.Add(23*time.Second))
+		if e != nil {
+			t.Fatal(e)
+		}
+		if len(h.Buckets) != w.count || h.StepSeconds != int(w.step/time.Second) || !h.End.Equal(now.Truncate(w.step)) {
+			t.Fatalf("%s wrong grid %+v", window, h)
+		}
+	}
+	h, e := s.History("target", 1, model.MethodICMP, model.FamilyIPv4, "7d", *now)
+	if e != nil {
+		t.Fatal(e)
+	}
+	found := false
+	for _, b := range h.Buckets {
+		if b.MedianMS != nil {
+			near(t, b.MedianMS, 12.123456789)
+			found = true
+		}
+	}
+	if !found {
+		t.Fatal("archived timing unavailable")
+	}
+	if e = s.SetRetention(1); e != nil {
+		t.Fatal(e)
+	}
+	h, e = s.History("target", 1, model.MethodICMP, model.FamilyIPv4, "7d", *now)
+	if e != nil {
+		t.Fatal(e)
+	}
+	for _, b := range h.Buckets {
+		if b.MedianMS != nil {
+			t.Fatal("expired history remains visible")
+		}
+	}
+	if !h.RetainedFrom.Equal(now.Add(-24*time.Hour)) || !h.Buckets[0].RetentionExpired || h.Buckets[len(h.Buckets)-1].RetentionExpired {
+		t.Fatal("retention-expired coverage was not distinguished from ordinary gaps")
+	}
+}
+
+func TestRTTUsesOriginalTimestampAcrossCompletedBoundary(t *testing.T) {
+	s, now := fixture(t)
+	*now = now.Add(10 * time.Second)
+	m := batch("target", now.Truncate(time.Minute).Add(time.Second), []float64{7}, 1)
+	m.Samples[0].At = m.At.Add(-2 * time.Second)
+	add(t, s, m)
+	h, e := s.History("target", 1, model.MethodICMP, model.FamilyIPv4, "1h", *now)
+	if e != nil {
+		t.Fatal(e)
+	}
+	near(t, h.Buckets[59].MedianMS, 7)
+	if h.Buckets[59].Sent != 0 || h.Buckets[59].LossPct != nil {
+		t.Fatal("packet counts fabricated in earlier RTT bucket")
+	}
+}
+
+func TestExclusiveLockBoundsErrorsAndCapacity(t *testing.T) {
+	s, now := fixture(t)
+	started := time.Now()
+	other, e := Open(s.path, 30)
+	if e == nil {
+		other.Close()
+		t.Fatal("second collector acquired profile")
+	}
+	if time.Since(started) > 3*time.Second {
+		t.Fatal("exclusive lock timeout unbounded")
+	}
+	add(t, s, batch("preserved", now.Add(-time.Minute), []float64{1}, 1))
+	var pages int
+	if e = s.db.QueryRow("PRAGMA page_count").Scan(&pages); e != nil {
+		t.Fatal(e)
+	}
+	if _, e = s.db.Exec(fmt.Sprintf("PRAGMA max_page_count=%d", pages)); e != nil {
+		t.Fatal(e)
+	}
+	failed := false
+	for i := 0; i < 100; i++ {
+		m := batch(fmt.Sprintf("long-target-%d", i), now.Add(-time.Minute), []float64{2}, 1)
+		m.Detail = strings.Repeat("x", 512)
+		e = s.Add(m)
+		if errors.Is(e, ErrCapacity) {
+			failed = true
+			break
+		}
+		if e != nil {
+			t.Fatal(e)
+		}
+	}
+	if !failed {
+		t.Fatal("capacity failure did not surface")
+	}
+	points, e := s.Buckets("preserved", 1, now.Add(-time.Minute), *now)
+	if e != nil {
+		t.Fatal(e)
+	}
+	near(t, points[0].MedianMS, 1)
+	if _, e = s.Buckets("target", 1, *now, now.Add(1441*time.Minute)); !errors.Is(e, ErrQueryTooLarge) {
+		t.Fatal("unbounded query accepted")
+	}
+	if e = s.SetRetention(0); !errors.Is(e, ErrInvalid) {
+		t.Fatal("invalid retention accepted")
+	}
+	bad := batch("target", *now, []float64{1}, 1)
+	bad.UnobservedSent = 1
+	if e = s.Add(bad); !errors.Is(e, ErrInvalid) {
+		t.Fatal("received exceeds eligible sends accepted")
+	}
+	if e = s.Close(); e != nil {
+		t.Fatal(e)
+	}
+	if e = s.Close(); e != nil {
+		t.Fatal(e)
+	}
+	if e = s.Add(batch("target", *now, []float64{1}, 1)); !errors.Is(e, ErrClosed) {
+		t.Fatal("write after close accepted")
+	}
+}
+
+func TestRuntimePragmasAndCorruption(t *testing.T) {
+	s, now := fixture(t)
+	for pragma, want := range map[string]int{"cache_size": -8192, "mmap_size": 0, "auto_vacuum": 2, "temp_store": 2, "max_page_count": 1048576} {
+		var n int
+		if e := s.db.QueryRow("PRAGMA " + pragma).Scan(&n); e != nil || n != want {
+			t.Fatalf("%s %d %v", pragma, n, e)
+		}
+	}
+	if s.db.Stats().MaxOpenConnections != 1 {
+		t.Fatal("unbounded connection pool")
+	}
+	add(t, s, batch("target", now.Add(-time.Minute), []float64{1}, 1))
+	if _, e := s.db.Exec("UPDATE raw SET data=x'ff'"); e != nil {
+		t.Fatal(e)
+	}
+	if _, e := s.History("target", 1, model.MethodICMP, model.FamilyIPv4, "1h", *now); e == nil {
+		t.Fatal("corrupt record silently ignored")
+	}
+	path := filepath.Join(t.TempDir(), "original.db")
+	original := []byte("old database retained")
+	if e := os.WriteFile(path, original, 0600); e != nil {
+		t.Fatal(e)
+	}
+	if st, e := Open(path, 30); e == nil {
+		st.Close()
+		t.Fatal("unrelated file accepted")
+	}
+	after, _ := os.ReadFile(path)
+	if !reflect.DeepEqual(original, after) {
+		t.Fatal("unrelated database file changed")
+	}
+}
+
+func TestConcurrentOperationsAndMinuteReplacement(t *testing.T) {
+	s, now := fixture(t)
+	var wg sync.WaitGroup
+	errCh := make(chan error, 10)
 	for i := 0; i < 10; i++ {
-		group.Add(1)
-		go func(index int) {
-			defer group.Done()
-			if err := s.Add(measurement(fmt.Sprintf("target-%d", index), 1, *now, model.StatusOK)); err != nil {
-				errorsCh <- err
-			}
-			if _, err := s.Latest(); err != nil {
-				errorsCh <- err
-			}
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			errCh <- s.Add(batch(fmt.Sprintf("target%d", i), now.Add(-time.Minute), []float64{float64(i)}, 1))
 		}(i)
 	}
-	group.Wait()
-	close(errorsCh)
-	for err := range errorsCh {
-		t.Error(err)
+	wg.Wait()
+	close(errCh)
+	for e := range errCh {
+		if e != nil {
+			t.Fatal(e)
+		}
 	}
-	if countRows(t, s) != 10 {
-		t.Fatal("concurrent writes lost measurements")
+	newer := batch("target0", now.Add(-time.Minute+20*time.Second), []float64{20}, 1)
+	add(t, s, newer)
+	add(t, s, batch("target0", now.Add(-time.Minute+10*time.Second), []float64{99}, 1))
+	if rowCount(t, s, "raw") != 10 {
+		t.Fatal("minute replacement duplicated history")
+	}
+	latest, e := s.Latest()
+	if e != nil {
+		t.Fatal(e)
+	}
+	for _, m := range latest {
+		if m.TargetID == "target0" {
+			near(t, m.LatencyMS, 20)
+		}
 	}
 }

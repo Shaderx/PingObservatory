@@ -84,5 +84,14 @@ func probeWith(ctx context.Context, host string, timeout time.Duration, lookup i
 }
 
 func failure(status, detail string) model.Measurement {
-	return model.Measurement{Status: status, Detail: detail}
+	return model.Measurement{Status: status, Detail: detail, UnableToMeasure: 1}
+}
+
+func icmpAfterSend(m model.Measurement) model.Measurement {
+	m.Sent, m.FailureStage = 1, "response"
+	m.UnobservedSent = 1
+	if m.Status == model.StatusTimeout || m.Status == model.StatusUnreachable {
+		m.UnableToMeasure, m.UnobservedSent, m.HasObservation = 0, 0, true
+	}
+	return m
 }

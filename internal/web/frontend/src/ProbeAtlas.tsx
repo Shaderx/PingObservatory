@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import * as maplibregl from 'maplibre-gl';
 import type { Family, Observation, Target } from './types';
-import { reading, statusOf, statusLabel } from './model';
+import { ageSeconds, elevatedTiming, isRTTMethod, lossValue, metric, reading, rollingStatus, statusOf, statusLabel } from './model';
 import { ARRIVAL_WINDOW_MS, freshCompletedAt } from './batch-arrivals';
 import { probeActivity } from './probe-model';
 import { retainCurrentTargetGroups } from './probe-layout';
@@ -64,15 +64,18 @@ function separateLeader(x: number, y: number, desired: Position, labelWidth: num
   })[0];
   return { ...fallback, clearance: clearance(fallback), separated: false };
 }
+const methodCode = { icmp: 'I', udp_echo: 'U', tcp_connect: 'T', https: 'H', dns: 'D' };
+function shortProvider(provider: string) { return provider === 'Epic Games' ? 'EP' : provider === 'Amazon Web Services' ? 'AWS' : provider.slice(0, 4).toUpperCase(); }
 function conditionCode(o: Observation | undefined, now: number) {
-  const codes: Record<string, string> = { na: 'N/A', stale: '+', timeout: 'TO', unreachable: 'NR', dns_error: 'DNS', permission_denied: 'DEN', unsupported: 'NS', error: 'ERR' };
-  return codes[statusOf(o, now)] ?? '';
+  const codes: Record<string, string> = { na: 'N/A', stale: '+', unverified: 'UV', disabled: 'OFF', timeout: 'NR', unreachable: 'NR', dns_error: 'DNS', permission_denied: 'DEN', unsupported: 'NS', error: 'ERR', unavailable: 'UTM', suspended: 'N/A' };
+  return codes[statusOf(o, now)] ?? (elevatedTiming(o, now) ? '↑' : statusOf(o, now) === 'degraded' ? '!' : '');
 }
 function tone(o: Observation | undefined, now: number, light: boolean) {
   const status = statusOf(o, now);
-  if (status === 'ok') return light ? '#507a09' : '#c5ef69';
-  if (status === 'na' || status === 'stale') return light ? '#697665' : '#9ca897';
-  return light ? '#aa4935' : '#ed9784';
+  if (o && ['timeout', 'unreachable', 'error'].includes(status) && (isRTTMethod(o.method) ? o.sent > 0 : o.attempted > 0)) return light ? '#aa4935' : '#ed9784';
+  if (!o || ['na', 'stale', 'unverified', 'unsupported', 'disabled', 'unavailable'].includes(status) || o.median_ms === null || !o.baseline_ms || o.baseline_ms <= 0 || rollingStatus(o, now) !== 'fresh' || ageSeconds(o.baseline_as_of, now) > 180 || o.baseline_sample_count < 5) return light ? '#697665' : '#9ca897';
+  const rise = Math.max(0, Math.min(1, o.median_ms / o.baseline_ms - 1));
+  return `hsl(${90 - rise * 80} ${light ? 62 : 76}% ${light ? 31 : 69}%)`;
 }
 function arrange(map: maplibregl.Map, targets: Target[], sizes: Map<string, LabelSize>, previousPositions = new Map<string, Position>()): Layout {
   const width = map.getContainer().clientWidth, height = map.getContainer().clientHeight, narrow = width < 800;
@@ -310,7 +313,7 @@ export function ProbeAtlas({ map, targets, selected, onSelect, family, now, arri
       const marker = markers.current.get(t.id); if (!marker) continue;
       const el = marker.getElement(), o = reading(t, family), status = statusOf(o, now);
       el.style.setProperty('--probe-tone', tone(o, now, theme === 'light'));
-      const activity = probeActivity(t, o, now);
+      el.classList.toggle('has-fresh-loss', (lossValue(o) ?? 0) > 0 && rollingStatus(o, now) === 'fresh');
       updateMarkerAppearance(el, selected === t.id, status, `${t.label} / ${statusLabel(status)} / approximate location`);
     }
   }, [targets, selected, family, now, theme]);
@@ -393,9 +396,9 @@ export function ProbeAtlas({ map, targets, selected, onSelect, family, now, arri
         <div className="probe-location" title={first.region}>{first.region}</div>
         <div className="probe-telemetry" ref={element => attachTelemetry(g.id, element)}>
           {g.ids.map(id => {
-            const t = targetsById.get(id)!, o = reading(t, family), status = statusOf(o, now), color = tone(o, now, theme === 'light');
-            return <button key={id} type="button" className={`probe-row ${id === selected ? 'selected' : ''} ${status}`} style={{ '--probe-tone': color } as CSSProperties} onClick={() => onSelect(id)} aria-pressed={id === selected} aria-label={`${t.label}. ICMP ${compact(o?.median_ms)} milliseconds. ${statusLabel(status)}.`}>
-              <span className="probe-reading"><span className="probe-provider">ICMP</span><strong>{compact(o?.median_ms)}{o?.median_ms != null && <small>ms</small>}</strong><span className="probe-condition">{conditionCode(o, now)}</span></span>
+            const t = targetsById.get(id)!, o = reading(t, family), status = statusOf(o, now), roll = rollingStatus(o, now), value = lossValue(o), color = tone(o, now, theme === 'light');
+            return <button key={id} type="button" className={`probe-row ${id === selected ? 'selected' : ''} ${status}`} style={{ '--probe-tone': color } as CSSProperties} onClick={() => onSelect(id)} aria-pressed={id === selected} aria-label={`${t.region} ${t.provider}. ${o?.method ?? 'Method unavailable'} ${metric(o?.median_ms)} milliseconds. One-hour ${isRTTMethod(o?.method) ? 'packet loss' : 'failed-attempt rate'} ${metric(value)} percent. ${statusLabel(status)}.`}>
+              <span className="probe-reading"><span className="probe-provider">{shortProvider(t.provider)}</span><span className="probe-method">{o ? methodCode[o.method] : '-'}</span><strong>{compact(o?.median_ms)}{o?.median_ms != null && <small>ms</small>}<span className="probe-condition">{conditionCode(o, now)}</span></strong><span className={`probe-loss ${(value ?? 0) > 0 ? 'has-loss' : ''} ${roll}`}>{isRTTMethod(o?.method) ? 'L' : 'F'}{compact(value)}{value != null ? '%' : ''}{roll === 'stale' ? '+' : ''}</span><span className="probe-activity" title="Only completed results are shown; in-flight target activity is unavailable">{probeActivity(t, o, now) === 'unknown' ? '?' : '-'}</span></span>
             </button>;
           })}
         </div>

@@ -1,31 +1,25 @@
-# MVP implementation breakdown
+# Standalone implementation
 
-The MVP follows the public plan and uses AGPL-3.0-only. Implementation is on `feature/mvp`. The owner approved sanitized reuse and publication of the existing application frontend; independent review is required before pushing. No executable release is published.
+Development on `feature/mvp` preserves the approved LG interface in a standalone Windows/Linux executable. This is a development checkpoint; the populated verified catalogue and final acceptance are pending. No executable release is published. The application licence is `AGPL-3.0-only`.
 
-## Build and runtime
+## Runtime and probes
 
-- Use Go to produce one executable per Windows/Linux architecture, with the local verification UI and starter catalogue embedded.
-- Keep the collector in the application process. Closing a browser tab does not stop collection.
-- Bind the HTTP UI to loopback. Store configuration and the database in a per-user application directory.
-- Probe IPv4 through Windows ICMP APIs and Linux ICMP datagram sockets. Report unsupported or permission-denied probe operations explicitly. Do not change host security settings.
+The application owns a background collector and an embedded loopback web UI. Closing the browser does not stop collection. Settings, identity revisions, the last-valid catalogue and observations remain in a per-user profile. Each scheduled series uses the target's intrinsic method and declared address family.
 
-## Data contract and collector
+Native probes support ICMP, GameLift UDP echo on port 7770, TCP connect, HTTPS and DNS on resolver port 53 with explicit expected answers. IPv4 and IPv6 are separate series. Batches are bounded to 30 seconds and staggered once per minute, without catch-up after downtime. The application never changes host permissions or security settings.
 
-- Identify each target by a stable ID and integer revision. Store both on each measurement so target changes do not rewrite history.
-- Record only actual attempts, with a timestamp, status and optional latency. Represent absent minute buckets as `N/A`; never turn missing records into packet loss.
-- Stagger probes across each minute, with bounded concurrency and timeouts. After a stop, sleep or clock gap, resume from the current schedule without replaying missed work.
-- Allow the user to set an origin location and enter an explicitly user-provided target. User-provided targets are not labelled as verified catalogue records.
+Actual sends, received outcomes and local inability to measure are separate counters. Packet loss is calculated only for measured ICMP/UDP outcomes; TCP/HTTPS/DNS use failed-attempt rates. Outcomes made unmeasurable by local errors are excluded from denominators. Clock discontinuities during a probe discard that batch's statistical outcomes. Missing history remains N/A.
 
-## Storage and catalogue
+## Storage and statistics
 
-- Use a local embedded database, bounded retention and a row cap. Keep configuration and the last-valid catalogue locally.
-- Fetch bounded JSON over HTTPS from a configured GitHub catalogue URL. Validate schema, stable target identities, revisions, verification metadata and version progression before adopting it.
-- Embed an empty starter catalogue until real targets have been verified. Do not invent verified target records. If an update fails, retain the last-valid catalogue or bundled starter.
-- Treat catalogue data as data: do not execute commands, scripts or plugins supplied by it.
+Pure-Go SQLite keeps 26 hours of compact raw batches, then preserves original counts and individual RTT values, timestamps and sequence numbers in 30-minute chunks. The default retention is 30 days. The main database is bounded to 4 GiB, with one connection and an 8 MiB page cache. Capacity failure is explicit; no unexpired row cap truncates history. Mature catalogue density and active journal bounds remain acceptance checks.
 
-## UI and verification
+Statistics separate the latest batch from the rolling hour. Medians, type-7 p95 and population standard deviation are recalculated from individual timings. A 24-hour baseline needs at least five successful timings, including valid zero-duration replies, and a positive resulting median. Freshness uses observation timestamps. Timing is elevated only when a fresh batch is both at least 50% and at least 10 ms above its fresh baseline and rolling data is fresh.
 
-- Integrate the existing application's map, directory, detail and history presentation with the local API. Remove fixed origin, old branding, external publication URLs and private records; preserve map and dependency licences.
-- Test storage restart/retention, failed attempts versus missing buckets, missed-schedule handling, catalogue rejection/fallback, bounded HTTP input and loopback access.
-- Test native probes with loopback in each available OS. Cross-compilation alone does not verify runtime behavior.
-- Obtain an independent implementation review, fix findings, and record available test environments and unresolved blockers.
+The map, animations, favorites, theme, configurable origin, family selection, provider/category/world-area filters, method filter and same-method/family comparison are retained. History uses completed UTC-aligned 1h/1-minute, 24h/5-minute, 7d/30-minute and 30d/2-hour grids. Expired retention is labelled separately from ordinary gaps.
+
+## Catalogue and acceptance
+
+The catalogue pipeline is ordinary homelab validation, sanitized versioned GitHub JSON, then desktop download. Each admitted method/family needs an exact matching endpoint and recorded successful observation, including the actual numeric destination and timestamp. Pending definitions stay unverified and are not scheduled. Schema, revision continuity, size limits and last-valid fallback are enforced. No commands or plugins are executed from catalogue data.
+
+The bundled starter remains empty while the exact current definition/result evidence is reconciled. The desktop has no runtime homelab dependency. Current Windows checks and remaining Linux, capacity, browser and publication checks are recorded in [TESTING.md](TESTING.md). Independent review is required before accepting the correction as complete. macOS remains deferred.
