@@ -1,32 +1,32 @@
 # The Ping Observatory catalogue channel
 
-This branch contains public catalogue data, verification receipts and their
-documentation. It is the application's update channel, separate from source
-development and executable releases.
-
-The stable download is:
+This branch contains reviewed public catalogue data, verification receipts,
+documentation and the licence. Source development and executable releases are
+separate. The complete stable download is:
 
 ```
 https://raw.githubusercontent.com/Shaderx/PingObservatory/catalogue/catalogue/latest.json
 ```
 
-`catalogue/latest.json` is a complete manifest, currently identical to the
-immutable `catalogue/v2.json` snapshot. Version 2 preserves 171 public target
-definitions and 196 configured family series: 116 literal ICMP/IPv4 families
-have historical success evidence dated 2026-10-09; 80 hostname families remain
-pending and are not automatically probed. See `catalogue/evidence/README.md`.
-Historical verification does not guarantee current or desktop reachability.
+`catalogue/latest.json` is byte-identical to immutable `catalogue/v3.json`.
+Schema 3 preserves 171 definitions and 196 configured families: 116 historical
+numeric-destination and 22 explicitly hostname-level successes are verified;
+58 families remain pending without automatic probing. These are dated October 9
+observations, not current or desktop reachability guarantees. See the evidence
+README for the exact distinction and the limits of derived literal receipts.
 
-Each application embeds the same reviewed starter snapshot. A fresh offline
-profile can therefore display the complete catalogue immediately. Startup and
-six-hour refreshes download only this GitHub manifest; accepted updates are
-persisted as a last-valid local cache. Failed, malformed, oversized, downgraded
-or same-version conflicting updates keep the existing valid data. No Homelab
-access is required by the application.
+Hostname receipts omit a numeric destination because the old probe's peer was
+not retained. Each client resolves and validates its own destination. Curator
+provenance never globally pins geographic DNS or creates local measurements.
 
-To publish an update, add a new immutable versioned snapshot and its reviewed
-evidence, give the complete manifest a higher version, then advance `latest.json`
-to that exact snapshot on this branch. Preserve earlier versioned files and
-evidence commits. A probe-definition change requires a higher target revision.
-Review pending-family changes explicitly. This channel contains data only and
-cannot supply executable code or installation commands to the application.
+The application embeds the same reviewed v3 snapshot for immediate offline
+startup. Startup and six-hour refreshes accept complete bounded manifests and
+retain a last-valid cache. Failed, malformed, oversized, downgraded or conflicting
+same-version updates keep valid local data. Older schema-2 applications reject
+schema 3 and keep their v2 cache/starter; no executable release is published.
+
+Publish future releases as new immutable snapshots and reviewed evidence, then
+advance `latest.json` to that exact higher-version document. Preserve v2/v3 files
+and evidence commits. Intrinsic probe-definition changes require higher target
+revisions; provenance-only updates preserve local measurement identity/history.
+This data-only channel supplies no executable code or installation commands.
