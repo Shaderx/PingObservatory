@@ -1,6 +1,8 @@
 # Endpoint catalogue
 
-The application downloads versioned JSON from `Shaderx/PingObservatory/<ref>/catalogue/v<number>.json` on `https://raw.githubusercontent.com`. An empty URL disables updates. The bundled `v1.json` is an empty legacy starter; the schema-2 master and its verified population remain pending exact current evidence. No candidate is promoted by inference.
+The application downloads versioned JSON from `Shaderx/PingObservatory/<ref>/catalogue/v<number>.json` on `https://raw.githubusercontent.com`. An empty URL disables updates. The schema-2 master `v2.json` contains 171 public target definitions and 196 configured family series: 116 historical ICMP/IPv4 literal successes are verified, while 80 hostname families remain pending without automatic probing. See the [dated evidence and its limits](evidence/README.md). The executable still embeds the empty legacy `v1.json` starter during final integration; no executable release is published.
+
+The 101 derived literal receipts use matching definitions and successes from 2026-10-09, not assumed unchanged configuration at a later date. The other 15 receipts explicitly record their numeric destinations and successful rounds on that date. No historical DNS answer is inferred, and no success from another method or family is substituted. Versioned evidence files are retained; the master pins its evidence object to a Git commit.
 
 ## Schema 2
 
@@ -12,7 +14,7 @@ Measurement methods are `icmp`, `udp_echo`, `tcp_connect`, `https` and `dns`, wi
 
 Every declared family has an `admission` entry with state `verified`, `unverified`, `unsupported` or `disabled`. A pending state must explain its reason and cannot contain success evidence. It remains visible without automatic probing. A verified family requires `evidence` with the exact matching method, family, actual numeric destination, actual UTC `observed_at` and an HTTPS source URL. ICMP destinations are IP addresses; other methods use IP:port, with bracket notation for IPv6. The recorded port must match the endpoint, and a literal host must match the observed IP. Catalogue and runtime use the same public-unicast destination boundary.
 
-A source review date, deployment date, generic validation label, hostname resolution performed later, synthetic fixture, HTTPS success or DNS success cannot substitute for the required method/family observation. Verification records a success from the owner's validation network at that time; it does not guarantee reachability from a desktop network. Desktop measurements remain separate.
+A source review date, deployment date, generic validation label, hostname resolution performed later, synthetic fixture, HTTPS success or DNS success cannot substitute for the required method/family observation. The numeric-peer requirement is this schema's evidence policy; an earlier successful hostname probe can verify a hostname-level claim but cannot supply an unrecorded numeric peer. Verification records a success from the owner's validation network at that time; it does not guarantee current availability or reachability from a desktop network. Desktop measurements remain separate.
 
 ## Identity and promotion
 

@@ -17,8 +17,8 @@ A standalone network latency map for Windows and Linux. An initial scaffold is o
 
 1. **Data contract and platform probe support:** Implemented stable target IDs/revisions, actual attempt records and native Windows/Linux IPv4 probes. Missing minute buckets are N/A; attempted failures retain their explicit status.
 2. **Local storage and UI:** Implemented bounded local storage, one-minute staggered background collection, per-user settings and the embedded local map/history UI. The origin is configurable.
-3. **Catalogue updates:** Implemented periodic bounded GitHub JSON fetching, strict validation, bundled starter and last-valid fallback. The starter remains empty pending real owner-homelab endpoint verification evidence.
-4. **Tests and packaging:** Unit/integration tests and Windows/Linux amd64 native loopback checks pass. Single executable builds are prepared for Windows/Linux amd64/arm64. Arm64 runtime and successful unprivileged Linux ping sockets still require suitable test environments; no release is published.
+3. **Catalogue updates:** Implemented periodic bounded GitHub JSON fetching, strict validation, bundled starter and last-valid fallback. The version-2 master contains 171 definitions with 116 dated historical verified literal families and 80 pending hostname families. The legacy starter remains empty during final catalogue integration.
+4. **Tests and packaging:** Windows native ICMP IPv4/IPv6 and protocol loopback checks pass. Linux suites, protocol fixtures, packaged TCP loopback and ICMP socket-denial checks pass; successful Linux native ICMP remains unverified. Single executable builds are prepared for Windows/Linux amd64/arm64. Arm64 runtime still requires a suitable test environment; no release is published.
 
 See [verification details](TESTING.md) and [third-party notices](THIRD_PARTY.md).
 

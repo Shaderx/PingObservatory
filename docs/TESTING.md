@@ -1,6 +1,6 @@
 # Verification checkpoint
 
-The intended standalone MVP is not yet accepted as complete. The populated verified catalogue, mature storage-capacity evidence and final independent acceptance remain pending. No executable release is published.
+The intended standalone MVP is not yet accepted as complete. The version-2 master has reviewed historical literal evidence; final catalogue integration, populated packaging and independent acceptance remain pending. No executable release is published.
 
 ## Current Windows checks
 
@@ -8,7 +8,7 @@ On the resumed correction, Go 1.26.5 on Windows amd64 passes `go test -p 2 -coun
 
 Tests cover persistence, exact uneven-sample quantiles, population standard deviation, separate method/family/revision series, real sends versus unobservable outcomes, valid zero-duration baseline samples, completed history grids, explicit retention expiry, active-probe clock jumps, revision ledgers, catalogue rejection/fallback and local API boundaries. Test workers are bounded to two.
 
-Recovered HTTPS catalogue definitions retain their five-second application timeouts. The shared validator permits HTTPS timeouts up to ten seconds while retaining the existing three-second limit for other methods and the 30-second complete-cycle bound. The expanded catalogue remains a local review draft; decoder acceptance does not establish admission evidence or publication.
+Recovered HTTPS catalogue definitions retain their five-second application timeouts. The shared validator permits HTTPS timeouts up to ten seconds while retaining the existing three-second limit for other methods and the 30-second complete-cycle bound. The expanded master is checked against its historical receipts; decoder acceptance does not establish current availability or populated packaging.
 
 Frontend TypeScript compilation, 17 Vitest tests and the production Vite build pass using existing pinned dependencies. The map assets and third-party notices remain embedded. The packaged Windows browser checks pass for manual method settings, map/callouts/origin, provider/category/world-area filters, loss sorting, comparison limits, family switching, all history windows, explicit retention expiry, theme, motion and a 390-pixel mobile viewport. The isolated UI made no external requests and reported no browser errors. A separate loopback TCP fixture recorded a newer successful measurement after browser closure, confirming independent background collection. Temporary test processes were closed. A regression guards both family-switch history races and middle-target revision changes.
 
@@ -18,7 +18,9 @@ WSL is not used for this correction's resumed validation. On the owner's separat
 
 The same cloud run measured a synthetic 342-series, 30-day profile with three successful samples per minute: 14,774,400 minute batches occupied 2,288,648,192 bytes (2.13 GiB). A 30-day series history took about 120 ms and all-series statistics about 1.07 seconds on that host. This scenario is not the final admitted catalogue workload. Extrapolation at the allowed maximum ICMP packet setting exceeds the 4 GiB cap for sufficiently many series; a universal 30-day capacity claim is not supported.
 
-That mature profile also exposed a 91.3-second synchronous one-day cleanup. The correction removes cleanup from profile opening and retention changes. The app runs resumable background maintenance, commits at most one 64-row modifying batch per step and yields the storage lock between steps. Reads enforce retention immediately, before physical deletion. A regression verifies reopening without draining, interrupted archival, atomic replacement without duplicate raw/chunk records, exact history and immediate expiry. The mature cloud profile must rerun against the corrected commit to establish observed startup/foreground latency and active journal/memory bounds.
+That mature profile also exposed a 91.3-second synchronous one-day cleanup. The correction removes cleanup from profile opening and retention changes. The app runs resumable background maintenance, commits at most one 64-row modifying batch per step and yields the storage lock between steps. Reads enforce retention immediately, before physical deletion. A regression verifies reopening without draining, interrupted archival, atomic replacement without duplicate raw/chunk records, exact history and immediate expiry.
+
+The cloud retest of exact `660ad6c1116d9391a8990b0a7993ec03b7190fcc` passed at the same synthetic 342-series mature scale. Store opening took 0.45 ms; the packaged executable announced its URL in 8.65 ms. During cleanup, 24 API requests passed, with worst state/history durations of 25.1/174.2 ms. Cleanup completed in 196.5 seconds across 7,605 bounded steps under 838 concurrent correct history reads; SQLite integrity checking passed. Peak RSS was 104.4 MiB, and shutdown took 11.2 ms. These are observations from that synthetic cloud sandbox, not performance guarantees or a measurement of the final admitted catalogue. The startup regression is resolved; allowed extreme workloads can still exceed the storage cap.
 
 Run the ordinary suite and vet first, without the native-success flag:
 
@@ -34,4 +36,4 @@ Do not set `PINGOBSERVATORY_NATIVE_TEST=1` on a host whose existing policy denie
 
 ## Remaining acceptance
 
-Verify mature full-catalogue retention and active journal/memory bounds, exact current catalogue evidence and admission, fresh cross-platform packaging, and independent source/publication review. Earlier scaffold-only Windows/WSL results do not establish completion of this correction. macOS is deferred.
+Verify final catalogue integration, the pending-family evidence policy, active journal bounds for the final workload, populated cross-platform packaging, and final independent acceptance. Earlier scaffold-only Windows/WSL results do not establish completion of this correction. macOS is deferred.
