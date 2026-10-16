@@ -77,6 +77,18 @@ func newManager(cachePath, url string, starter []byte) (*Manager, error) {
 		return m, nil
 	}
 	if err = validateTransition(c, m.identities, state.Catalogue); err != nil {
+		if c.SchemaVersion == 3 && state.Catalogue.SchemaVersion == 2 && state.Catalogue.Version < c.Version {
+			// Keep revision guards for IDs removed from a newer embedded release.
+			// This imports no old catalogue targets or measurements.
+			for _, target := range state.Identities {
+				if _, exists := m.identities[target.ID]; !exists {
+					m.identities[target.ID] = upgradeNumericIdentity(target)
+				}
+			}
+			if len(m.identities) > maxIdentities {
+				return nil, errors.New("catalogue identity ledger is full")
+			}
+		}
 		m.lastError = "catalogue cache ignored: " + err.Error()
 		return m, nil
 	}
@@ -182,7 +194,13 @@ func (m *Manager) Refresh(ctx context.Context) (err error) {
 	}
 	identities := make(map[string]model.Target, len(m.identities)+len(candidate.Targets))
 	for id, target := range m.identities {
-		identities[id] = cloneTarget(target)
+		copy := cloneTarget(target)
+		if m.current.SchemaVersion == 2 && candidate.SchemaVersion == 3 {
+			// Removed IDs still guard revision continuity. Their validated schema-2
+			// numeric evidence needs an explicit scope in the schema-3 cache ledger.
+			copy = upgradeNumericIdentity(copy)
+		}
+		identities[id] = copy
 	}
 	for _, target := range candidate.Targets {
 		identities[target.ID] = cloneTarget(target)
@@ -195,6 +213,16 @@ func (m *Manager) Refresh(ctx context.Context) (err error) {
 	}
 	m.current, m.identities, m.source = candidate, identities, "remote"
 	return nil
+}
+
+func upgradeNumericIdentity(target model.Target) model.Target {
+	copy := cloneTarget(target)
+	for _, admission := range copy.Admission {
+		if admission.Evidence != nil {
+			admission.Evidence.Scope = "numeric_destination"
+		}
+	}
+	return copy
 }
 
 func defaultClient() *http.Client {
@@ -293,10 +321,10 @@ func readCache(path string) (cacheState, error) {
 			state.Identities[i] = target
 		}
 		var err error
-		if state.Catalogue.SchemaVersion == 2 {
+		if state.Catalogue.SchemaVersion == 2 || state.Catalogue.SchemaVersion == 3 {
 			normalizeTarget(&target)
 			state.Identities[i] = target
-			err = validateTargetV2(target, state.Catalogue.PublishedAt)
+			err = validateTargetVersion(target, state.Catalogue.PublishedAt, state.Catalogue.SchemaVersion)
 		} else {
 			err = validateTarget(target, state.Catalogue.PublishedAt)
 		}

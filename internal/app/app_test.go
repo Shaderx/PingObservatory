@@ -207,13 +207,18 @@ func TestFirstRunCatalogueIsPopulatedWithEmptyLocalMeasurements(t *testing.T) {
 	if err := json.Unmarshal(state["statistics"], &statistics); err != nil {
 		t.Fatal(err)
 	}
-	if len(targets) != 171 || len(statistics) != 196 || len(a.Jobs()) != 116 {
+	if len(targets) != 171 || len(statistics) != 196 || len(a.Jobs()) != 138 {
 		t.Fatalf("first-run population disconnected: targets=%d statistics=%d jobs=%d", len(targets), len(statistics), len(a.Jobs()))
 	}
+	methods := map[string]int{}
 	for _, job := range a.Jobs() {
-		if job.Family != model.FamilyIPv4 || job.Target.Admission[job.Family].State != "verified" || model.Settings(job.Target).Method != model.MethodICMP {
+		methods[model.Settings(job.Target).Method]++
+		if job.Target.Admission[job.Family].State != "verified" {
 			t.Fatal("pending or mismatched catalogue family scheduled")
 		}
+	}
+	if methods[model.MethodICMP] != 120 || methods[model.MethodUDP] != 16 || methods[model.MethodHTTPS] != 2 {
+		t.Fatal("unexpected admitted methods", methods)
 	}
 	for _, series := range statistics {
 		if series.Observation.Status != "na" || series.Observation.ObservedAt != nil || series.Observation.Sent != 0 || series.Observation.Received != 0 {
@@ -276,7 +281,7 @@ func TestInspectModeDoesNotProbeThePopulatedCatalogue(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Millisecond)
 	defer cancel()
 	a.Run(ctx)
-	if probes.Load() != 0 || a.collector.Snapshot().Enabled || len(a.Jobs()) != 116 {
+	if probes.Load() != 0 || a.collector.Snapshot().Enabled || len(a.Jobs()) != 138 {
 		t.Fatal("inspect mode probed targets or lost the effective catalogue")
 	}
 }

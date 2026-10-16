@@ -26,7 +26,7 @@ func validateV2(c model.Catalogue) error {
 	seen := make(map[string]bool, len(c.Targets))
 	slots := 0
 	for _, t := range c.Targets {
-		if err := validateTargetV2(t, c.PublishedAt); err != nil {
+		if err := validateTargetVersion(t, c.PublishedAt, c.SchemaVersion); err != nil {
 			return fmt.Errorf("target %q: %w", t.ID, err)
 		}
 		if seen[t.ID] {
@@ -42,6 +42,10 @@ func validateV2(c model.Catalogue) error {
 }
 
 func validateTargetV2(t model.Target, published time.Time) error {
+	return validateTargetVersion(t, published, 2)
+}
+
+func validateTargetVersion(t model.Target, published time.Time, schema int) error {
 	if !identifier.MatchString(t.ID) || strings.HasPrefix(t.ID, "manual-") {
 		return errors.New("invalid or reserved stable ID")
 	}
@@ -55,7 +59,7 @@ func validateTargetV2(t model.Target, published time.Time) error {
 		return err
 	}
 	if t.VerifiedAt != nil || t.VerificationSource != "" || t.VerificationMethod != "" || t.VerificationFamily != "" || t.VerificationDestination != "" {
-		return errors.New("schema 2 uses per-family admission evidence; legacy verification fields are not allowed")
+		return errors.New("schema 2/3 uses per-family admission evidence; legacy verification fields are not allowed")
 	}
 	if t.Category == "private_baseline" || strings.EqualFold(t.Provider, "Homelab") {
 		return errors.New("private target classification is not allowed in the public catalogue")
@@ -111,7 +115,7 @@ func validateTargetV2(t model.Target, published time.Time) error {
 			if admission.Evidence == nil {
 				return errors.New("verified admission requires actual successful observation evidence")
 			}
-			if err := validateEvidence(t, family, *admission.Evidence, published); err != nil {
+			if err := validateEvidence(t, family, *admission.Evidence, published, schema); err != nil {
 				return err
 			}
 		case "unverified", "unsupported", "disabled":
@@ -205,7 +209,7 @@ func validateProbeSettings(t model.Target) error {
 	return model.ValidateProbeTarget(t)
 }
 
-func validateEvidence(t model.Target, family string, e model.Verification, published time.Time) error {
+func validateEvidence(t model.Target, family string, e model.Verification, published time.Time, schema int) error {
 	if e.Method != t.Measurement.Method || e.Family != family {
 		return errors.New("verification must match the configured method and family")
 	}
@@ -214,6 +218,27 @@ func validateEvidence(t model.Target, family string, e model.Verification, publi
 	}
 	if err := validatePublicHTTPSURL(e.SourceURL); err != nil {
 		return fmt.Errorf("invalid verification source_url: %w", err)
+	}
+	if schema == 2 && (e.Scope != "" || e.Hostname != "" || e.Port != 0) {
+		return errors.New("schema 2 accepts only legacy numeric-destination evidence")
+	}
+	if schema == 3 {
+		switch e.Scope {
+		case "hostname":
+			if _, err := netip.ParseAddr(t.Host); err == nil || e.Hostname != t.Host || e.Destination != "" {
+				return errors.New("hostname evidence must match the configured DNS hostname and cannot claim a numeric destination")
+			}
+			if e.Port != evidencePort(t) {
+				return errors.New("hostname evidence port differs from the configured endpoint")
+			}
+			return nil
+		case "numeric_destination":
+			if e.Hostname != "" || e.Port != 0 {
+				return errors.New("numeric evidence cannot contain hostname-level fields")
+			}
+		default:
+			return errors.New("schema 3 evidence scope must be numeric_destination or hostname")
+		}
 	}
 	var destination netip.Addr
 	if e.Method == model.MethodICMP {
@@ -228,13 +253,7 @@ func validateEvidence(t model.Target, family string, e model.Verification, publi
 			return errors.New("transport evidence destination must be exact IP:port")
 		}
 		destination = peer.Addr()
-		port := t.Port
-		if port == 0 && e.Method == model.MethodHTTPS {
-			port = 443
-		}
-		if port == 0 && e.Method == model.MethodDNS {
-			port = 53
-		}
+		port := evidencePort(t)
 		if int(peer.Port()) != port {
 			return errors.New("verification destination port differs from the configured endpoint")
 		}
@@ -246,6 +265,16 @@ func validateEvidence(t model.Target, family string, e model.Verification, publi
 		return errors.New("verification destination differs from the literal endpoint")
 	}
 	return nil
+}
+
+func evidencePort(t model.Target) int {
+	if t.Port == 0 && t.Measurement.Method == model.MethodHTTPS {
+		return 443
+	}
+	if t.Port == 0 && t.Measurement.Method == model.MethodDNS {
+		return 53
+	}
+	return t.Port
 }
 
 func publicAddress(ip netip.Addr) bool {

@@ -65,7 +65,7 @@ func validRef(ref string) bool {
 	return true
 }
 
-// Decode accepts one strict, bounded schema-1 JSON document. Unknown fields,
+// Decode accepts one strict, bounded supported catalogue document. Unknown fields,
 // duplicate keys, invalid UTF-8, and trailing documents are errors.
 func Decode(data []byte) (model.Catalogue, error) {
 	var c model.Catalogue
@@ -85,10 +85,10 @@ func Decode(data []byte) (model.Catalogue, error) {
 	return c, nil
 }
 
-// Validate checks the data contract. A target revision covers its entire record,
-// including verification metadata; any record change requires a new revision.
+// Validate checks the data contract. In schema 2/3 a target revision covers its
+// probe definition; a higher document version can refresh admission and display data.
 func Validate(c model.Catalogue) error {
-	if c.SchemaVersion == 2 {
+	if c.SchemaVersion == 2 || c.SchemaVersion == 3 {
 		return validateV2(c)
 	}
 	if c.SchemaVersion != 1 {
@@ -326,12 +326,17 @@ func requireTargetFieldsForSchema(data []byte, schema int) error {
 	}
 	for i, t := range targets {
 		keys := []string{"id", "revision", "label", "host", "verified_at", "verification_source", "verification_method", "verification_family", "verification_destination"}
-		if schema == 2 {
+		if schema == 2 || schema == 3 {
 			keys = []string{"id", "revision", "label", "host", "measurement", "admission"}
 		}
 		for _, key := range keys {
 			if _, ok := t[key]; !ok {
 				return fmt.Errorf("target %d missing field %q", i, key)
+			}
+		}
+		if schema == 2 || schema == 3 {
+			if err := requireEvidenceFields(t["admission"], schema); err != nil {
+				return fmt.Errorf("target %d: %w", i, err)
 			}
 		}
 		if point, ok := t["location"]; ok && !bytes.Equal(bytes.TrimSpace(point), []byte("null")) {
@@ -343,6 +348,57 @@ func requireTargetFieldsForSchema(data []byte, schema int) error {
 				value, ok := fields[key]
 				if !ok || bytes.Equal(bytes.TrimSpace(value), []byte("null")) {
 					return fmt.Errorf("target %d location missing %q", i, key)
+				}
+			}
+		}
+	}
+	return nil
+}
+
+// Check presence as well as values: null or empty fields cannot disguise a
+// mixed scope, and extending the model must not change the schema-2 contract.
+func requireEvidenceFields(data []byte, schema int) error {
+	var admissions map[string]struct {
+		Evidence map[string]json.RawMessage `json:"evidence"`
+	}
+	if err := json.Unmarshal(data, &admissions); err != nil {
+		return err
+	}
+	for _, admission := range admissions {
+		e := admission.Evidence
+		if e == nil {
+			continue
+		}
+		forbid := []string{"scope", "hostname", "port"}
+		if schema == 3 {
+			var scope, method string
+			if err := json.Unmarshal(e["scope"], &scope); err != nil {
+				return errors.New("schema 3 evidence requires scope")
+			}
+			if err := json.Unmarshal(e["method"], &method); err != nil {
+				return err
+			}
+			switch scope {
+			case "hostname":
+				forbid = []string{"destination"}
+				if _, ok := e["hostname"]; !ok {
+					return errors.New("hostname evidence requires hostname")
+				}
+				if method == model.MethodICMP {
+					forbid = append(forbid, "port")
+				} else if value, ok := e["port"]; !ok || bytes.Equal(bytes.TrimSpace(value), []byte("null")) {
+					return errors.New("transport hostname evidence requires port")
+				}
+			case "numeric_destination":
+				forbid = []string{"hostname", "port"}
+			default:
+				return errors.New("unknown schema 3 evidence scope")
+			}
+		}
+		for _, field := range forbid {
+			for actual := range e {
+				if strings.EqualFold(actual, field) {
+					return fmt.Errorf("evidence field %q is forbidden for this scope/schema", actual)
 				}
 			}
 		}

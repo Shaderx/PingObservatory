@@ -1,6 +1,6 @@
 # Verification checkpoint
 
-The intended standalone MVP is not yet accepted as complete. The populated starter and GitHub update channel pass Windows integration checks. The hostname-family evidence policy, remaining platform checks and final product acceptance remain pending. No executable release is published.
+The intended standalone MVP is not yet accepted as complete. The populated starter and GitHub update channel pass Windows integration checks. Schema 3 adds explicitly labelled historical hostname evidence; remaining platform checks and final product acceptance remain pending. No executable release is published.
 
 ## Current Windows checks
 
@@ -22,6 +22,14 @@ The packaged Windows executable was then tested with `--collect=false --open-bro
 
 The populated browser check passed for the map, all 171 directory records, settings URL/version/source, provider/category/world-area/method filters, 116 empty-local-history IPv4 states versus 55 unverified states, and 25 unverified versus 146 unconfigured IPv6 states. Desktop and 390-pixel mobile layouts had no horizontal overflow, browser errors or external UI requests. Test-owned processes were closed. The full Windows Go suite, native IPv4/IPv6 loopback tests and vet passed after the integration fixes. Static builds for Windows/Linux amd64/arm64 also passed; cross-compilation does not establish Linux or arm64 runtime behavior for this populated integration. No public endpoint probes were performed.
 
+## Schema-3 hostname evidence
+
+The reviewed evidence-only commit `62c8fef7839f43dad3f8a84e8e68e4187556475e` preserves 22 genuine successful hostname-family batches from the saved October 9 audit: 16 GameLift UDP batches at 3/3, four Fortnite ICMP batches at 5/5, and two cdnjs HTTPS batches at 1/1. Independent review matched the configured hostname, applicable port/scheme/path/HTTP method, exact method/family, timestamps, status and counts. Every receipt explicitly states that the numeric peer was not recorded; no later DNS lookup supplies one. The 116 earlier numeric-destination receipts, v2 snapshot and evidence pins remain unchanged.
+
+The v3 embedded starter and complete `latest.json` match the immutable v3 snapshot: 171 definitions, 196 configured families, 138 eligible jobs (120 ICMP, 16 UDP, two HTTPS), and 58 pending families. Eligibility comprises 116 numeric-destination and 22 hostname-level historical successes. New tests reject missing/mixed scopes, including forbidden empty/null fields, wrong hostname/port/method/family/time and hostname evidence on literal targets. Schema 2 remains numeric-only. Cache tests cover schema-3 reopen, higher valid cache, older-cache fallback, removed-ID revision guards across upgrade, and rollback/equivocation rejection. Provenance-only promotion and refresh preserve intrinsic probe identity and revision.
+
+The Windows suite, native IPv4/IPv6 loopback checks, vet, TypeScript build, 18 frontend tests and embedded production build pass. A packaged offline browser run with collection paused passed explicit hostname/numeric/pending labels, all 171 directory records, IPv4/IPv6 admission states and N/A local statistics/history. Desktop and 390-pixel mobile layouts had no horizontal overflow, external UI requests or browser errors. No public endpoint probes were performed. Verification of the published v3 channel and actual older schema-2 executable follows publication.
+
 ## Linux validation handoff
 
 WSL is not used for this correction's resumed validation. On the owner's separately approved cloud computer, exact commit `78f5e1a2a4c6328923fc1f2731c4a9e1b6785414` passes the full Go suite, vet, IPv4/IPv6 permission-denial tests, static Linux build, 17 frontend tests and the production build. Packaged HTTP/config, all four history grids, TCP loopback background collection, shutdown/reopen persistence and `--collect=false` pass. Chromium could not launch under the existing cloud sandbox, so Windows provides the current browser evidence. Successful Linux native ICMP and arm64 runtime behavior still require a suitable existing environment.
@@ -42,8 +50,8 @@ CGO_ENABLED=0 go build -trimpath -o PingObservatory ./cmd/pingobservatory
 ./PingObservatory --licenses
 ```
 
-Do not set `PINGOBSERVATORY_NATIVE_TEST=1` on a host whose existing policy denies ICMP. Permission denial must have no sent-packet loss denominator. For UI checks, use a temporary data directory and `--open-browser=false --collect=false --listen 127.0.0.1:0`. The populated default has 116 eligible public series, so leave collection paused during inspection. A loopback collection test must also disable or replace catalogue jobs with its isolated fixtures.
+Do not set `PINGOBSERVATORY_NATIVE_TEST=1` on a host whose existing policy denies ICMP. Permission denial must have no sent-packet loss denominator. For UI checks, use a temporary data directory and `--open-browser=false --collect=false --listen 127.0.0.1:0`. The v3 populated default has 138 eligible public series, so leave collection paused during inspection. A loopback collection test must also disable or replace catalogue jobs with its isolated fixtures.
 
 ## Remaining acceptance
 
-Resolve the pending-family evidence policy, verify active journal bounds for the final workload, run the populated integration on Linux, complete successful Linux native ICMP and arm64 runtime checks, and obtain final product acceptance. Earlier scaffold-only Windows/WSL results do not establish completion of this correction. macOS is deferred.
+Verify active journal bounds for the final workload, run the populated schema-3 integration on Linux, complete successful Linux native ICMP and arm64 runtime checks, and obtain final product acceptance. Families without adequate evidence remain pending. Earlier scaffold-only Windows/WSL results do not establish completion of this correction. macOS is deferred.

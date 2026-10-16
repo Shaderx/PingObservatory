@@ -1,8 +1,13 @@
-import type { Family, History, LocalTarget, Method, Observation, ProbeSettings, State, Target, Window } from './types';
+import type { Family, History, LocalTarget, Method, Observation, ProbeSettings, State, Target, Verification, Window } from './types';
 import { historyWindows } from './history-windows';
 
 export const methods: Record<Method, string> = { icmp: 'ICMP RTT', udp_echo: 'UDP echo RTT', tcp_connect: 'TCP connect', https: 'HTTPS duration', dns: 'DNS query' };
 export const BASELINE_POLICY = 'A fresh successful batch is compared with its fresh, positive 24-hour baseline for the same target revision, method and address family. Timing is elevated only when it is at least 50% and at least 10 ms above baseline, and rolling-hour data is fresh.';
+export function verificationDescription(evidence: Verification) {
+  return evidence.scope === 'hostname'
+    ? `Hostname-level evidence: ${evidence.hostname}${evidence.port ? `:${evidence.port}` : ''}. Numeric peer was not recorded.`
+    : `Numeric-destination evidence: ${evidence.destination}.`;
+}
 const labels: Record<string, string> = { ok: 'Observed', degraded: 'Degraded', na: 'N/A', stale: 'Stale', timeout: 'No response', unreachable: 'Unreachable', dns_error: 'DNS error', permission_denied: 'Permission denied', unsupported: 'Unsupported', error: 'Local error', suspended: 'N/A', unavailable: 'Unable to measure', fresh: 'Fresh', unverified: 'Unverified', disabled: 'Disabled' };
 export function statusLabel(value: string) { return labels[value] ?? value.replaceAll('_', ' '); }
 export function metric(value: number | null | undefined) { return value == null || !Number.isFinite(value) ? 'N/A' : value.toFixed(1); }

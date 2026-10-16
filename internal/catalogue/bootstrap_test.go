@@ -21,21 +21,26 @@ import (
 
 func assertPopulation(t *testing.T, c model.Catalogue) {
 	t.Helper()
-	verified, pending, slots := 0, 0, 0
+	verified, pending, slots, numeric, hostname := 0, 0, 0, 0, 0
 	for _, target := range c.Targets {
 		for _, family := range target.Measurement.Families {
 			slots++
 			if target.Admission[family].State == "verified" {
 				verified++
-				if family != model.FamilyIPv4 || target.Measurement.Method != model.MethodICMP {
-					t.Fatal("unexpected admitted method/family")
+				if target.Admission[family].Evidence.Scope == "numeric_destination" {
+					numeric++
+					if family != model.FamilyIPv4 || target.Measurement.Method != model.MethodICMP {
+						t.Fatal("unexpected numeric admission")
+					}
+				} else {
+					hostname++
 				}
 			} else {
 				pending++
 			}
 		}
 	}
-	if c.SchemaVersion != 2 || len(c.Targets) != 171 || slots != 196 || verified != 116 || pending != 80 {
+	if c.SchemaVersion != 3 || len(c.Targets) != 171 || slots != 196 || verified != 138 || numeric != 116 || hostname != 22 || pending != 58 {
 		t.Fatalf("unexpected effective population: schema=%d targets=%d slots=%d verified=%d pending=%d", c.SchemaVersion, len(c.Targets), slots, verified, pending)
 	}
 }
@@ -64,7 +69,7 @@ func TestProductionStarterAndPublishedAliasMatch(t *testing.T) {
 		t.Fatal(err)
 	}
 	assertPopulation(t, starter)
-	for _, name := range []string{"v2.json", "latest.json"} {
+	for _, name := range []string{"v3.json", "latest.json"} {
 		data, err := os.ReadFile(filepath.Join("..", "..", "catalogue", name))
 		if err != nil {
 			t.Fatal(err)
@@ -206,6 +211,44 @@ func TestProductionFailuresKeepPopulatedStarter(t *testing.T) {
 	assertPopulation(t, c)
 	if source != "bundled" || !strings.Contains(m.LastError(), "downgrade") {
 		t.Fatal("legacy empty cache downgraded the real starter")
+	}
+	data, err := os.ReadFile(filepath.Join("..", "..", "catalogue", "v2.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	v2, err := Decode(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	identities := map[string]model.Target{}
+	for _, target := range v2.Targets {
+		identities[target.ID] = target
+	}
+	removed := fixtureV2(2).Targets[0]
+	removed.ID = "removed-preview-target"
+	identities[removed.ID] = removed
+	if err := writeCache(path, v2, identities); err != nil {
+		t.Fatal(err)
+	}
+	m, err = New(path, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	c, source = m.Snapshot()
+	assertPopulation(t, c)
+	if source != "bundled" || !strings.Contains(m.LastError(), "downgrade") {
+		t.Fatal("older populated v2 cache downgraded schema3 starter")
+	}
+	retained, exists := m.identities[removed.ID]
+	if !exists || retained.Revision != removed.Revision || retained.Admission["ipv4"].Evidence.Scope != "numeric_destination" {
+		t.Fatal("new starter discarded an older cache's removed-ID revision guard")
+	}
+	next := cloneCatalogue(c)
+	next.Version++
+	retained.Host = "changed.example.com"
+	next.Targets = append(next.Targets, retained)
+	if err := validateTransition(c, m.identities, next); err == nil {
+		t.Fatal("removed ID could reset its identity after bundled-schema migration")
 	}
 }
 

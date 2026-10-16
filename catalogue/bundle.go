@@ -7,7 +7,7 @@ import _ "embed"
 // higher version; its versioned snapshot and pinned evidence remain immutable.
 const DefaultURL = "https://raw.githubusercontent.com/Shaderx/PingObservatory/catalogue/catalogue/latest.json"
 
-//go:embed v2.json
+//go:embed v3.json
 var starter []byte
 
 // Starter returns a copy so callers cannot change the embedded catalogue.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { comparable, elevatedTiming, emptyObservation, historyPath, historySummary, lossValue, presentHistory, presentTargets, reading, selectCompatibleHistories, settings, statusOf } from './model';
+import { comparable, elevatedTiming, emptyObservation, historyPath, historySummary, lossValue, presentHistory, presentTargets, reading, selectCompatibleHistories, settings, statusOf, verificationDescription } from './model';
 import type { Bucket, History, LocalTarget, Observation, State } from './types';
 import { createHistoryChartOption } from './HistoryChart';
 
@@ -11,6 +11,13 @@ function bucket(changes: Partial<Bucket> = {}): Bucket { return { retention_expi
 function history(changes: Partial<History> = {}): History { return { target_id: target.id, target_revision: target.revision, method: 'icmp', family: 'ipv4', window: '1h', step_seconds: 60, start: at, end: '2026-10-14T13:00:00Z', as_of: at, retention_days: 30, retained_from: '2026-09-14T12:00:00Z', buckets: [], points: [], ...changes }; }
 
 describe('local observation fidelity', () => {
+  it('labels hostname evidence without inventing a numeric peer or local measurement', () => {
+    const evidence = { scope: 'hostname' as const, method: 'udp_echo' as const, family: 'ipv6' as const, hostname: 'example.com', port: 7770, observed_at: at, source_url: 'https://example.com/receipts' };
+    expect(verificationDescription(evidence)).toBe('Hostname-level evidence: example.com:7770. Numeric peer was not recorded.');
+    expect(verificationDescription({ ...evidence, scope: 'numeric_destination', destination: '[2606:4700:4700::1111]:7770', hostname: undefined, port: undefined })).toContain('Numeric-destination evidence: [2606:4700:4700::1111]:7770');
+    const catalogueTarget = { ...target, id: 'catalogue-test', measurement: settings(target), admission: { ipv4: { state: 'verified' as const, evidence: { ...evidence, family: 'ipv4' as const } } } };
+    expect(reading(presentTargets({ ...state, targets: [catalogueTarget], statistics: [], latest: [] })[0], 'ipv4')?.observed_at).toBeNull();
+  });
   it('keeps current and rolling totals and variance separate', () => {
     const current = reading(presentTargets(state)[0], 'ipv4')!;
     expect(current.sent).toBe(3); expect(current.rolling_1h_sent).toBe(180);

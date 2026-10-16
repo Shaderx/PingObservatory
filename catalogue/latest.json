@@ -1,7 +1,7 @@
 {
-  "schema_version": 2,
-  "version": 2,
-  "published_at": "2026-10-16T19:39:16.182142Z",
+  "schema_version": 3,
+  "version": 3,
+  "published_at": "2026-10-16T20:54:26.654020Z",
   "targets": [
     {
       "id": "akamai-cloud-osaka-icmp",
@@ -38,7 +38,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -77,7 +77,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -119,11 +119,11 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         },
         "ipv6": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -164,7 +164,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -206,11 +206,11 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         },
         "ipv6": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -255,12 +255,28 @@
       },
       "admission": {
         "ipv4": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "gamelift-ping.ap-northeast-1.api.aws",
+            "method": "udp_echo",
+            "family": "ipv4",
+            "observed_at": "2026-10-09T10:13:39.74065452Z",
+            "port": 7770,
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         },
         "ipv6": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "gamelift-ping.ap-northeast-1.api.aws",
+            "method": "udp_echo",
+            "family": "ipv6",
+            "observed_at": "2026-10-09T10:13:03.951441834Z",
+            "port": 7770,
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         }
       }
     },
@@ -302,11 +318,11 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         },
         "ipv6": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -348,11 +364,11 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         },
         "ipv6": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -397,12 +413,28 @@
       },
       "admission": {
         "ipv4": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "gamelift-ping.ap-south-1.api.aws",
+            "method": "udp_echo",
+            "family": "ipv4",
+            "observed_at": "2026-10-09T10:13:44.379655834Z",
+            "port": 7770,
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         },
         "ipv6": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "gamelift-ping.ap-south-1.api.aws",
+            "method": "udp_echo",
+            "family": "ipv6",
+            "observed_at": "2026-10-09T10:13:13.52604441Z",
+            "port": 7770,
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         }
       }
     },
@@ -447,12 +479,28 @@
       },
       "admission": {
         "ipv4": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "gamelift-ping.ap-southeast-1.api.aws",
+            "method": "udp_echo",
+            "family": "ipv4",
+            "observed_at": "2026-10-09T10:13:06.58966721Z",
+            "port": 7770,
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         },
         "ipv6": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "gamelift-ping.ap-southeast-1.api.aws",
+            "method": "udp_echo",
+            "family": "ipv6",
+            "observed_at": "2026-10-09T10:13:25.194583298Z",
+            "port": 7770,
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         }
       }
     },
@@ -497,12 +545,28 @@
       },
       "admission": {
         "ipv4": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "gamelift-ping.ap-southeast-2.api.aws",
+            "method": "udp_echo",
+            "family": "ipv4",
+            "observed_at": "2026-10-09T10:13:37.590990105Z",
+            "port": 7770,
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         },
         "ipv6": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "gamelift-ping.ap-southeast-2.api.aws",
+            "method": "udp_echo",
+            "family": "ipv6",
+            "observed_at": "2026-10-09T10:13:23.108711442Z",
+            "port": 7770,
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         }
       }
     },
@@ -543,12 +607,28 @@
       "port": 7770,
       "admission": {
         "ipv4": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "gamelift-ping.ap-southeast-5.api.aws",
+            "method": "udp_echo",
+            "family": "ipv4",
+            "observed_at": "2026-10-09T10:13:11.385685422Z",
+            "port": 7770,
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         },
         "ipv6": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "gamelift-ping.ap-southeast-5.api.aws",
+            "method": "udp_echo",
+            "family": "ipv6",
+            "observed_at": "2026-10-09T10:13:42.110176559Z",
+            "port": 7770,
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         }
       }
     },
@@ -589,12 +669,28 @@
       "port": 7770,
       "admission": {
         "ipv4": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "gamelift-ping.ap-southeast-7.api.aws",
+            "method": "udp_echo",
+            "family": "ipv4",
+            "observed_at": "2026-10-09T10:13:16.07991021Z",
+            "port": 7770,
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         },
         "ipv6": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "gamelift-ping.ap-southeast-7.api.aws",
+            "method": "udp_echo",
+            "family": "ipv6",
+            "observed_at": "2026-10-09T10:13:27.543489158Z",
+            "port": 7770,
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         }
       }
     },
@@ -636,11 +732,11 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         },
         "ipv6": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -685,12 +781,28 @@
       },
       "admission": {
         "ipv4": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "gamelift-ping.eu-central-1.api.aws",
+            "method": "udp_echo",
+            "family": "ipv4",
+            "observed_at": "2026-10-09T10:12:46.810185709Z",
+            "port": 7770,
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         },
         "ipv6": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "gamelift-ping.eu-central-1.api.aws",
+            "method": "udp_echo",
+            "family": "ipv6",
+            "observed_at": "2026-10-09T10:13:32.901250005Z",
+            "port": 7770,
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         }
       }
     },
@@ -732,11 +844,11 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         },
         "ipv6": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -778,11 +890,11 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         },
         "ipv6": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -824,11 +936,11 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         },
         "ipv6": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -870,11 +982,11 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         },
         "ipv6": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -916,11 +1028,11 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         },
         "ipv6": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -962,11 +1074,11 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         },
         "ipv6": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -1008,11 +1120,11 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         },
         "ipv6": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -1057,12 +1169,28 @@
       },
       "admission": {
         "ipv4": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "gamelift-ping.us-east-1.api.aws",
+            "method": "udp_echo",
+            "family": "ipv4",
+            "observed_at": "2026-10-09T10:13:35.208240725Z",
+            "port": 7770,
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         },
         "ipv6": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "gamelift-ping.us-east-1.api.aws",
+            "method": "udp_echo",
+            "family": "ipv6",
+            "observed_at": "2026-10-09T10:13:09.13294028Z",
+            "port": 7770,
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         }
       }
     },
@@ -1103,7 +1231,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -1144,7 +1272,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -1185,7 +1313,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -1226,7 +1354,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -1267,7 +1395,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -1309,11 +1437,11 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         },
         "ipv6": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -1355,11 +1483,11 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         },
         "ipv6": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -1401,11 +1529,11 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         },
         "ipv6": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -1446,7 +1574,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -1488,11 +1616,11 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         },
         "ipv6": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -1533,7 +1661,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -1577,12 +1705,28 @@
       "path": "/ajax/libs/normalize/8.0.1/normalize.min.css",
       "admission": {
         "ipv4": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "cdnjs.cloudflare.com",
+            "method": "https",
+            "family": "ipv4",
+            "observed_at": "2026-10-09T10:13:13.756676864Z",
+            "port": 443,
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         },
         "ipv6": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "cdnjs.cloudflare.com",
+            "method": "https",
+            "family": "ipv6",
+            "observed_at": "2026-10-09T10:12:42.305166542Z",
+            "port": 443,
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         }
       }
     },
@@ -1628,7 +1772,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -1674,7 +1818,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -1712,7 +1856,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -1750,7 +1894,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -1788,7 +1932,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -1829,8 +1973,15 @@
       },
       "admission": {
         "ipv4": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "ping-gb.ds.on.epicgames.com",
+            "method": "icmp",
+            "family": "ipv4",
+            "observed_at": "2026-10-09T10:13:20.581018235Z",
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         }
       }
     },
@@ -1868,7 +2019,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -1906,7 +2057,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -1944,7 +2095,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -1982,7 +2133,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -2020,7 +2171,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -2058,7 +2209,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -2096,7 +2247,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -2134,7 +2285,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -2175,8 +2326,15 @@
       },
       "admission": {
         "ipv4": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "ping-syd.ds.on.epicgames.com",
+            "method": "icmp",
+            "family": "ipv4",
+            "observed_at": "2026-10-09T10:13:20.581018235Z",
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         }
       }
     },
@@ -2217,8 +2375,15 @@
       },
       "admission": {
         "ipv4": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "ping-tok.ds.on.epicgames.com",
+            "method": "icmp",
+            "family": "ipv4",
+            "observed_at": "2026-10-09T10:13:20.581018235Z",
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         }
       }
     },
@@ -2259,8 +2424,15 @@
       },
       "admission": {
         "ipv4": {
-          "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "state": "verified",
+          "evidence": {
+            "scope": "hostname",
+            "hostname": "ping-tx.ds.on.epicgames.com",
+            "method": "icmp",
+            "family": "ipv4",
+            "observed_at": "2026-10-09T10:13:20.581018235Z",
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/62c8fef7839f43dad3f8a84e8e68e4187556475e/catalogue/evidence/v3.json"
+          }
         }
       }
     },
@@ -2298,7 +2470,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -2344,7 +2516,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -2389,7 +2561,7 @@
       "admission": {
         "ipv4": {
           "state": "unverified",
-          "reason": "No qualifying numeric-destination success receipt is available for this method and family."
+          "reason": "No retained successful observation matches this configured endpoint, method and family."
         }
       }
     },
@@ -2436,7 +2608,8 @@
             "family": "ipv4",
             "destination": "13.75.41.5",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -2484,7 +2657,8 @@
             "family": "ipv4",
             "destination": "216.189.149.173",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -2532,7 +2706,8 @@
             "family": "ipv4",
             "destination": "191.234.191.4",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -2580,7 +2755,8 @@
             "family": "ipv4",
             "destination": "125.212.218.98",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -2628,7 +2804,8 @@
             "family": "ipv4",
             "destination": "18.166.77.234",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -2676,7 +2853,8 @@
             "family": "ipv4",
             "destination": "43.208.23.43",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -2724,7 +2902,8 @@
             "family": "ipv4",
             "destination": "34.97.21.27",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -2772,7 +2951,8 @@
             "family": "ipv4",
             "destination": "108.136.240.24",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -2820,7 +3000,8 @@
             "family": "ipv4",
             "destination": "203.17.177.156",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -2868,7 +3049,8 @@
             "family": "ipv4",
             "destination": "5.188.70.78",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -2916,7 +3098,8 @@
             "family": "ipv4",
             "destination": "128.199.131.158",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -2964,7 +3147,8 @@
             "family": "ipv4",
             "destination": "103.59.110.154",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -3012,7 +3196,8 @@
             "family": "ipv4",
             "destination": "52.79.45.118",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -3060,7 +3245,8 @@
             "family": "ipv4",
             "destination": "103.91.67.60",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -3108,7 +3294,8 @@
             "family": "ipv4",
             "destination": "13.64.199.156",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -3156,7 +3343,8 @@
             "family": "ipv4",
             "destination": "47.254.232.31",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -3204,7 +3392,8 @@
             "family": "ipv4",
             "destination": "13.73.234.162",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -3252,7 +3441,8 @@
             "family": "ipv4",
             "destination": "185.17.144.91",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -3300,7 +3490,8 @@
             "family": "ipv4",
             "destination": "119.8.148.31",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -3348,7 +3539,8 @@
             "family": "ipv4",
             "destination": "35.198.121.229",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -3396,7 +3588,8 @@
             "family": "ipv4",
             "destination": "139.84.230.2",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -3440,7 +3633,8 @@
             "family": "ipv4",
             "destination": "34.131.168.67",
             "observed_at": "2026-10-09T10:30:21.405311+00:00",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -3488,7 +3682,8 @@
             "family": "ipv4",
             "destination": "45.114.118.94",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -3536,7 +3731,8 @@
             "family": "ipv4",
             "destination": "52.28.104.3",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -3584,7 +3780,8 @@
             "family": "ipv4",
             "destination": "102.133.146.185",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -3632,7 +3829,8 @@
             "family": "ipv4",
             "destination": "34.90.245.67",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -3680,7 +3878,8 @@
             "family": "ipv4",
             "destination": "38.54.45.223",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -3728,7 +3927,8 @@
             "family": "ipv4",
             "destination": "139.99.171.211",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -3776,7 +3976,8 @@
             "family": "ipv4",
             "destination": "54.94.153.234",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -3824,7 +4025,8 @@
             "family": "ipv4",
             "destination": "35.236.59.23",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -3872,7 +4074,8 @@
             "family": "ipv4",
             "destination": "47.89.27.152",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -3920,7 +4123,8 @@
             "family": "ipv4",
             "destination": "35.203.66.136",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -3968,7 +4172,8 @@
             "family": "ipv4",
             "destination": "34.22.88.69",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -4016,7 +4221,8 @@
             "family": "ipv4",
             "destination": "52.185.166.150",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -4064,7 +4270,8 @@
             "family": "ipv4",
             "destination": "34.101.80.192",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -4112,7 +4319,8 @@
             "family": "ipv4",
             "destination": "14.63.196.113",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -4160,7 +4368,8 @@
             "family": "ipv4",
             "destination": "52.34.219.179",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -4204,7 +4413,8 @@
             "family": "ipv4",
             "destination": "3.104.65.18",
             "observed_at": "2026-10-09T10:31:11.937941+00:00",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -4252,7 +4462,8 @@
             "family": "ipv4",
             "destination": "188.226.227.6",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -4300,7 +4511,8 @@
             "family": "ipv4",
             "destination": "147.78.0.106",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -4348,7 +4560,8 @@
             "family": "ipv4",
             "destination": "34.92.69.88",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -4396,7 +4609,8 @@
             "family": "ipv4",
             "destination": "20.233.42.17",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -4440,7 +4654,8 @@
             "family": "ipv4",
             "destination": "35.152.90.160",
             "observed_at": "2026-10-09T10:30:54.962481+00:00",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -4488,7 +4703,8 @@
             "family": "ipv4",
             "destination": "13.75.214.88",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -4536,7 +4752,8 @@
             "family": "ipv4",
             "destination": "43.229.63.134",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -4584,7 +4801,8 @@
             "family": "ipv4",
             "destination": "45.32.119.108",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -4632,7 +4850,8 @@
             "family": "ipv4",
             "destination": "52.8.135.54",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -4676,7 +4895,8 @@
             "family": "ipv4",
             "destination": "34.252.169.48",
             "observed_at": "2026-10-09T10:30:29.848289+00:00",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -4724,7 +4944,8 @@
             "family": "ipv4",
             "destination": "104.198.127.37",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -4768,7 +4989,8 @@
             "family": "ipv4",
             "destination": "35.187.161.32",
             "observed_at": "2026-10-09T10:31:03.445151+00:00",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -4816,7 +5038,8 @@
             "family": "ipv4",
             "destination": "149.56.100.202",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -4864,7 +5087,8 @@
             "family": "ipv4",
             "destination": "139.162.17.221",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -4912,7 +5136,8 @@
             "family": "ipv4",
             "destination": "45.124.65.37",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -4956,7 +5181,8 @@
             "family": "ipv4",
             "destination": "34.73.192.22",
             "observed_at": "2026-10-09T10:30:59.225729+00:00",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5000,7 +5226,8 @@
             "family": "ipv4",
             "destination": "34.18.43.176",
             "observed_at": "2026-10-09T10:30:17.283156+00:00",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5044,7 +5271,8 @@
             "family": "ipv4",
             "destination": "34.116.170.199",
             "observed_at": "2026-10-09T10:31:07.675991+00:00",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5092,7 +5320,8 @@
             "family": "ipv4",
             "destination": "99.79.39.19",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5140,7 +5369,8 @@
             "family": "ipv4",
             "destination": "163.47.21.37",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5188,7 +5418,8 @@
             "family": "ipv4",
             "destination": "104.211.165.134",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5236,7 +5467,8 @@
             "family": "ipv4",
             "destination": "192.241.188.38",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5284,7 +5516,8 @@
             "family": "ipv4",
             "destination": "103.126.161.146",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5328,7 +5561,8 @@
             "family": "ipv4",
             "destination": "16.50.103.34",
             "observed_at": "2026-10-09T10:30:46.534598+00:00",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5376,7 +5610,8 @@
             "family": "ipv4",
             "destination": "5.188.238.86",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5424,7 +5659,8 @@
             "family": "ipv4",
             "destination": "103.13.231.128",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5472,7 +5708,8 @@
             "family": "ipv4",
             "destination": "45.76.51.107",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5516,7 +5753,8 @@
             "family": "ipv4",
             "destination": "13.112.189.146",
             "observed_at": "2026-10-09T10:31:16.039982+00:00",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5560,7 +5798,8 @@
             "family": "ipv4",
             "destination": "78.12.154.242",
             "observed_at": "2026-10-09T10:30:25.654500+00:00",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5608,7 +5847,8 @@
             "family": "ipv4",
             "destination": "34.86.45.4",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5656,7 +5896,8 @@
             "family": "ipv4",
             "destination": "103.150.37.205",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5704,7 +5945,8 @@
             "family": "ipv4",
             "destination": "168.63.103.13",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5752,7 +5994,8 @@
             "family": "ipv4",
             "destination": "124.156.158.246",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5800,7 +6043,8 @@
             "family": "ipv4",
             "destination": "52.170.114.205",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5848,7 +6092,8 @@
             "family": "ipv4",
             "destination": "153.92.127.77",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5896,7 +6141,8 @@
             "family": "ipv4",
             "destination": "35.199.78.97",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5944,7 +6190,8 @@
             "family": "ipv4",
             "destination": "47.88.170.34",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -5992,7 +6239,8 @@
             "family": "ipv4",
             "destination": "47.91.122.48",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -6040,7 +6288,8 @@
             "family": "ipv4",
             "destination": "3.110.186.98",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -6088,7 +6337,8 @@
             "family": "ipv4",
             "destination": "159.138.237.46",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -6132,7 +6382,8 @@
             "family": "ipv4",
             "destination": "18.60.87.24",
             "observed_at": "2026-10-09T10:30:33.928346+00:00",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -6176,7 +6427,8 @@
             "family": "ipv4",
             "destination": "15.216.47.205",
             "observed_at": "2026-10-09T10:30:50.745296+00:00",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -6224,7 +6476,8 @@
             "family": "ipv4",
             "destination": "116.251.223.179",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -6272,7 +6525,8 @@
             "family": "ipv4",
             "destination": "150.109.184.58",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -6320,7 +6574,8 @@
             "family": "ipv4",
             "destination": "119.235.251.86",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -6368,7 +6623,8 @@
             "family": "ipv4",
             "destination": "13.208.184.0",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -6416,7 +6672,8 @@
             "family": "ipv4",
             "destination": "35.198.195.18",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -6464,7 +6721,8 @@
             "family": "ipv4",
             "destination": "92.38.169.164",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -6512,7 +6770,8 @@
             "family": "ipv4",
             "destination": "52.187.125.220",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -6560,7 +6819,8 @@
             "family": "ipv4",
             "destination": "45.150.242.190",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -6608,7 +6868,8 @@
             "family": "ipv4",
             "destination": "65.20.72.42",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -6656,7 +6917,8 @@
             "family": "ipv4",
             "destination": "45.32.202.82",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -6704,7 +6966,8 @@
             "family": "ipv4",
             "destination": "203.29.241.56",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -6752,7 +7015,8 @@
             "family": "ipv4",
             "destination": "51.116.177.233",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -6800,7 +7064,8 @@
             "family": "ipv4",
             "destination": "43.212.116.195",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -6848,7 +7113,8 @@
             "family": "ipv4",
             "destination": "35.200.192.240",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -6896,7 +7162,8 @@
             "family": "ipv4",
             "destination": "35.189.53.113",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -6944,7 +7211,8 @@
             "family": "ipv4",
             "destination": "66.228.49.252",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -6992,7 +7260,8 @@
             "family": "ipv4",
             "destination": "35.236.137.214",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -7040,7 +7309,8 @@
             "family": "ipv4",
             "destination": "45.248.78.97",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -7088,7 +7358,8 @@
             "family": "ipv4",
             "destination": "180.149.230.26",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -7136,7 +7407,8 @@
             "family": "ipv4",
             "destination": "54.169.45.221",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -7184,7 +7456,8 @@
             "family": "ipv4",
             "destination": "58.228.131.31",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -7232,7 +7505,8 @@
             "family": "ipv4",
             "destination": "13.85.40.35",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -7280,7 +7554,8 @@
             "family": "ipv4",
             "destination": "52.141.57.79",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -7328,7 +7603,8 @@
             "family": "ipv4",
             "destination": "51.79.220.143",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -7372,7 +7648,8 @@
             "family": "ipv4",
             "destination": "13.246.46.85",
             "observed_at": "2026-10-09T10:30:13.139616+00:00",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -7420,7 +7697,8 @@
             "family": "ipv4",
             "destination": "35.180.135.101",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -7468,7 +7746,8 @@
             "family": "ipv4",
             "destination": "147.139.184.12",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -7512,7 +7791,8 @@
             "family": "ipv4",
             "destination": "16.63.27.187",
             "observed_at": "2026-10-09T10:30:38.133688+00:00",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -7560,7 +7840,8 @@
             "family": "ipv4",
             "destination": "8.212.145.172",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -7608,7 +7889,8 @@
             "family": "ipv4",
             "destination": "103.56.4.229",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -7656,7 +7938,8 @@
             "family": "ipv4",
             "destination": "172.233.67.67",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -7704,7 +7987,8 @@
             "family": "ipv4",
             "destination": "168.205.92.109",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -7752,7 +8036,8 @@
             "family": "ipv4",
             "destination": "104.198.1.215",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -7800,7 +8085,8 @@
             "family": "ipv4",
             "destination": "46.101.28.83",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -7848,7 +8134,8 @@
             "family": "ipv4",
             "destination": "43.216.105.84",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }
@@ -7896,7 +8183,8 @@
             "family": "ipv4",
             "destination": "34.147.200.156",
             "observed_at": "2026-10-09T10:12:02.307267045Z",
-            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json"
+            "source_url": "https://raw.githubusercontent.com/Shaderx/PingObservatory/eab89a0d39c358841f7eab191be7a3808ee5d15c/catalogue/evidence/v2.json",
+            "scope": "numeric_destination"
           }
         }
       }

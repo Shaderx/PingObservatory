@@ -54,9 +54,12 @@ type ProbeSettings struct {
 }
 
 type Verification struct {
+	Scope       string    `json:"scope,omitempty"`
 	Method      string    `json:"method"`
 	Family      string    `json:"family"`
-	Destination string    `json:"destination"`
+	Destination string    `json:"destination,omitempty"`
+	Hostname    string    `json:"hostname,omitempty"`
+	Port        int       `json:"port,omitempty"`
 	ObservedAt  time.Time `json:"observed_at"`
 	SourceURL   string    `json:"source_url"`
 }
