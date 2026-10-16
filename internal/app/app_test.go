@@ -2,11 +2,13 @@ package app
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -177,7 +179,7 @@ func TestHTTPRejectsBadHostCatalogueAndOversizedInput(t *testing.T) {
 	}
 }
 
-func TestEmptyStateCollectionsAreArrays(t *testing.T) {
+func TestFirstRunCatalogueIsPopulatedWithEmptyLocalMeasurements(t *testing.T) {
 	a, err := Open(t.TempDir())
 	if err != nil {
 		t.Fatal(err)
@@ -192,10 +194,90 @@ func TestEmptyStateCollectionsAreArrays(t *testing.T) {
 	if err := json.Unmarshal(w.Body.Bytes(), &state); err != nil {
 		t.Fatal(err)
 	}
-	for _, field := range []string{"targets", "latest", "statistics"} {
+	for _, field := range []string{"latest"} {
 		if string(state[field]) != "[]" {
 			t.Fatalf("%s should be an empty array, got %s", field, state[field])
 		}
+	}
+	var targets []model.Target
+	var statistics []model.SeriesStats
+	if err := json.Unmarshal(state["targets"], &targets); err != nil {
+		t.Fatal(err)
+	}
+	if err := json.Unmarshal(state["statistics"], &statistics); err != nil {
+		t.Fatal(err)
+	}
+	if len(targets) != 171 || len(statistics) != 196 || len(a.Jobs()) != 116 {
+		t.Fatalf("first-run population disconnected: targets=%d statistics=%d jobs=%d", len(targets), len(statistics), len(a.Jobs()))
+	}
+	for _, job := range a.Jobs() {
+		if job.Family != model.FamilyIPv4 || job.Target.Admission[job.Family].State != "verified" || model.Settings(job.Target).Method != model.MethodICMP {
+			t.Fatal("pending or mismatched catalogue family scheduled")
+		}
+	}
+	for _, series := range statistics {
+		if series.Observation.Status != "na" || series.Observation.ObservedAt != nil || series.Observation.Sent != 0 || series.Observation.Received != 0 {
+			t.Fatal("catalogue verification became a desktop measurement")
+		}
+	}
+}
+
+func TestSavedCatalogueDefaultsMigrateWithoutChangingExplicitChoices(t *testing.T) {
+	for _, url := range []string{
+		"https://raw.githubusercontent.com/Shaderx/PingObservatory/main/catalogue/v1.json",
+		"https://raw.githubusercontent.com/Shaderx/PingObservatory/main/catalogue/v2.json",
+		"",
+		"https://raw.githubusercontent.com/Shaderx/PingObservatory/82c36232d0213abfadf1a3a421d2a17ab4e7a337/catalogue/v2.json",
+	} {
+		t.Run(url, func(t *testing.T) {
+			dir := t.TempDir()
+			c := config.Default()
+			c.CatalogueURL = url
+			if err := saveSettings(filepath.Join(dir, "config.json"), c, map[string]model.Target{}); err != nil {
+				t.Fatal(err)
+			}
+			a, err := Open(dir)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer a.Close()
+			want := url
+			if url == "https://raw.githubusercontent.com/Shaderx/PingObservatory/main/catalogue/v1.json" || url == "https://raw.githubusercontent.com/Shaderx/PingObservatory/main/catalogue/v2.json" {
+				want = config.DefaultCatalogueURL
+			}
+			stored, _, err := loadSettings(filepath.Join(dir, "config.json"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if a.config.CatalogueURL != want || stored.CatalogueURL != want || len(a.Targets()) != 171 {
+				t.Fatalf("unexpected migrated state: url=%q stored=%q targets=%d", a.config.CatalogueURL, stored.CatalogueURL, len(a.Targets()))
+			}
+		})
+	}
+}
+
+func TestInspectModeDoesNotProbeThePopulatedCatalogue(t *testing.T) {
+	a, err := Open(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.Close()
+	a.Collect = false
+	if err := a.catalogue.SetURL(""); err != nil {
+		t.Fatal(err)
+	}
+	var probes atomic.Int32
+	// A mistakenly enabled collector would reach a slot during this test.
+	a.collector.Interval = time.Millisecond
+	a.collector.ProbeTarget = func(context.Context, model.Target, string) model.Measurement {
+		probes.Add(1)
+		return model.Measurement{}
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Millisecond)
+	defer cancel()
+	a.Run(ctx)
+	if probes.Load() != 0 || a.collector.Snapshot().Enabled || len(a.Jobs()) != 116 {
+		t.Fatal("inspect mode probed targets or lost the effective catalogue")
 	}
 }
 

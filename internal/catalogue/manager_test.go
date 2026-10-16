@@ -33,6 +33,13 @@ func encoded(t *testing.T, value any) string {
 	return string(data)
 }
 
+// These state-machine fixtures exercise legacy schema-1 compatibility. Real
+// first-run startup always uses New and its populated production starter;
+// bootstrap_test.go covers that path and its network/cache failure handling.
+func legacyManager(cachePath, url string) (*Manager, error) {
+	return newManager(cachePath, url, []byte(`{"schema_version":1,"version":1,"published_at":"2026-10-14T00:00:00Z","targets":[]}`))
+}
+
 // loopbackTransport routes the production GitHub URL to httptest. It neither
 // relaxes URL validation nor makes an external network request.
 type loopbackTransport struct {
@@ -59,7 +66,7 @@ func testManager(t *testing.T, handler http.HandlerFunc) (*Manager, string) {
 		t.Fatal(err)
 	}
 	cache := filepath.Join(t.TempDir(), "data", "catalogue.json")
-	m, err := New(cache, DefaultURL)
+	m, err := legacyManager(cache, DefaultURL)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,7 +101,7 @@ func TestFallbackAndPersistence(t *testing.T) {
 	if !reflect.DeepEqual(actual, fixture(2)) {
 		t.Fatal("Snapshot shared mutable catalogue data")
 	}
-	loaded, err := New(cache, DefaultURL)
+	loaded, err := legacyManager(cache, DefaultURL)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -111,7 +118,7 @@ func TestFallbackAndPersistence(t *testing.T) {
 	if c, source := m.Snapshot(); source != "remote" || c.Version != 2 {
 		t.Fatal("failed refresh changed active catalogue")
 	}
-	loaded, err = New(cache, "")
+	loaded, err = legacyManager(cache, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -132,7 +139,7 @@ func TestMalformedCacheUsesBundled(t *testing.T) {
 	if err := os.WriteFile(path, []byte(`{"cache_version":1}`), 0600); err != nil {
 		t.Fatal(err)
 	}
-	m, err := New(path, DefaultURL)
+	m, err := legacyManager(path, DefaultURL)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -178,7 +185,7 @@ func TestVersionAndRevisionContinuity(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Removal cannot reset a stable identity, including after an app restart.
-	loaded, err := New(cache, DefaultURL)
+	loaded, err := legacyManager(cache, DefaultURL)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -323,7 +330,7 @@ func TestRemovedCachedIdentityRequiresCompleteRecord(t *testing.T) {
 	if err := os.WriteFile(path, []byte(data), 0600); err != nil {
 		t.Fatal(err)
 	}
-	m, err := New(path, DefaultURL)
+	m, err := legacyManager(path, DefaultURL)
 	if err != nil {
 		t.Fatal(err)
 	}

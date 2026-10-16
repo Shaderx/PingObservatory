@@ -1,6 +1,6 @@
 # Verification checkpoint
 
-The intended standalone MVP is not yet accepted as complete. The version-2 master has reviewed historical literal evidence; final catalogue integration, populated packaging and independent acceptance remain pending. No executable release is published.
+The intended standalone MVP is not yet accepted as complete. The populated starter and GitHub update channel pass Windows integration checks. The hostname-family evidence policy, remaining platform checks and final product acceptance remain pending. No executable release is published.
 
 ## Current Windows checks
 
@@ -8,9 +8,19 @@ On the resumed correction, Go 1.26.5 on Windows amd64 passes `go test -p 2 -coun
 
 Tests cover persistence, exact uneven-sample quantiles, population standard deviation, separate method/family/revision series, real sends versus unobservable outcomes, valid zero-duration baseline samples, completed history grids, explicit retention expiry, active-probe clock jumps, revision ledgers, catalogue rejection/fallback and local API boundaries. Test workers are bounded to two.
 
-Recovered HTTPS catalogue definitions retain their five-second application timeouts. The shared validator permits HTTPS timeouts up to ten seconds while retaining the existing three-second limit for other methods and the 30-second complete-cycle bound. The expanded master is checked against its historical receipts; decoder acceptance does not establish current availability or populated packaging.
+Recovered HTTPS catalogue definitions retain their five-second application timeouts. The shared validator permits HTTPS timeouts up to ten seconds while retaining the existing three-second limit for other methods and the 30-second complete-cycle bound. The expanded master is checked against its historical receipts; these checks do not establish current endpoint availability.
 
 Frontend TypeScript compilation, 17 Vitest tests and the production Vite build pass using existing pinned dependencies. The map assets and third-party notices remain embedded. The packaged Windows browser checks pass for manual method settings, map/callouts/origin, provider/category/world-area filters, loss sorting, comparison limits, family switching, all history windows, explicit retention expiry, theme, motion and a 390-pixel mobile viewport. The isolated UI made no external requests and reported no browser errors. A separate loopback TCP fixture recorded a newer successful measurement after browser closure, confirming independent background collection. Temporary test processes were closed. A regression guards both family-switch history races and middle-target revision changes.
+
+## Populated catalogue onboarding
+
+The default URL is [the complete manifest on the data-only catalogue branch](https://raw.githubusercontent.com/Shaderx/PingObservatory/catalogue/catalogue/latest.json). Channel commit `c6dce37a8072619d63bad0a07899c0679042369f` was independently reviewed as a parentless six-file tree. Its actual GitHub download matches the reviewed immutable version-2 Git blob `d14c2415445af82705137eaa40abf00782f324d3`. Main remains unchanged. The executable embeds this same version-2 snapshot: 171 targets, 196 configured family slots, 116 historically verified ICMP/IPv4 literal families and 80 pending hostname families. The hostname schema and evidence policy are unchanged.
+
+Production-path tests cover immediate populated startup, same-version remote activation and cache reopening, a valid newer cache taking precedence, rejected downgrades and malformed updates, HTTP failures and a cancelled download, malformed caches and rejection of the old empty version-1 cache. Both exact obsolete default URLs migrate persistently; empty and explicit pinned URLs are preserved. A disabled updater retains rejected-cache warnings. Inspect mode uses a one-millisecond test schedule with a probe counter and makes no probe calls. Missing and expired observations remain N/A rather than becoming local inability failures; real failure statuses remain intact.
+
+The packaged Windows executable was then tested with `--collect=false --open-browser=false --listen 127.0.0.1:0` in fresh temporary profiles. Its first API snapshot was populated from the bundle before the actual GitHub download activated and persisted the cache. Reopening, a real GitHub 404 with an unchanged last-valid cache, updates disabled, a corrupt cache, both migrated defaults and an explicit immutable URL passed. Verification receipts never became desktop samples: all 196 local series had no observation timestamp or sent/received counts, and history buckets stayed N/A.
+
+The populated browser check passed for the map, all 171 directory records, settings URL/version/source, provider/category/world-area/method filters, 116 empty-local-history IPv4 states versus 55 unverified states, and 25 unverified versus 146 unconfigured IPv6 states. Desktop and 390-pixel mobile layouts had no horizontal overflow, browser errors or external UI requests. Test-owned processes were closed. The full Windows Go suite, native IPv4/IPv6 loopback tests and vet passed after the integration fixes. Static builds for Windows/Linux amd64/arm64 also passed; cross-compilation does not establish Linux or arm64 runtime behavior for this populated integration. No public endpoint probes were performed.
 
 ## Linux validation handoff
 
@@ -32,8 +42,8 @@ CGO_ENABLED=0 go build -trimpath -o PingObservatory ./cmd/pingobservatory
 ./PingObservatory --licenses
 ```
 
-Do not set `PINGOBSERVATORY_NATIVE_TEST=1` on a host whose existing policy denies ICMP. Permission denial must have no sent-packet loss denominator. For UI checks, use a temporary data directory and `--open-browser=false --collect=false --listen 127.0.0.1:0`; add only loopback fixture targets. The default verified catalogue is still pending.
+Do not set `PINGOBSERVATORY_NATIVE_TEST=1` on a host whose existing policy denies ICMP. Permission denial must have no sent-packet loss denominator. For UI checks, use a temporary data directory and `--open-browser=false --collect=false --listen 127.0.0.1:0`. The populated default has 116 eligible public series, so leave collection paused during inspection. A loopback collection test must also disable or replace catalogue jobs with its isolated fixtures.
 
 ## Remaining acceptance
 
-Verify final catalogue integration, the pending-family evidence policy, active journal bounds for the final workload, populated cross-platform packaging, and final independent acceptance. Earlier scaffold-only Windows/WSL results do not establish completion of this correction. macOS is deferred.
+Resolve the pending-family evidence policy, verify active journal bounds for the final workload, run the populated integration on Linux, complete successful Linux native ICMP and arm64 runtime checks, and obtain final product acceptance. Earlier scaffold-only Windows/WSL results do not establish completion of this correction. macOS is deferred.

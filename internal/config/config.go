@@ -12,10 +12,23 @@ import (
 	"regexp"
 	"strings"
 
+	bundled "github.com/Shaderx/PingObservatory/catalogue"
 	"github.com/Shaderx/PingObservatory/internal/model"
 )
 
-const DefaultCatalogueURL = "https://raw.githubusercontent.com/Shaderx/PingObservatory/main/catalogue/v2.json"
+const DefaultCatalogueURL = bundled.DefaultURL
+
+// MigrateCatalogueURL upgrades only the exact defaults from earlier previews.
+// An empty value intentionally disables updates; custom/pinned URLs are kept.
+func MigrateCatalogueURL(raw string) string {
+	switch raw {
+	case "https://raw.githubusercontent.com/Shaderx/PingObservatory/main/catalogue/v1.json",
+		"https://raw.githubusercontent.com/Shaderx/PingObservatory/main/catalogue/v2.json":
+		return DefaultCatalogueURL
+	default:
+		return raw
+	}
+}
 
 var idPattern = regexp.MustCompile(`^manual-[a-z0-9][a-z0-9_-]{0,47}$`)
 

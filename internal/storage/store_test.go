@@ -129,6 +129,22 @@ func TestPersistenceMissingVersusFailuresAndSeries(t *testing.T) {
 	}
 }
 
+func TestMissingAndExpiredStatisticsAreGaps(t *testing.T) {
+	s, now := fixture(t)
+	add(t, s, batch("expired", now.Add(-time.Minute), []float64{10}, 1))
+	*now = now.Add(31 * 24 * time.Hour)
+	stats, err := s.Statistics([]model.Target{target("never-observed"), target("expired")}, *now)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, series := range stats {
+		o := series.Observation
+		if o.Status != "na" || o.ObservedAt != nil || o.Sent != 0 || o.Received != 0 || o.UnableToMeasure != 0 || o.MedianMS != nil || o.LossPct != nil {
+			t.Fatalf("missing local observation became a failure: %+v", o)
+		}
+	}
+}
+
 func TestExactStatisticsEligibilityAndBaseline(t *testing.T) {
 	s, now := fixture(t)
 	add(t, s, batch("target", now.Add(-30*time.Minute+10*time.Second), []float64{1, 2, 3}, 3))

@@ -1,6 +1,6 @@
 # Standalone implementation
 
-Development on `feature/mvp` preserves the approved LG interface in a standalone Windows/Linux executable. This is a development checkpoint; the populated verified catalogue and final acceptance are pending. No executable release is published. The application licence is `AGPL-3.0-only`.
+Development on `feature/mvp` preserves the approved LG interface in a standalone Windows/Linux executable. This is a development checkpoint; final acceptance remains pending. No executable release is published. The application licence is `AGPL-3.0-only`.
 
 ## Runtime and probes
 
@@ -22,4 +22,4 @@ The map, animations, favorites, theme, configurable origin, family selection, pr
 
 The catalogue pipeline is ordinary homelab validation, sanitized versioned GitHub JSON, then desktop download. Each admitted method/family needs an exact matching endpoint and recorded successful observation, including the actual numeric destination and timestamp. Pending definitions stay unverified and are not scheduled. Schema, revision continuity, size limits and last-valid fallback are enforced. No commands or plugins are executed from catalogue data.
 
-The version-2 master preserves 171 definitions, with 116 dated historical literal successes and 80 pending hostname families. Its evidence does not claim current or desktop reachability. The bundled legacy starter remains empty during final catalogue integration. The desktop has no runtime homelab dependency. Verification and remaining acceptance are recorded in [TESTING.md](TESTING.md). Independent review is required before accepting the correction as complete. macOS remains deferred.
+The embedded version-2 starter preserves 171 definitions, with 116 dated historical literal successes and 80 pending hostname families. Its evidence does not claim current or desktop reachability, and local history starts empty. Updates use the data-only `catalogue` branch's complete `catalogue/latest.json`, independent of the application's source branch. A fresh offline profile is populated immediately; rejected updates retain the valid local cache or starter. The desktop has no runtime homelab dependency. Verification and remaining acceptance are recorded in [TESTING.md](TESTING.md). Independent review is required before accepting the correction as complete. macOS remains deferred.

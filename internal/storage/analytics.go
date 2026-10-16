@@ -176,7 +176,7 @@ func (s *Store) Statistics(targets []model.Target, now time.Time) ([]model.Serie
 }
 
 func (s *Store) statistics(target string, revision uint64, method, family string, now time.Time) (model.Observation, error) {
-	o := model.Observation{Method: method, Family: family, Status: model.StatusUnavailable, Detail: "No local measurement is available."}
+	o := model.Observation{Method: method, Family: family, Status: "na", Detail: "No local measurement is available."}
 	var latest []byte
 	var lastSuccess sql.NullInt64
 	err := s.db.QueryRow("SELECT latest,last_success_ns FROM series WHERE target=? AND revision=? AND method=? AND family=?", target, revision, method, family).Scan(&latest, &lastSuccess)

@@ -11,7 +11,7 @@ import (
 )
 
 func TestURLAllowlist(t *testing.T) {
-	for _, raw := range []string{"", DefaultURL, "https://raw.githubusercontent.com/shaderx/PingObservatory/v0.1.0/catalogue/v1.json", "https://raw.githubusercontent.com/Shaderx/PingObservatory/0123456789abcdef/catalogue/v2.json"} {
+	for _, raw := range []string{"", DefaultURL, "https://raw.githubusercontent.com/Shaderx/PingObservatory/main/catalogue/latest.json", "https://raw.githubusercontent.com/shaderx/PingObservatory/v0.1.0/catalogue/v1.json", "https://raw.githubusercontent.com/Shaderx/PingObservatory/0123456789abcdef/catalogue/v2.json"} {
 		if err := ValidateURL(raw); err != nil {
 			t.Fatalf("rejected valid URL %q: %v", raw, err)
 		}

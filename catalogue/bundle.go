@@ -3,7 +3,11 @@ package catalogue
 
 import _ "embed"
 
-//go:embed v1.json
+// DefaultURL is a data-only release channel. Each complete manifest has a
+// higher version; its versioned snapshot and pinned evidence remain immutable.
+const DefaultURL = "https://raw.githubusercontent.com/Shaderx/PingObservatory/catalogue/catalogue/latest.json"
+
+//go:embed v2.json
 var starter []byte
 
 // Starter returns a copy so callers cannot change the embedded catalogue.

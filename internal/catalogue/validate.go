@@ -15,6 +15,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	bundled "github.com/Shaderx/PingObservatory/catalogue"
 	"github.com/Shaderx/PingObservatory/internal/model"
 )
 
@@ -27,15 +28,15 @@ const (
 	// VerificationSource identifies actual probes from the owner's homelab. It
 	// does not promise that an endpoint will reply from every user's network.
 	VerificationSource = "owner-homelab"
-	DefaultURL         = "https://raw.githubusercontent.com/Shaderx/PingObservatory/main/catalogue/v2.json"
+	DefaultURL         = bundled.DefaultURL
 )
 
 var (
 	identifier        = regexp.MustCompile(`^[a-z0-9][a-z0-9._-]{0,63}$`)
-	catalogueFilename = regexp.MustCompile(`^v[1-9][0-9]*\.json$`)
+	catalogueFilename = regexp.MustCompile(`^(v[1-9][0-9]*|latest)\.json$`)
 )
 
-// ValidateURL allows only the project's versioned JSON catalogues on GitHub.
+// ValidateURL allows only the project's versioned snapshots or latest alias on GitHub.
 // An empty URL disables remote updates without disabling the current catalogue.
 func ValidateURL(raw string) error {
 	if raw == "" {
@@ -47,7 +48,7 @@ func ValidateURL(raw string) error {
 	}
 	parts := strings.Split(strings.TrimPrefix(u.Path, "/"), "/")
 	if len(parts) != 5 || !strings.EqualFold(parts[0], "Shaderx") || parts[1] != "PingObservatory" || !validRef(parts[2]) || parts[3] != "catalogue" || !catalogueFilename.MatchString(parts[4]) {
-		return errors.New("catalogue URL must name Shaderx/PingObservatory/<ref>/catalogue/v<number>.json")
+		return errors.New("catalogue URL must name Shaderx/PingObservatory/<ref>/catalogue/v<number>.json or latest.json")
 	}
 	return nil
 }

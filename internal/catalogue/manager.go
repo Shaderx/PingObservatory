@@ -50,13 +50,17 @@ type Manager struct {
 // A missing or malformed cache falls back to the starter; LastError exposes a
 // malformed-cache warning. Invalid configuration or starter data is fatal.
 func New(cachePath, url string) (*Manager, error) {
+	return newManager(cachePath, url, bundled.Starter())
+}
+
+func newManager(cachePath, url string, starter []byte) (*Manager, error) {
 	if cachePath == "" {
 		return nil, errors.New("catalogue cache path is required")
 	}
 	if err := ValidateURL(url); err != nil {
 		return nil, err
 	}
-	c, err := Decode(bundled.Starter())
+	c, err := Decode(starter)
 	if err != nil {
 		return nil, fmt.Errorf("invalid bundled catalogue: %w", err)
 	}
@@ -121,6 +125,14 @@ func (m *Manager) SetURL(raw string) error {
 func (m *Manager) Refresh(ctx context.Context) (err error) {
 	m.refreshMu.Lock()
 	defer m.refreshMu.Unlock()
+	m.mu.RLock()
+	raw, generation, client := m.url, m.generation, m.client
+	m.mu.RUnlock()
+	if raw == "" {
+		// Disabling updates does not repair a rejected cache or failed download.
+		// Keep that warning until an actual successful refresh replaces it.
+		return nil
+	}
 	defer func() {
 		m.mu.Lock()
 		defer m.mu.Unlock()
@@ -130,12 +142,6 @@ func (m *Manager) Refresh(ctx context.Context) (err error) {
 			m.lastError = ""
 		}
 	}()
-	m.mu.RLock()
-	raw, generation, client := m.url, m.generation, m.client
-	m.mu.RUnlock()
-	if raw == "" {
-		return nil
-	}
 	if err = ValidateURL(raw); err != nil {
 		return err
 	}

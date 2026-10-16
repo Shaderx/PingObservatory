@@ -53,6 +53,7 @@ func Open(dir string) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
+	c.CatalogueURL = config.MigrateCatalogueURL(c.CatalogueURL)
 	if err := catalogue.ValidateURL(c.CatalogueURL); err != nil {
 		return nil, err
 	}
