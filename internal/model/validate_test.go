@@ -24,9 +24,17 @@ func TestProtocolSettingsAndFamilyAdmission(t *testing.T) {
 		t.Fatal("unbounded UDP burst accepted")
 	}
 	https := Target{Host: "example.com", Port: 443, Scheme: "https", Path: "/", Measurement: ProbeSettings{Method: MethodHTTPS, Families: []string{FamilyIPv4}, HTTPMethod: "HEAD", ExpectedStatusCodes: []int{200}}}
+	// Recovered source HTTPS definitions use five-second application timeouts.
+	// They must fit the shared desktop validator as well as the catalogue parser.
+	https.Measurement.TimeoutMS = 5000
 	if err := ValidateProbeTarget(https); err != nil {
 		t.Fatal(err)
 	}
+	https.Measurement.TimeoutMS = 10001
+	if ValidateProbeTarget(https) == nil {
+		t.Fatal("unbounded HTTPS timeout accepted")
+	}
+	https.Measurement.TimeoutMS = 5000
 	https.Measurement.HTTPMethod = "POST"
 	if ValidateProbeTarget(https) == nil {
 		t.Fatal("mutating HTTP request accepted")

@@ -39,7 +39,11 @@ func ValidateProbeTarget(t Target) error {
 			}
 		}
 	}
-	if p.TimeoutMS < 100 || p.TimeoutMS > 3000 || p.PacketSpacingMS < 0 || p.PacketSpacingMS > 3000 {
+	maxTimeout := 3000
+	if p.Method == MethodHTTPS {
+		maxTimeout = 10000
+	}
+	if p.TimeoutMS < 100 || p.TimeoutMS > maxTimeout || p.PacketSpacingMS < 0 || p.PacketSpacingMS > 3000 {
 		return errors.New("timeout or packet spacing is outside supported bounds")
 	}
 	if p.PacketsPerCycle < 1 || p.PacketsPerCycle > 20 {
