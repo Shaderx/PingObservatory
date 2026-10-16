@@ -19,7 +19,8 @@ import (
 	"github.com/Shaderx/PingObservatory/internal/model"
 )
 
-func probeHTTPS(ctx context.Context, t model.Target, addr netip.Addr, p model.ProbeSettings, roots *x509.CertPool) model.Measurement {
+func probeHTTPS(ctx context.Context, t model.Target, addr netip.Addr, p model.ProbeSettings, roots *x509.CertPool) (result model.Measurement) {
+	defer func() { result = captureDestination(result, addr) }()
 	call, cancel := context.WithTimeout(ctx, time.Duration(p.TimeoutMS)*time.Millisecond)
 	defer cancel()
 	var mu sync.Mutex

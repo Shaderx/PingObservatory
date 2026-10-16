@@ -71,6 +71,7 @@ type Admission struct {
 }
 
 type Measurement struct {
+	DestinationIP   string             `json:"destination_ip,omitempty"`
 	TargetID        string             `json:"target_id"`
 	TargetRevision  uint64             `json:"target_revision"`
 	At              time.Time          `json:"at"`
@@ -93,6 +94,26 @@ type Measurement struct {
 	Timings         map[string]float64 `json:"timings,omitempty"`
 	POPHint         string             `json:"pop_hint,omitempty"`
 	Discarded       bool               `json:"discarded,omitempty"`
+}
+
+const DestinationHistoryLimit = 64
+
+// DestinationState is local observation metadata, never curator provenance.
+// Changes are informational; DNS/CDN rotation does not imply a health failure.
+type DestinationState struct {
+	BaselineIP         string              `json:"baseline_ip"`
+	BaselineObservedAt time.Time           `json:"baseline_observed_at"`
+	LastIP             string              `json:"last_ip"`
+	LastObservedAt     time.Time           `json:"last_observed_at"`
+	ChangeCount        uint64              `json:"change_count"`
+	HistoryLimit       int                 `json:"history_limit"`
+	History            []DestinationChange `json:"history"`
+}
+
+type DestinationChange struct {
+	ObservedAt time.Time `json:"observed_at"`
+	OldIP      string    `json:"old_ip"`
+	NewIP      string    `json:"new_ip"`
 }
 
 type RTTSample struct {
@@ -142,6 +163,8 @@ type Bucket struct {
 }
 
 type Observation struct {
+	DestinationIP           string             `json:"destination_ip,omitempty"`
+	Destination             *DestinationState  `json:"destination,omitempty"`
 	Method                  string             `json:"method"`
 	Family                  string             `json:"family"`
 	Status                  string             `json:"status"`
@@ -183,18 +206,19 @@ type SeriesStats struct {
 }
 
 type History struct {
-	TargetID       string    `json:"target_id"`
-	TargetRevision uint64    `json:"target_revision"`
-	Method         string    `json:"method"`
-	Family         string    `json:"family"`
-	Window         string    `json:"window"`
-	StepSeconds    int       `json:"step_seconds"`
-	Start          time.Time `json:"start"`
-	End            time.Time `json:"end"`
-	AsOf           time.Time `json:"as_of"`
-	RetentionDays  int       `json:"retention_days"`
-	RetainedFrom   time.Time `json:"retained_from"`
-	Buckets        []Bucket  `json:"buckets"`
+	Destination    *DestinationState `json:"destination,omitempty"`
+	TargetID       string            `json:"target_id"`
+	TargetRevision uint64            `json:"target_revision"`
+	Method         string            `json:"method"`
+	Family         string            `json:"family"`
+	Window         string            `json:"window"`
+	StepSeconds    int               `json:"step_seconds"`
+	Start          time.Time         `json:"start"`
+	End            time.Time         `json:"end"`
+	AsOf           time.Time         `json:"as_of"`
+	RetentionDays  int               `json:"retention_days"`
+	RetainedFrom   time.Time         `json:"retained_from"`
+	Buckets        []Bucket          `json:"buckets"`
 }
 
 func Settings(t Target) ProbeSettings {

@@ -11,6 +11,7 @@ A standalone network latency map for Windows and Linux. An initial scaffold is o
 - Display normal probe failures separately from those gaps.
 - Periodically fetch a versioned, verified endpoint catalogue from GitHub.
 - Include a bundled starter catalogue and retain a last-valid fallback.
+- Preserve hostname identity while recording actual local attempted addresses and flagging dated changes as informational.
 - Defer macOS support until testing is available.
 
 ## Milestone sequence
@@ -19,6 +20,8 @@ A standalone network latency map for Windows and Linux. An initial scaffold is o
 2. **Local storage and UI:** Implemented bounded local storage, one-minute staggered background collection, per-user settings and the embedded local map/history UI. The origin is configurable.
 3. **Catalogue updates:** Implemented periodic bounded GitHub JSON fetching, strict validation, a populated version-3 starter and last-valid fallback. The starter contains 171 definitions with 116 numeric-destination and 22 labelled hostname-level historical verified families, plus 58 pending families. The data-only `catalogue` branch supplies complete updates through `catalogue/latest.json`; source development and catalogue publication are independent.
 4. **Tests and packaging:** Windows native ICMP IPv4/IPv6 and protocol loopback checks pass. Linux suites, protocol fixtures, packaged TCP loopback and ICMP socket-denial checks pass; successful Linux native ICMP remains unverified. Single executable builds are prepared for Windows/Linux amd64/arm64. Arm64 runtime still requires a suitable test environment; no release is published.
+
+Local destination tracking is implemented with first-capture baselines, bounded old/new history and catalogue/local provenance separation. Existing unknown peers are not backfilled. The profile upgrade and behavior are described in [DESTINATIONS.md](DESTINATIONS.md); final platform and product acceptance remain pending.
 
 See [verification details](TESTING.md) and [third-party notices](THIRD_PARTY.md).
 

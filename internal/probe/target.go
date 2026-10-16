@@ -90,6 +90,10 @@ func probeTargetWith(ctx context.Context, t model.Target, family string, lookup 
 	case model.MethodDNS:
 		m = probeDNS(bounded, addr, t.Port, p)
 	}
+	// Every adapter above uses this exact pinned numeric address directly.
+	// Resolution alone proves no probe: only an accounted network operation
+	// can supply local destination evidence, including an observed timeout.
+	m = captureDestination(m, addr)
 	if m.Timings == nil {
 		m.Timings = map[string]float64{}
 	}
@@ -150,6 +154,7 @@ func reliableElapsed(wall, elapsed, budget time.Duration) bool {
 }
 
 func discardMeasurement(m model.Measurement, detail string) model.Measurement {
+	m.DestinationIP = ""
 	m.Status, m.Detail, m.Discarded = model.StatusSuspended, detail, true
 	m.Sent, m.Received, m.Attempted = 0, 0, 0
 	m.UnobservedSent = 0
@@ -168,7 +173,8 @@ func probeICMP(ctx context.Context, addr netip.Addr, p model.ProbeSettings) mode
 
 // Native calls overlap when their timeout exceeds the configured send spacing.
 // The bounded result channel preserves each completed response independently.
-func probeICMPWith(ctx context.Context, addr netip.Addr, p model.ProbeSettings, native func(context.Context, netip.Addr, int) model.Measurement) model.Measurement {
+func probeICMPWith(ctx context.Context, addr netip.Addr, p model.ProbeSettings, native func(context.Context, netip.Addr, int) model.Measurement) (result model.Measurement) {
+	defer func() { result = captureDestination(result, addr) }()
 	type outcome struct {
 		sequence int
 		ended    time.Time
@@ -236,6 +242,14 @@ func interruptedMeasurement(ctx context.Context, m model.Measurement, pending in
 	m.Status, m.Detail, m.UnableToMeasure = model.StatusUnavailable, detail, m.UnableToMeasure+1
 	m.UnobservedSent += pending
 	return summarize(m)
+}
+
+func captureDestination(m model.Measurement, addr netip.Addr) model.Measurement {
+	m.DestinationIP = ""
+	if m.Sent > 0 && !m.Discarded {
+		m.DestinationIP = addr.String()
+	}
+	return m
 }
 
 func summarize(m model.Measurement) model.Measurement {

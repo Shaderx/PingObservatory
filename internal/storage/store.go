@@ -95,7 +95,7 @@ func openStore(path string, retentionDays int, now func() time.Time) (*Store, er
 	if err = db.QueryRow("PRAGMA user_version").Scan(&schema); err != nil {
 		return fail(err)
 	}
-	if schema != 0 && schema != 2 {
+	if schema != 0 && schema != 2 && schema != 3 {
 		return fail(errors.New("unsupported SQLite history schema"))
 	}
 	if schema == 0 {
@@ -115,7 +115,8 @@ CREATE TABLE IF NOT EXISTS raw(series_id INTEGER NOT NULL REFERENCES series(id),
 CREATE INDEX IF NOT EXISTS raw_age ON raw(minute);
 CREATE TABLE IF NOT EXISTS chunks(series_id INTEGER NOT NULL REFERENCES series(id),minute INTEGER NOT NULL,data BLOB NOT NULL,PRIMARY KEY(series_id,minute)) WITHOUT ROWID;
 CREATE INDEX IF NOT EXISTS chunks_age ON chunks(minute);
-PRAGMA user_version=2;
+CREATE TABLE IF NOT EXISTS destinations(series_id INTEGER PRIMARY KEY REFERENCES series(id) ON DELETE CASCADE,data BLOB NOT NULL);
+PRAGMA user_version=3;
 COMMIT;`); err != nil {
 		return fail(capacityError(err))
 	}
@@ -159,6 +160,9 @@ func (s *Store) SetRetention(days int) error {
 // Add keeps the newest batch for each minute and exact series. It never infers
 // sent packets from a timeout or a local error, and never creates gap records.
 func (s *Store) Add(m model.Measurement) error {
+	if m.DestinationIP != "" && (m.Sent <= 0 || m.Discarded) {
+		return fmt.Errorf("%w: destination was not captured by an accepted network attempt", ErrInvalid)
+	}
 	m = normalize(m)
 	if err := validate(m); err != nil {
 		return err
@@ -197,8 +201,16 @@ func (s *Store) Add(m model.Measurement) error {
 		return capacityError(err)
 	}
 	var id int64
-	if err = tx.QueryRow("SELECT id FROM series WHERE target=? AND revision=? AND method=? AND family=?", m.TargetID, m.TargetRevision, m.Method, m.Family).Scan(&id); err != nil {
+	var previousLatest sql.NullInt64
+	if err = tx.QueryRow("SELECT id,latest_ns FROM series WHERE target=? AND revision=? AND method=? AND family=?", m.TargetID, m.TargetRevision, m.Method, m.Family).Scan(&id, &previousLatest); err != nil {
 		return err
+	}
+	if previousLatest.Valid && previousLatest.Int64 < s.now().UTC().Add(-s.retention).UnixNano() {
+		// Logical expiry takes effect even while physical cleanup is pending.
+		// A new active epoch must seed its own first actual captured destination.
+		if _, err = tx.Exec("DELETE FROM destinations WHERE series_id=?", id); err != nil {
+			return err
+		}
 	}
 	minute := m.At.Unix() / 60
 	var old []byte
@@ -206,12 +218,40 @@ func (s *Store) Add(m model.Measurement) error {
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return err
 	}
+	if errors.Is(err, sql.ErrNoRows) && m.At.Before(s.now().Add(-RawRetention)) {
+		var chunk []byte
+		chunkErr := tx.QueryRow("SELECT data FROM chunks WHERE series_id=? AND minute=?", id, minute/30*30).Scan(&chunk)
+		if chunkErr != nil && !errors.Is(chunkErr, sql.ErrNoRows) {
+			return chunkErr
+		}
+		if chunkErr == nil {
+			records, decodeErr := decodeChunk(chunk)
+			if decodeErr != nil {
+				return decodeErr
+			}
+			for _, previous := range records {
+				if previous.At.Unix()/60 == minute {
+					old, err = encodeMeasurement(previous)
+					if err != nil {
+						return err
+					}
+					break
+				}
+			}
+		}
+	}
 	if err == nil {
 		previous, e := decodeMeasurement(old)
 		if e != nil {
 			return e
 		}
 		if previous.At.After(m.At) {
+			return nil
+		}
+		if previous.At.Equal(m.At) && previous.DestinationIP != "" && m.DestinationIP != "" && previous.DestinationIP != m.DestinationIP {
+			return fmt.Errorf("%w: conflicting destination at the same observation time", ErrInvalid)
+		}
+		if previous.At.Equal(m.At) && previous.DestinationIP != "" && m.DestinationIP == "" {
 			return nil
 		}
 	}
@@ -228,6 +268,9 @@ func (s *Store) Add(m model.Measurement) error {
 	}
 	_, err = tx.Exec("UPDATE series SET latest=?,latest_ns=? WHERE id=? AND (latest_ns IS NULL OR latest_ns<=?)", latest, m.At.UnixNano(), id, m.At.UnixNano())
 	if err != nil {
+		return capacityError(err)
+	}
+	if err := updateDestination(tx, id, m, s.now().UTC().Add(-s.retention)); err != nil {
 		return capacityError(err)
 	}
 	for _, sample := range m.Samples {
@@ -261,6 +304,9 @@ func (s *Store) Latest() ([]model.Measurement, error) {
 		var m model.Measurement
 		if err = json.Unmarshal(data, &m); err != nil {
 			return nil, err
+		}
+		if m.DestinationIP != "" && !validDestinationIP(m.DestinationIP, m.Family) {
+			return nil, errors.New("corrupt measurement destination/family")
 		}
 		out = append(out, m)
 	}
@@ -419,6 +465,14 @@ func putChunk(tx *sql.Tx, id, minute int64, m model.Measurement) error {
 			if old.At.After(m.At) {
 				return nil
 			}
+			if old.At.Equal(m.At) && old.DestinationIP != "" {
+				if m.DestinationIP == "" {
+					return nil
+				}
+				if old.DestinationIP != m.DestinationIP {
+					return fmt.Errorf("%w: conflicting archived destination at the same observation time", ErrInvalid)
+				}
+			}
 			records[i] = m
 			found = true
 			break
@@ -477,6 +531,10 @@ func (s *Store) measurements(id string, revision uint64, method, family string, 
 					m.TargetRevision = revision
 					m.Method = method
 					m.Family = family
+					if m.DestinationIP != "" && !validDestinationIP(m.DestinationIP, family) {
+						rows.Close()
+						return nil, errors.New("corrupt compact destination/family")
+					}
 					out = append(out, m)
 				}
 			}
@@ -517,6 +575,9 @@ func normalize(m model.Measurement) model.Measurement {
 }
 
 func validate(m model.Measurement) error {
+	if m.DestinationIP != "" && (!validDestinationIP(m.DestinationIP, m.Family) || m.Sent <= 0 || m.Discarded) {
+		return fmt.Errorf("%w: destination must be an actual attempted numeric address in this family", ErrInvalid)
+	}
 	if len(m.TargetID) == 0 || len(m.TargetID) > 128 || !utf8.ValidString(m.TargetID) || strings.TrimSpace(m.TargetID) != m.TargetID || m.TargetRevision == 0 || m.TargetRevision > 9007199254740991 {
 		return fmt.Errorf("%w: target identity", ErrInvalid)
 	}

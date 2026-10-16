@@ -75,14 +75,14 @@ func TestTCPUDPAndDNSLoopbackFamilies(t *testing.T) {
 			}()
 			target := model.Target{Host: addr.String(), Port: listener.Addr().(*net.TCPAddr).Port, Measurement: fixtureSettings(model.MethodTCP, family)}
 			m := ProbeTarget(context.Background(), target, family)
-			if m.Status != model.StatusOK || m.Sent != 1 || m.Received != 1 || m.Attempted != 1 || m.UnableToMeasure != 0 || len(m.Samples) != 1 || m.At != m.BatchEndedAt || m.BatchStartedAt.After(m.At) {
+			if m.DestinationIP != addr.String() || m.Status != model.StatusOK || m.Sent != 1 || m.Received != 1 || m.Attempted != 1 || m.UnableToMeasure != 0 || len(m.Samples) != 1 || m.At != m.BatchEndedAt || m.BatchStartedAt.After(m.At) {
 				t.Fatalf("TCP measurement = %+v", m)
 			}
 			udpPort, closeUDP := udpFixture(t, addr, func(packet []byte) [][]byte { return [][]byte{packet} })
 			defer closeUDP()
 			p := fixtureSettings(model.MethodUDP, family)
 			m = probeUDP(context.Background(), addr, udpPort, p)
-			if m.Status != model.StatusOK || m.Sent != 1 || m.Received != 1 || m.UnobservedSent != 0 || len(m.Samples) != 1 {
+			if m.DestinationIP != addr.String() || m.Status != model.StatusOK || m.Sent != 1 || m.Received != 1 || m.UnobservedSent != 0 || len(m.Samples) != 1 {
 				t.Fatalf("UDP measurement = %+v", m)
 			}
 			for _, qtype := range []string{"A", "AAAA"} {
@@ -95,7 +95,7 @@ func TestTCPUDPAndDNSLoopbackFamilies(t *testing.T) {
 				p.DNSQueryName, p.DNSQueryType, p.DNSExpectedAnswers = "fixture.example", qtype, []string{answer.String()}
 				m = probeDNS(context.Background(), addr, dnsPort, p)
 				closeDNS()
-				if m.Status != model.StatusOK || m.Sent != 1 || m.Received != 1 || m.UnableToMeasure != 0 || len(m.Samples) != 1 {
+				if m.DestinationIP != addr.String() || m.Status != model.StatusOK || m.Sent != 1 || m.Received != 1 || m.UnableToMeasure != 0 || len(m.Samples) != 1 {
 					t.Fatalf("DNS %s/%s = %+v", family, qtype, m)
 				}
 			}
@@ -199,12 +199,12 @@ func TestHTTPSFamiliesPreserveHostTrustAndCompletionTiming(t *testing.T) {
 			}))
 			defer server.Close()
 			m := probeHTTPS(context.Background(), target, fixtureAddress(family), target.Measurement, roots)
-			if m.Status != model.StatusOK || m.Received != 1 || m.Sent != 1 || m.POPHint != "LHR" || len(m.Samples) != 1 || m.Samples[0].LatencyMS < 75 {
+			if m.DestinationIP != fixtureAddress(family).String() || m.Status != model.StatusOK || m.Received != 1 || m.Sent != 1 || m.POPHint != "LHR" || len(m.Samples) != 1 || m.Samples[0].LatencyMS < 75 {
 				t.Fatalf("HTTPS measurement = %+v", m)
 			}
 			// With no injected fixture root, the same server must fail trust.
 			untrusted := probeHTTPS(context.Background(), target, fixtureAddress(family), target.Measurement, nil)
-			if untrusted.Status == model.StatusOK || untrusted.Received != 0 || untrusted.FailureStage != "tls" {
+			if untrusted.DestinationIP != fixtureAddress(family).String() || untrusted.Status == model.StatusOK || untrusted.Received != 0 || untrusted.FailureStage != "tls" {
 				t.Fatalf("untrusted TLS accepted: %+v", untrusted)
 			}
 		})
@@ -290,7 +290,7 @@ func TestNativeTargetLoopbackFamilies(t *testing.T) {
 			p := fixtureSettings(model.MethodICMP, family)
 			p.PacketsPerCycle, p.PacketSpacingMS, p.TimeoutMS = 3, 100, 100
 			m := ProbeTarget(context.Background(), model.Target{Host: fixtureAddress(family).String(), Measurement: p}, family)
-			if m.Status != model.StatusOK || m.Sent != 3 || m.Received != 3 || len(m.Samples) != 3 || m.UnableToMeasure != 0 || !m.HasObservation {
+			if m.DestinationIP != fixtureAddress(family).String() || m.Status != model.StatusOK || m.Sent != 3 || m.Received != 3 || len(m.Samples) != 3 || m.UnableToMeasure != 0 || !m.HasObservation {
 				t.Fatalf("native %s = %+v", family, m)
 			}
 			t.Logf("native %s burst: sent=%d received=%d median_ms=%.3f", family, m.Sent, m.Received, *m.LatencyMS)
@@ -334,7 +334,7 @@ func TestActiveProbeClockDiscontinuityDiscardsOutcomes(t *testing.T) {
 		case <-time.After(time.Second):
 			t.Fatal("fixture probe did not actually run")
 		}
-		if !m.Discarded || m.Status != model.StatusSuspended || m.HasObservation || m.Sent != 0 || m.Received != 0 || len(m.Samples) != 0 {
+		if !m.Discarded || m.Status != model.StatusSuspended || m.HasObservation || m.Sent != 0 || m.Received != 0 || len(m.Samples) != 0 || m.DestinationIP != "" {
 			t.Fatalf("clock jump retained outcomes: %+v", m)
 		}
 	}

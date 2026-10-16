@@ -10,7 +10,7 @@ Tests cover persistence, exact uneven-sample quantiles, population standard devi
 
 Recovered HTTPS catalogue definitions retain their five-second application timeouts. The shared validator permits HTTPS timeouts up to ten seconds while retaining the existing three-second limit for other methods and the 30-second complete-cycle bound. The expanded master is checked against its historical receipts; these checks do not establish current endpoint availability.
 
-Frontend TypeScript compilation, 17 Vitest tests and the production Vite build pass using existing pinned dependencies. The map assets and third-party notices remain embedded. The packaged Windows browser checks pass for manual method settings, map/callouts/origin, provider/category/world-area filters, loss sorting, comparison limits, family switching, all history windows, explicit retention expiry, theme, motion and a 390-pixel mobile viewport. The isolated UI made no external requests and reported no browser errors. A separate loopback TCP fixture recorded a newer successful measurement after browser closure, confirming independent background collection. Temporary test processes were closed. A regression guards both family-switch history races and middle-target revision changes.
+Frontend TypeScript compilation, 21 Vitest tests and the production Vite build pass using existing pinned dependencies. The map assets and third-party notices remain embedded. The packaged Windows browser checks pass for manual method settings, map/callouts/origin, provider/category/world-area filters, loss sorting, comparison limits, family switching, all history windows, explicit retention expiry, theme, motion and a 390-pixel mobile viewport. The isolated UI made no external requests and reported no browser errors. A separate loopback TCP fixture recorded a newer successful measurement after browser closure, confirming independent background collection. Temporary test processes were closed. A regression guards both family-switch history races and middle-target revision changes.
 
 ## Populated catalogue onboarding
 
@@ -31,6 +31,20 @@ The v3 embedded starter and complete `latest.json` match the immutable v3 snapsh
 The Windows suite, native IPv4/IPv6 loopback checks, vet, TypeScript build, 18 frontend tests and embedded production build pass. A packaged offline browser run with collection paused passed explicit hostname/numeric/pending labels, all 171 directory records, IPv4/IPv6 admission states and N/A local statistics/history. Desktop and 390-pixel mobile layouts had no horizontal overflow, external UI requests or browser errors. No public endpoint probes were performed.
 
 The reviewed source checkpoint `53be9a3003a507dd88f3b0f84556d98cbbbc55b4` and data-channel commit `78dc198515597d689babfb82e955b80c8551c99a` were published together. The actual stable GitHub manifest matches the embedded v3 Git blob `3f4a606aed3b83213d496ea5d130d56246c0dba2`; its pinned hostname evidence and retained immutable v2 also match their reviewed blobs. The packaged default download, persisted schema-3 cache, offline reopening and a real 404 with an unchanged cache passed with collection paused. An actual earlier schema-2 executable rejected the new `scope` field and retained its populated 116-verified v2 starter. Neither version fabricated local measurements. Test-owned processes were closed; main and LG remain unchanged.
+
+## Actual local destinations
+
+The destination-tracking change passes the full Windows Go suite, native ICMP IPv4/IPv6 loopback tests, vet, TypeScript compilation, all 21 frontend tests and the embedded production build. Static Windows/Linux amd64/arm64 builds pass. These builds do not establish Linux or arm64 runtime behavior for this change.
+
+Owned loopback TCP listeners exercise A to B to A under one stable hostname, exactly one resolver call per cycle, two recorded changes and unchanged healthy status. Protocol fixtures verify captured addresses for TCP, UDP, DNS resolver transport, HTTPS including a TLS failure, and native ICMP in both families. Unsent operations and clock-discarded batches omit the address. No public endpoint probes were performed.
+
+Storage regressions cover first capture without legacy backfill, accepted forward-time changes, same-address retries, retained late batches, equal-time conflicts, health separation, reopen persistence, mixed compact versions, archived IPv6, 64-event bounds, revision/method/family isolation, retention expiry and new-epoch seeding. Schema-2 migration preserves old compact bytes while upgrading SQLite to schema 3; older executables cannot open that upgraded profile.
+
+A production-path catalogue test routes the normal GitHub fetch to an owned loopback server. A synthetic curator peer update preserves local baseline and events. Failed fetches and rejected rollback leave cache bytes and local state unchanged. Withdrawing admission stops scheduling without changing local history or target revision.
+
+The packaged Windows check uses temporary profiles and `--collect=false --open-browser=false --listen 127.0.0.1:0`. The actual public schema-3 download creates no local destination or baseline. Synthetic A to B to A history displays two informational changes while health stays Observed; the API retains the captured IPs and baseline across reopening. An old SQLite-2 profile upgrades to 3 without backfilled addresses. A pending family displays dated local peer history with current N/A and no automatic probing. Desktop and 390-pixel mobile layouts have no horizontal overflow, external UI requests or browser errors. Screenshots were inspected and all test-owned child processes exited.
+
+The catalogue files, evidence pins, data-channel commit and manifest schema remain unchanged by local destination tracking. See [DESTINATIONS.md](DESTINATIONS.md) for the API fields, retention and profile compatibility limits. This is a development checkpoint; final product acceptance remains pending.
 
 ## Linux validation handoff
 
@@ -56,4 +70,4 @@ Do not set `PINGOBSERVATORY_NATIVE_TEST=1` on a host whose existing policy denie
 
 ## Remaining acceptance
 
-Verify active journal bounds for the final workload, run the populated schema-3 integration on Linux, complete successful Linux native ICMP and arm64 runtime checks, and obtain final product acceptance. Families without adequate evidence remain pending. Earlier scaffold-only Windows/WSL results do not establish completion of this correction. macOS is deferred.
+Verify active journal bounds for the final workload, run the populated schema-3 integration and destination tracking on Linux, complete successful Linux native ICMP and arm64 runtime checks, and obtain final product acceptance. Families without adequate evidence remain pending. Earlier scaffold-only Windows/WSL results do not establish completion of this correction. macOS is deferred.

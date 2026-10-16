@@ -10,6 +10,8 @@ Native probes support ICMP, GameLift UDP echo on port 7770, TCP connect, HTTPS a
 
 Actual sends, received outcomes and local inability to measure are separate counters. Packet loss is calculated only for measured ICMP/UDP outcomes; TCP/HTTPS/DNS use failed-attempt rates. Outcomes made unmeasurable by local errors are excluded from denominators. Clock discontinuities during a probe discard that batch's statistical outcomes. Missing history remains N/A.
 
+Native attempts retain their exact pinned numeric destination without a second DNS lookup. Per-series first-capture baselines and dated old/new changes are informational and do not affect health. Curator verification and catalogue refreshes never seed or rewrite local destination state. See [destination tracking](DESTINATIONS.md), including bounded change details, forward-time counting and the SQLite schema-3 profile upgrade.
+
 ## Storage and statistics
 
 Pure-Go SQLite keeps 26 hours of compact raw batches, then preserves original counts and individual RTT values, timestamps and sequence numbers in 30-minute chunks. The default retention is 30 days. The main database is bounded to 4 GiB, with one connection and an 8 MiB page cache. Capacity failure is explicit; no unexpired row cap truncates history. Mature catalogue density and active journal bounds remain acceptance checks.

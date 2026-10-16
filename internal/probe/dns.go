@@ -34,7 +34,8 @@ func dnsQuestion(name, queryType string, id uint16) ([]byte, error) {
 	return packet, nil
 }
 
-func probeDNS(ctx context.Context, addr netip.Addr, port int, p model.ProbeSettings) model.Measurement {
+func probeDNS(ctx context.Context, addr netip.Addr, port int, p model.ProbeSettings) (result model.Measurement) {
+	defer func() { result = captureDestination(result, addr) }()
 	queryID := make([]byte, 2)
 	if _, err := rand.Read(queryID); err != nil {
 		return failure(model.StatusError, "could not create DNS transaction ID")

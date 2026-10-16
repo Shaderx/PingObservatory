@@ -14,7 +14,7 @@ export function metric(value: number | null | undefined) { return value == null 
 export function ageSeconds(at: string | null | undefined, now: number) { const time = at ? Date.parse(at) : NaN; return Number.isFinite(time) && time <= now ? (now - time) / 1000 : Infinity; }
 export function ageText(at: string | null | undefined, now: number) { const age = ageSeconds(at, now); return !Number.isFinite(age) ? 'unavailable' : age < 60 ? `${Math.floor(age)}s ago` : age < 3600 ? `${Math.floor(age / 60)}m ago` : `${Math.floor(age / 3600)}h ago`; }
 export function reading(target: Target, family: Family) { return target.observations.find(observation => observation.family === family && observation.method === target.measurement.method); }
-export function rollingStatus(observation: Observation | undefined, now: number) { return !observation?.rolling_as_of ? 'unavailable' : ageSeconds(observation.rolling_as_of, now) > 180 ? 'stale' : 'fresh'; }
+export function rollingStatus(observation: Observation | undefined, now: number) { return !observation?.rolling_as_of ? 'na' : ageSeconds(observation.rolling_as_of, now) > 180 ? 'stale' : 'fresh'; }
 export function elevatedTiming(observation: Observation | undefined, now: number) {
   if (!observation || observation.status !== 'ok' || rollingStatus(observation, now) !== 'fresh' || ageSeconds(observation.observed_at, now) > 180 || ageSeconds(observation.baseline_as_of, now) > 180 || observation.baseline_sample_count < 5) return false;
   const median = observation.median_ms, baseline = observation.baseline_ms;
@@ -40,9 +40,10 @@ export function presentTargets(state: State): Target[] {
     const measurement = settings(target);
     const observations = (['ipv4', 'ipv6'] as Family[]).map(family => {
       const admission = target.admission?.[family];
+      const local = state.statistics?.find(series => series.target_id === target.id && series.target_revision === target.revision && series.observation.method === measurement.method && series.observation.family === family)?.observation;
       if (!measurement.families.includes(family)) return emptyObservation(measurement.method, family, 'unsupported', 'This target is not configured for this address family.');
-      if (!target.id.startsWith('manual-') && admission?.state !== 'verified') return emptyObservation(measurement.method, family, admission?.state ?? 'unverified', admission?.reason ?? 'No successful owner verification for this exact method and family. Automatic probing is disabled.');
-      return state.statistics?.find(series => series.target_id === target.id && series.target_revision === target.revision && series.observation.method === measurement.method && series.observation.family === family)?.observation ?? emptyObservation(measurement.method, family);
+      if (!target.id.startsWith('manual-') && admission?.state !== 'verified') return { ...emptyObservation(measurement.method, family, admission?.state ?? 'unverified', admission?.reason ?? 'No successful owner verification for this exact method and family. Automatic probing is disabled.'), destination: local?.destination };
+      return local ?? emptyObservation(measurement.method, family);
     });
     return { ...target, provider: target.provider || 'User-provided', category: target.category || 'manual', region: target.region || target.label, world_area: target.world_area || 'User location', country_code: target.country_code || '', role: target.role || '', measurement, enabled: true, geography: { coordinates: target.location ? [target.location.longitude, target.location.latitude] : null }, observations };
   });

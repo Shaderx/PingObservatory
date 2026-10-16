@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"net/netip"
 	"sort"
 	"time"
 
@@ -27,7 +28,11 @@ func statusCode(status string) byte {
 // and sequence. No percentile, timing quantization or averaged loss is stored.
 func encodeMeasurement(m model.Measurement) ([]byte, error) {
 	var b bytes.Buffer
-	b.WriteByte(2)
+	version := byte(2)
+	if m.DestinationIP != "" {
+		version = 3
+	}
+	b.WriteByte(version)
 	putInt(&b, m.At.UnixNano())
 	putInt(&b, m.BatchStartedAt.UnixNano()-m.At.UnixNano())
 	putInt(&b, m.BatchEndedAt.UnixNano()-m.At.UnixNano())
@@ -55,6 +60,15 @@ func encodeMeasurement(m model.Measurement) ([]byte, error) {
 		putFloat(&b, r.LatencyMS)
 		putUint(&b, uint64(r.Sequence))
 	}
+	if version == 3 {
+		if !validDestinationIP(m.DestinationIP, m.Family) || m.Sent <= 0 || m.Discarded {
+			return nil, fmt.Errorf("%w: invalid captured destination", ErrInvalid)
+		}
+		ip, _ := netip.ParseAddr(m.DestinationIP)
+		data := ip.AsSlice()
+		b.WriteByte(byte(len(data)))
+		b.Write(data)
+	}
 	if b.Len() > 1024 {
 		return nil, fmt.Errorf("%w: encoded batch too large", ErrInvalid)
 	}
@@ -71,7 +85,7 @@ func decodeMeasurement(data []byte) (model.Measurement, error) {
 	}
 	r := bytes.NewReader(data)
 	version, e := r.ReadByte()
-	if e != nil || version != 2 {
+	if e != nil || (version != 2 && version != 3) {
 		return bad()
 	}
 	at, e := binary.ReadVarint(r)
@@ -134,6 +148,21 @@ func decodeMeasurement(data []byte) (model.Measurement, error) {
 			return bad()
 		}
 		m.Samples = append(m.Samples, model.RTTSample{At: time.Unix(0, at+offset).UTC(), LatencyMS: v, Sequence: int(seq)})
+	}
+	if version == 3 {
+		n, err := r.ReadByte()
+		if err != nil || (n != 4 && n != 16) {
+			return bad()
+		}
+		data := make([]byte, int(n))
+		if _, err := io.ReadFull(r, data); err != nil {
+			return bad()
+		}
+		ip, ok := netip.AddrFromSlice(data)
+		if !ok || !validDestinationIP(ip.String(), "") || m.Sent <= 0 || m.Discarded {
+			return bad()
+		}
+		m.DestinationIP = ip.String()
 	}
 	if r.Len() != 0 || m.UnobservedSent > m.Sent || m.Received > m.Sent-m.UnobservedSent || m.Sent > m.Attempted || len(m.Samples) != m.Received {
 		return bad()

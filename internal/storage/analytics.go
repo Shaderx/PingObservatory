@@ -47,6 +47,10 @@ func (s *Store) History(targetID string, revision uint64, method, family, window
 	if err != nil {
 		return model.History{}, err
 	}
+	h.Destination, err = s.destinationForSeries(targetID, revision, method, family, readStart, now.UTC())
+	if err != nil {
+		return model.History{}, err
+	}
 	values := make([][]float64, definition.count)
 	latest := make([]*model.Measurement, definition.count)
 	type sampleKey struct {
@@ -178,11 +182,16 @@ func (s *Store) Statistics(targets []model.Target, now time.Time) ([]model.Serie
 func (s *Store) statistics(target string, revision uint64, method, family string, now time.Time) (model.Observation, error) {
 	o := model.Observation{Method: method, Family: family, Status: "na", Detail: "No local measurement is available."}
 	var latest []byte
+	var destination []byte
 	var lastSuccess sql.NullInt64
-	err := s.db.QueryRow("SELECT latest,last_success_ns FROM series WHERE target=? AND revision=? AND method=? AND family=?", target, revision, method, family).Scan(&latest, &lastSuccess)
+	err := s.db.QueryRow("SELECT latest,last_success_ns,(SELECT data FROM destinations WHERE series_id=series.id) FROM series WHERE target=? AND revision=? AND method=? AND family=?", target, revision, method, family).Scan(&latest, &lastSuccess, &destination)
 	if errors.Is(err, sql.ErrNoRows) {
 		return o, nil
 	}
+	if err != nil {
+		return o, err
+	}
+	o.Destination, err = destinationSnapshot(destination, family, s.now().UTC().Add(-s.retention), now)
 	if err != nil {
 		return o, err
 	}
@@ -190,11 +199,16 @@ func (s *Store) statistics(target string, revision uint64, method, family string
 	if err = json.Unmarshal(latest, &m); err != nil {
 		return o, err
 	}
+	if m.DestinationIP != "" && !validDestinationIP(m.DestinationIP, family) {
+		return o, errors.New("corrupt latest destination/family")
+	}
 	cutoff := s.now().UTC().Add(-s.retention)
 	if m.At.After(now) || m.At.Before(cutoff) {
+		o.Destination = nil
 		return o, nil
 	}
 	o.Status = m.Status
+	o.DestinationIP = m.DestinationIP
 	o.Detail = m.Detail
 	o.ObservedAt = timePointer(m.At)
 	o.BatchStartedAt = timePointer(m.BatchStartedAt)

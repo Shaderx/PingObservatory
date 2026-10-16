@@ -80,7 +80,11 @@ func probeWith(ctx context.Context, host string, timeout time.Duration, lookup i
 	if err := bounded.Err(); err != nil {
 		return finish(failure(model.StatusError, "probe cancelled before ICMP send"))
 	}
-	return finish(native(bounded, addr))
+	m := native(bounded, addr)
+	if m.Sent > 0 && !m.Discarded {
+		m.DestinationIP = addr.String()
+	}
+	return finish(m)
 }
 
 func failure(status, detail string) model.Measurement {

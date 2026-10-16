@@ -50,7 +50,8 @@ func operationFailure(err error, sent int, stage string) model.Measurement {
 	return m
 }
 
-func probeTCP(ctx context.Context, addr netip.Addr, port int, p model.ProbeSettings) model.Measurement {
+func probeTCP(ctx context.Context, addr netip.Addr, port int, p model.ProbeSettings) (result model.Measurement) {
+	defer func() { result = captureDestination(result, addr) }()
 	call, cancel := context.WithTimeout(ctx, time.Duration(p.TimeoutMS)*time.Millisecond)
 	defer cancel()
 	started := time.Now()

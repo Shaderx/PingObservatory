@@ -46,7 +46,8 @@ type pendingEcho struct {
 	expires time.Time
 }
 
-func probeUDP(ctx context.Context, addr netip.Addr, port int, p model.ProbeSettings) model.Measurement {
+func probeUDP(ctx context.Context, addr netip.Addr, port int, p model.ProbeSettings) (result model.Measurement) {
+	defer func() { result = captureDestination(result, addr) }()
 	m := model.Measurement{Status: model.StatusTimeout}
 	conn, err := net.DialUDP(networkFor("udp", addr), nil, net.UDPAddrFromAddrPort(netip.AddrPortFrom(addr, uint16(port))))
 	if err != nil {
