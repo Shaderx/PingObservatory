@@ -41,6 +41,8 @@ Linux needs existing permission for ICMP ping sockets or raw sockets. If neither
 
 See [the plan](docs/PLAN.md), [implementation breakdown](docs/MVP.md), and [verification results](docs/TESTING.md). Windows native ICMP and cross-platform protocol fixtures are tested; successful Linux native ICMP and arm64 runtime checks remain pending. No release is published.
 
+A Windows amd64 release candidate is being prepared from source `51edfab`; its [draft release notes](docs/RELEASE_NOTES.md) state the proposed scope, profile migration and remaining platform limits. Publishing a release and final MVP acceptance remain owner decisions.
+
 ## Licence
 
 The application is licensed under the GNU Affero General Public License version 3 only (`AGPL-3.0-only`). See [LICENSE](LICENSE).

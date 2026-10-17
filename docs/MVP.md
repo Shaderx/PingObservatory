@@ -14,7 +14,7 @@ Native attempts retain their exact pinned numeric destination without a second D
 
 ## Storage and statistics
 
-Pure-Go SQLite keeps 26 hours of compact raw batches, then preserves original counts and individual RTT values, timestamps and sequence numbers in 30-minute chunks. The default retention is 30 days. The main database is bounded to 4 GiB, with one connection and an 8 MiB page cache. Capacity failure is explicit; no unexpired row cap truncates history. Mature catalogue density and active journal bounds remain acceptance checks.
+Pure-Go SQLite keeps 26 hours of compact raw batches, then preserves original counts and individual RTT values, timestamps and sequence numbers in 30-minute chunks. The default retention is 30 days. The main database is bounded to 4 GiB, with one connection and an 8 MiB page cache. Capacity failure is explicit; no unexpired row cap truncates history. Mature-profile and bounded 196-series destination/journal checks pass in the documented synthetic scenarios; these results do not guarantee that every permitted workload fits 30 days within the cap.
 
 Statistics separate the latest batch from the rolling hour. Medians, type-7 p95 and population standard deviation are recalculated from individual timings. A 24-hour baseline needs at least five successful timings, including valid zero-duration replies, and a positive resulting median. Freshness uses observation timestamps. Timing is elevated only when a fresh batch is both at least 50% and at least 10 ms above its fresh baseline and rolling data is fresh.
 

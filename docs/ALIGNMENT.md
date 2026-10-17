@@ -5,7 +5,7 @@ The initial scaffold omitted supported product semantics. The correction preserv
 ## Data and catalogue
 
 - Preserve each public target's stable ID, intrinsic method, configured families, endpoint definition and public provider/geography/source metadata.
-- Admit method/family pairs separately. Exact current successful evidence must match the configured endpoint, method, family and actual recorded time. HTTPS or DNS success does not verify an ICMP entry.
+- Admit method/family pairs separately. Dated successful evidence must match the configured endpoint, method, family and actual recorded time, with numeric-destination or hostname-level scope stated explicitly. Hostname-level evidence omits an unrecorded numeric peer; it does not imply current reachability. HTTPS or DNS success does not verify an ICMP entry.
 - Preserve unverified definitions explicitly without scheduling them. Reject an oversized manifest visibly rather than truncating it.
 - The curator uses bounded ordinary homelab observations as verification input, then publishes a sanitized versioned GitHub JSON manifest. Desktop applications download that manifest and probe locally.
 
