@@ -4,7 +4,7 @@ A standalone network latency map for Windows and Linux.
 
 ## Status
 
-The initial scaffold is available on `main`. Development on `feature/mvp` is correcting it to preserve the stable Looking Glass application's supported methods, families, filters, statistics and history views. The intended standalone MVP is not complete. No executable release is published.
+A [Windows amd64 preview prerelease, v0.1.0-rc.2](https://github.com/Shaderx/PingObservatory/releases/tag/v0.1.0-rc.2), contains the reviewed standalone collector and updated atlas presentation. Its product code and embedded assets match tested commit `be141f5`; the release source adds documentation only. `main` still contains the earlier scaffold, so use the release tag or corresponding-source archive to build this preview. Final MVP acceptance remains open.
 
 ## MVP
 
@@ -39,9 +39,9 @@ Linux needs existing permission for ICMP ping sockets or raw sockets. If neither
 
 ## Initial milestones
 
-See [the plan](docs/PLAN.md), [implementation breakdown](docs/MVP.md), and [verification results](docs/TESTING.md). Windows native ICMP and cross-platform protocol fixtures are tested; successful Linux native ICMP and arm64 runtime checks remain pending. No release is published.
+See [the plan](docs/PLAN.md), [implementation breakdown](docs/MVP.md), and [verification results](docs/TESTING.md). Windows native ICMP and protocol fixtures are tested. Linux startup and cloud Firefox presentation checks pass; successful Linux native ICMP, full Linux workflow acceptance and arm64 runtime checks remain pending.
 
-A Windows amd64 release candidate is being prepared from source `51edfab`; its [draft release notes](docs/RELEASE_NOTES.md) state the proposed scope, profile migration and remaining platform limits. Publishing a release and final MVP acceptance remain owner decisions.
+The [release notes](docs/RELEASE_NOTES.md) describe the Windows preview, presentation changes, profile migration and remaining platform limits. Linux and arm64 binaries are excluded from the supported download set. Physical suspend/resume and final product acceptance remain open.
 
 ## Licence
 

@@ -1,6 +1,14 @@
-# The Ping Observatory v0.1.0-rc.1
+# The Ping Observatory v0.1.0-rc.2
 
-Release candidate for **Windows amd64 preview**. Source: [`51edfab96143b3b6051f65d02c29ee4be024ee35`](https://github.com/Shaderx/PingObservatory/commit/51edfab96143b3b6051f65d02c29ee4be024ee35). Final MVP acceptance remains pending.
+Release candidate for **Windows amd64 preview**. [Exact release source](https://github.com/Shaderx/PingObservatory/tree/v0.1.0-rc.2). Product code and embedded assets match tested commit [`be141f5cad1dd76529494e38bd016bbcee619a00`](https://github.com/Shaderx/PingObservatory/commit/be141f5cad1dd76529494e38bd016bbcee619a00); the release source adds documentation only. Final MVP acceptance remains pending.
+
+## Changes since rc.1
+
+The atlas has compact provider/method/timing labels, positive-loss miniature bars, distinct status patterns and reason tooltips, matching legends, stronger pulses, travelling connector signals and fading row highlights. A fair queue uses monotonic deadlines, per-location service rotation and demand pacing. Saved data and recovered or hidden snapshots do not replay as new results.
+
+Distance colours use the configured local origin and a disclosed heuristic. Regional grouping affects display only. Measured label/control rectangles trigger a scrollable reading list when labels cannot fit. Zoom controls remain reachable, manual pan/zoom survives resize/fullscreen, and narrow-frame sizing is corrected. Collector, settings, SQLite/history, rollups, catalogue and actual-destination tracking code are unchanged.
+
+Windows paused-package Chrome checks and cloud Firefox ESR presentation acceptance pass on the exact product. Cloud Linux startup and packaged assets pass. The cloud synthetic presentation harness returned HTTP 501 for history/settings deliberately, so it did not requalify those backend workflows. Existing backend evidence remains separate.
 
 ## What is included
 
@@ -33,10 +41,10 @@ Closed/asleep gaps remain N/A; observed probe failures are separate. Local desti
 ## Platform and acceptance limits
 
 - **Windows amd64:** the candidate is intended for preview review on the tested Windows environment. Native ICMP IPv4/IPv6, protocol loopback fixtures and desktop/mobile UI checks pass. No claim is made for untested Windows versions.
-- **Linux amd64:** source tests, permission-denial behavior, local protocol/API/persistence checks and bounded storage/journal tests pass on the approved cloud host. Successful native ICMP and visual browser behavior remain unverified under that host's restrictions. The Linux binary is prepared for review and withheld from the proposed supported download set.
-- **Windows/Linux arm64:** compilation only; no runtime validation. These binaries are withheld from the proposed supported download set.
+- **Linux amd64:** prior source tests, permission-denial behavior, local protocol/API/persistence checks and bounded storage/journal tests cover the unchanged backend. Linux startup and cloud Firefox presentation acceptance now pass. Successful native ICMP and full Linux workflow acceptance remain unverified. Linux binaries are excluded from this release's supported downloads.
+- **Windows/Linux arm64:** previous compilation evidence only; no runtime validation. These binaries are excluded from this release's supported downloads.
 - **macOS:** deferred.
 
 Active-clock interruption tests pass, but a physical machine suspend/resume acceptance run has not been performed for this candidate. No host power or security policy was changed. This is a release candidate for owner evaluation, not final MVP acceptance. No new live public endpoint verification was performed for this candidate.
 
-The application is `AGPL-3.0-only`. The ZIP includes the licence and embedded third-party notices; the proposed release also includes corresponding source and SHA-256 checksums.
+The application is `AGPL-3.0-only`. The Windows ZIP includes the licence and embedded third-party notices. This prerelease also supplies corresponding source, these notes and `SHA256SUMS.txt`. Windows binaries are unsigned. Only Windows amd64 is in this preview download set.

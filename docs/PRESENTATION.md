@@ -12,4 +12,4 @@ Floating labels use measured dimensions and actual control rectangles. If they c
 
 Native fullscreen has an in-page fallback, keyboard containment and focus return. Row help uses the active fullscreen root and closes before an additional Escape exits the fallback. The local origin marker, signal directory, detailed statistics, settings and history remain available.
 
-The candidate requires the separate cloud Firefox replay before final browser acceptance. It is not a release or deployment. See [verification notes](TESTING.md).
+Cloud Firefox ESR acceptance passed on exact product commit `be141f5cad1dd76529494e38bd016bbcee619a00`, including resize, shared-location queue fairness, expiry, visibility, reduced motion and fullscreen. Linux startup and exact packaged assets also passed. Synthetic history/settings routes returned HTTP 501 deliberately, so that replay did not requalify backend workflows. The Windows preview retains the other platform and final-product limits in [verification notes](TESTING.md).
