@@ -1,5 +1,15 @@
 # Verification checkpoint
 
+## Local atlas presentation candidate
+
+The presentation port passes 75 frontend tests, TypeScript compilation and the embedded production build. Regressions cover the original monotonic queue expiry, source coalescing, revision/family cancellation, no filter replay, actual-service fairness across two 16-row shared-location cohorts, a backward clock adjustment during admission, tiny positive loss, non-RTT failure fields, unsent timeout information cues and configured zero-coordinate origin semantics. The full Windows Go suite, native IPv4/IPv6 loopback fixtures and vet also pass. The first sandboxed Go attempt could not open fixture sockets; the elevated loopback run passes.
+
+The packaged Windows Chrome check keeps collection paused and catalogue updates disabled. Synthetic responses are supplied only in the browser. All 171 bundled directory records and 126 mapped rows remain available at a 1364x1024 browser viewport and a forced 914x410 map frame. Measured visible labels do not overlap and both zoom controls pass pointer hit testing. A separate 32-row shared-location fixture triggers the stable side list; blank-area wheel input, scrollbar dragging, keyboard access and last-row selection pass. Browser widths of 800 and 810 retain a nonzero map and the below-map list. A 390-pixel layout has no horizontal overflow.
+
+Manual pan/zoom remains within three CSS pixels of its prior projection relative to map centre through shrink/grow and fallback fullscreen. Native fullscreen, the active tooltip portal, Escape dismissal, focus return and scroll-lock cleanup pass. Eight fresh local results each pulse once and finish through the real browser animation path. Initial saved data, simulated tab hide/return and reduced-motion snapshots remain silent. Status patterns distinguish elevated/tiny-loss results, measured network failures and local inability. Inspected dark/light/mobile screenshots, no browser errors and no external UI requests complete this local check.
+
+The separate cloud Firefox replay, including its larger burst fixtures, remains pending for this candidate. A Linux cross-build is build evidence only. No release, deployment, public probe batch, catalogue edit or host security change is part of this presentation validation. See [the presentation contract](PRESENTATION.md).
+
 The intended standalone MVP is not yet accepted as complete. The populated starter and GitHub update channel pass Windows integration checks. Schema 3 adds explicitly labelled historical hostname evidence; remaining platform checks and final product acceptance remain pending. No executable release is published.
 
 ## Current Windows checks

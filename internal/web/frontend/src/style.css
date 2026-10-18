@@ -21,7 +21,6 @@
 .atlas-wrap .map-note{display:block;position:static;flex:none;font-size:8px;pointer-events:none}
 @media(max-width:800px){.atlas-wrap>.map-heading{padding:13px 14px}.atlas-wrap>.map-heading h2{font-size:18px}.atlas-wrap>.map-heading p{font-size:8px}.map-footer{align-items:flex-start;flex-direction:column;gap:9px;padding:10px 14px}.atlas-wrap .map-note{text-align:left}.atlas-wrap .map-note br{display:none}.atlas-wrap .map-note span{margin-left:4px}}
 
-/* Preserve the accepted transparent atlas callouts and readable telemetry. */
 .atlas-frame{height:auto;min-height:0;overflow:hidden}
 .atlas-canvas{position:relative;width:100%;overflow:hidden}
 .atlas-canvas>.atlas{position:absolute;inset:0;width:100%;height:100%}
@@ -36,7 +35,7 @@
 .probe-row{display:block;width:100%;padding:2px;text-align:left;border:0;border-radius:0;line-height:1.2;color:var(--text);background:color-mix(in srgb,var(--panel),transparent 27%);white-space:nowrap;pointer-events:auto}
 .probe-row.selected{background:color-mix(in srgb,var(--accent),transparent 89%);box-shadow:inset 1px 0 var(--accent)}
 .probe-row:hover{background:var(--panel2);color:var(--text)}
-.probe-reading{display:grid;grid-template-columns:20px 7px 58px 40px 33px;align-items:baseline;gap:4px;white-space:nowrap;font:11px 'Courier New',monospace}
+.probe-reading{display:grid;grid-template-columns:7ch 6px auto;align-items:baseline;gap:4px;white-space:nowrap;font:11px 'Courier New',monospace}
 .probe-provider,.probe-method{font-size:11px;color:var(--muted)}
 .probe-reading strong{font-size:12px;letter-spacing:-.2px;color:var(--probe-tone);font-weight:600}
 .probe-reading strong small{font-size:11px;font-weight:400;letter-spacing:0}
@@ -44,29 +43,38 @@
 .non_response .probe-condition,.blocked .probe-condition,.local_error .probe-condition{color:var(--danger)}
 .degraded .probe-condition{color:var(--amber)}
 .stale .probe-reading strong{color:var(--muted)}
-.probe-loss{font-size:11px;color:var(--muted)}
-.probe-loss.has-loss{color:var(--amber)}
-.probe-loss.stale,.probe-loss.unavailable{color:var(--muted);text-decoration:underline dotted;text-underline-offset:3px}
-.probe-activity{font-size:11px;text-align:right;color:var(--muted)}
-.unknown .probe-activity{color:var(--amber)}
+
+
 .probe-geodot.map-pin{position:absolute;width:24px;height:24px;padding:0;border:0;border-radius:50%;background:transparent;box-shadow:none;--probe-tone:var(--accent);z-index:3}
 .probe-geodot.map-pin.selected{width:24px;height:24px;padding:0;border:0;background:transparent;box-shadow:none;z-index:4}
 .probe-geodot>span{position:absolute;display:block;pointer-events:none}
 .probe-aura{inset:6px;border:1px solid var(--probe-tone);border-radius:50%;opacity:.5;box-shadow:0 0 13px 2px color-mix(in srgb,var(--probe-tone),transparent 75%)}
 .probe-geodot.selected .probe-aura{inset:3px;opacity:.8}
 .probe-core{inset:9px;border-radius:50%;background:var(--probe-tone);border:1px solid color-mix(in srgb,var(--probe-tone),white 20%)}
-.probe-loss-ring{inset:3px;border:1.5px solid transparent;border-radius:50%}
-.probe-geodot.has-fresh-loss .probe-loss-ring{border-color:var(--amber);box-shadow:0 0 7px color-mix(in srgb,var(--amber),transparent 55%)}
-.probe-ripple{inset:6px;border:1px solid var(--probe-tone);border-radius:50%;opacity:0}
-.probe-geodot.is-arrival.animate .probe-ripple{animation:probe-arrival .9s ease-out forwards}
-@keyframes probe-arrival{0%{opacity:.85;transform:scale(.7)}100%{opacity:0;transform:scale(3)}}
+.probe-arrival-layer.maplibregl-marker{width:24px;height:24px;pointer-events:none;z-index:2147483647!important;mix-blend-mode:hard-light}
+/* The location owns the first beat; the connector takes over at 900ms. */
+.probe-arrival-layer>.probe-ripple{
+  position:absolute;inset:-8px;border:3px solid color-mix(in srgb,var(--probe-tone) 25%,white);
+  border-radius:50%;opacity:0;pointer-events:none;
+  box-shadow:0 0 5px 1px color-mix(in srgb,var(--probe-tone) 65%,transparent),inset 0 0 3px color-mix(in srgb,var(--probe-tone) 45%,transparent);
+  animation:probe-arrival .9s linear forwards;
+}
+[data-theme=light] .probe-arrival-layer>.probe-ripple{
+  border-color:color-mix(in srgb,var(--probe-tone) 75%,black);
+  box-shadow:0 0 4px 1px color-mix(in srgb,var(--probe-tone) 35%,transparent),inset 0 0 2px color-mix(in srgb,var(--probe-tone) 30%,transparent);
+}
+@keyframes probe-arrival{
+  0%{opacity:1;transform:scale(.3)}
+  18%{opacity:1;transform:scale(.62)}
+  60%{opacity:.95;transform:scale(1)}
+  82%{opacity:.55;transform:scale(1.1)}
+  100%{opacity:0;transform:scale(1.2)}
+}
 .probe-atlas.narrow{position:relative;inset:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:15px 16px;padding:16px 12px;border-top:1px solid var(--line)}
 .probe-atlas.narrow .probe-callout{position:static;width:max-content;max-width:100%;background:transparent;transform:none!important;visibility:visible!important}
 .map-key{min-width:0;flex:1}
 .progressive-legend{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:center;font:11px 'Courier New',monospace;color:var(--muted)}
-.baseline-gradient{display:inline-block;width:65px;height:6px;border-radius:4px;background:linear-gradient(90deg,hsl(90 76% 69%),hsl(45 76% 69%),hsl(10 76% 69%));margin-right:7px}
-.progressive-legend .loss{color:var(--amber)}
-.legend-loss-ring{display:inline-block;width:11px;height:11px;margin-right:7px;border:1.5px solid var(--amber);border-radius:50%;vertical-align:-2px}
+.baseline-gradient{display:inline-block;width:65px;height:6px;border-radius:4px;background:linear-gradient(90deg,hsl(110 76% 69%),hsl(55 76% 69%),hsl(0 76% 69%));margin-right:7px}
 .legend-ripple,.legend-unknown{display:inline-grid;place-items:center;width:11px;height:11px;margin-right:7px;flex:none;font-style:normal;vertical-align:-1px}
 .legend-ripple{border:1px solid var(--accent);border-radius:50%;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
 .legend-unknown{border:1px solid var(--amber);border-radius:50%;font:8px 'Courier New',monospace;color:var(--amber)}
@@ -74,11 +82,12 @@
 .motion-toggle{flex:none;border:1px solid var(--line);border-radius:3px;padding:6px 9px;color:var(--muted);font:8px 'Courier New',monospace}
 .motion-toggle[aria-pressed=true]{color:var(--accent)}
 .atlas-frame.failed{min-height:220px}
-[data-theme=light] .probe-callout{background:transparent;box-shadow:none}
+/* Paint the light label surface and its hairline inside the existing bounds. */
+[data-theme=light] .probe-atlas .probe-callout{background:var(--bg);box-shadow:inset 0 0 0 1px var(--line);text-shadow:none}
 [data-theme=light] .probe-row{background:transparent}
-[data-theme=light] .baseline-gradient{background:linear-gradient(90deg,hsl(90 62% 31%),hsl(45 62% 31%),hsl(10 62% 31%))}
+[data-theme=light] .baseline-gradient{background:linear-gradient(90deg,hsl(110 70% 22%),hsl(55 70% 22%),hsl(0 70% 22%))}
 @media(max-width:800px){.mobile-tabs{display:none}.workspace{display:flex;flex-direction:column;gap:25px}.map-section{order:0;width:100%}.detail-panel{order:1;position:static;width:100%;padding:23px}.directory{order:2;margin-top:0;width:100%}.atlas-frame{height:auto;min-height:0}.map-footer{align-items:flex-start;flex-direction:column;gap:9px;padding:10px 14px}.atlas-wrap .map-note{text-align:left}.progressive-legend{font-size:10px;gap:9px}}
-@media(prefers-reduced-motion:reduce){.probe-ripple{animation:none!important}}
+@media(prefers-reduced-motion:reduce){.probe-arrival-layer>.probe-ripple{animation:none!important}}
 
 .expanded-history{flex-wrap:wrap;gap:14px}.expanded-history .window-control{max-width:100%;flex-wrap:wrap}
 /* Local settings and measurement presentation in the retained observatory layout. */
@@ -87,3 +96,104 @@
 .probe-reading{grid-template-columns:30px 7px 58px 40px 13px;gap:4px}.manual-families{display:flex;align-items:center;gap:18px}.manual-families .location-toggle{grid-column:auto}.settings select{max-width:none;width:100%}.state.unavailable,.state.unverified,.state.unsupported{color:var(--muted)}.state.degraded{color:var(--amber)}.baseline-policy{font-size:10px;color:var(--muted);line-height:1.6}.baseline-policy b{font-weight:400;color:var(--text)}
 .minute-result.retention-expired{color:var(--muted);border-style:dashed}
 .destination-history{border-top:1px solid var(--line);margin-top:16px;padding-top:14px;font-size:11px;line-height:1.8}.destination-history summary{cursor:pointer}.destination-history code{overflow-wrap:anywhere}.destination-history p{margin-top:10px;color:var(--muted)}.destination-history ol{padding-left:18px;max-height:220px;overflow:auto}.destination-history li{padding:8px 0;border-bottom:1px solid var(--line)}.peer-flag{display:inline-block;color:var(--accent);font-size:10px;margin-left:5px}
+
+/* Full-width atlas, compact telemetry, and retained mobile hit targets. */
+.shell{max-width:none;padding:0 2%}
+.map-section{grid-column:1 / -1;grid-row:1}
+.detail-panel{grid-column:1 / -1;grid-row:3;margin-top:24px;position:static}
+.directory{grid-column:1 / -1;grid-row:2;margin-top:24px}
+.probe-callout{font-size:10px;max-width:min(190px,calc(100vw - 32px))}
+.probe-location{font-size:10px;letter-spacing:.2px}
+.probe-reading{font-size:10px;gap:3px}
+.probe-provider,.probe-method,.probe-condition{font-size:10px}
+.probe-provider{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.probe-reading strong{font-size:11px;display:inline-flex;align-items:baseline;gap:1px}
+.probe-reading strong small{font-size:10px}
+.probe-reading{display:flex}.probe-provider{width:7ch;flex:none}.probe-method{width:6px;flex:none}
+.inline-loss{display:inline-block;margin-left:6px;font-size:10px;color:var(--amber)}
+.inline-loss.stale,.inline-loss.unavailable{color:var(--muted);text-decoration:underline dotted}
+.target-link strong{font-size:12px}td{padding:10px 8px}th{font-size:8px}
+@media(max-width:800px){
+  .shell{padding:0 3%}.detail-panel{margin-top:0}.directory{margin-top:0}
+  .probe-atlas.narrow{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px 10px}
+  .probe-row{min-height:28px;padding:6px 2px}
+  .probe-callout,.probe-location,.probe-reading,.probe-provider,.probe-method,.probe-condition{font-size:11px}
+  .probe-reading strong{font-size:12px}
+  .target-link strong{font-size:11px}
+}
+
+.map-heading-actions{display:flex;align-items:center;gap:12px}
+.atlas-maximize{pointer-events:auto;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--text);padding:7px 10px;font:inherit;font-size:12px;cursor:pointer;white-space:nowrap}
+.atlas-maximize:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.atlas-wrap.atlas-expanded{width:100%;height:100dvh;max-height:100dvh;background:var(--panel);overflow:hidden;box-sizing:border-box}
+.atlas-expanded-fallback{position:fixed;inset:0;z-index:1000}
+.atlas-expanded .map-heading,.atlas-expanded .map-footer{flex:none}
+.atlas-expanded .atlas-frame{flex:1;min-height:0;overflow:auto}
+/* Keep fullscreen gutter dimensions stable without clipping tall callouts; narrow telemetry grids retain their scrolling. */
+@media(min-width:800px){.atlas-expanded .atlas-frame:not(:has(.probe-atlas.narrow)){overflow:hidden auto;scrollbar-gutter:stable}.atlas-expanded .atlas-canvas{height:100%;aspect-ratio:auto!important}}
+@media(max-width:799px){.atlas-expanded .atlas-canvas{height:auto;min-height:0}.atlas-expanded .map-footer{max-height:24dvh;overflow:auto}.atlas-expanded .map-heading{padding:12px}.map-heading-actions{gap:8px;flex-wrap:wrap;justify-content:flex-end}}
+
+/* Keep measurement values and hit areas unchanged; compact only the labels. */
+.probe-location,.probe-provider,.probe-method{font-size:9px}
+@media(max-width:800px){.probe-location,.probe-provider,.probe-method{font-size:10px}}
+
+@media(min-width:1100px){
+  .workspace{grid-template-columns:minmax(650px,2fr) minmax(300px,1fr);column-gap:24px}
+  .directory{grid-column:1;grid-row:2;min-width:0;margin-top:24px}
+  .detail-panel{grid-column:2;grid-row:2;min-width:0;margin-top:24px;columns:1;column-gap:normal}
+}
+
+
+
+/* Share compact content-sized columns within each location, without dummy readings. */
+.probe-telemetry{width:max-content;max-width:100%;grid-template-columns:minmax(0,max-content) max-content minmax(0,max-content);column-gap:3px}
+.probe-row{display:grid;grid-column:1/-1;grid-template-columns:subgrid;column-gap:inherit;align-items:baseline}
+.probe-reading{display:contents}
+.probe-reading>.probe-provider,.probe-reading>.probe-method,.probe-reading>strong{position:relative;z-index:1}
+.probe-provider{width:auto;min-width:0;max-width:7ch}
+.probe-method{width:auto;min-width:1ch}
+.probe-reading strong{display:flex;max-width:100%;min-width:0;gap:0;align-items:baseline;flex:none;justify-self:end}
+.probe-measurement{display:flex;align-items:baseline;justify-content:flex-end;flex-wrap:wrap;gap:2px;min-width:0;max-width:100%;min-height:14px}
+.probe-rtt{flex:0 1 auto;min-width:0;max-width:100%;overflow-wrap:anywhere;white-space:normal}
+.probe-row{min-width:0;max-width:100%}
+.probe-atlas.narrow .probe-callout{justify-self:start;align-self:start}
+
+/* Zero and unknown have no visible bar or empty suffix slot. Raw positive loss sets the fill. */
+.probe-loss-bar{display:inline-block;width:2px;height:10px;flex:0 0 2px;align-self:center}
+.probe-loss-bar{position:relative;overflow:hidden;background:transparent;text-shadow:none}
+.probe-loss-fill{position:absolute;inset:0;background:var(--probe-loss-color);transform:scaleY(var(--probe-loss-scale));transform-origin:center bottom}
+.probe-loss-bar.stale .probe-loss-fill{opacity:.55}
+.probe-loss-bar.unavailable .probe-loss-fill{opacity:.2}
+
+/* Dedicated decorative children leave Tron overlays and all row geometry intact. */
+.probe-row{position:relative;isolation:isolate}
+.probe-status-pattern{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;--cue-alpha:.08;--cue-wash:.025;background-color:rgb(var(--cue-rgb)/var(--cue-wash))}
+.probe-status-pattern.performance{--cue-rgb:241 190 91;background-image:repeating-linear-gradient(135deg,rgb(var(--cue-rgb)/var(--cue-alpha)) 0 1px,transparent 1px 7px)}
+.probe-status-pattern.information{--cue-rgb:160 174 199;background-image:radial-gradient(circle,rgb(var(--cue-rgb)/var(--cue-alpha)) .6px,transparent .9px);background-size:6px 6px}
+.probe-status-pattern.failure{--cue-rgb:240 138 147;background-image:repeating-linear-gradient(0deg,rgb(var(--cue-rgb)/var(--cue-alpha)) 0 1px,transparent 1px 6px)}
+[data-theme=light] .probe-status-pattern{--cue-alpha:.06;--cue-wash:.015}
+[data-theme=light] .probe-status-pattern.performance{--cue-rgb:133 94 17}
+[data-theme=light] .probe-status-pattern.information{--cue-rgb:82 107 136}
+[data-theme=light] .probe-status-pattern.failure{--cue-rgb:175 62 75}
+.map-reading-tooltip{position:fixed;z-index:2147483647;width:min(340px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;padding:12px;border:1px solid var(--line);border-radius:5px;background:var(--panel);color:var(--text);box-shadow:0 3px 14px rgb(0 0 0/.2);font:12px/1.5 'Courier New',monospace;pointer-events:auto}
+.map-reading-tooltip p{margin:0 0 7px}.map-reading-tooltip p:last-child{margin-bottom:0}
+.legend-loss-bar{display:inline-block;width:2px;height:10px;margin:0 7px 0 3px;background:hsl(0 80% 55%);vertical-align:-1px}
+.legend-status-pattern{display:inline-block;width:12px;height:10px;margin-right:7px;background:repeating-linear-gradient(135deg,var(--muted) 0 1px,transparent 1px 7px);opacity:.5;vertical-align:-1px}
+.map-legend-help{margin-top:8px;font-size:11px;line-height:1.6;color:var(--muted)}
+.map-legend-help summary{cursor:pointer;width:fit-content}.map-legend-help p{margin:6px 0;max-width:90ch}
+
+/* A measured capacity fallback keeps every reading beside a crowded map. */
+.atlas-frame:has(.probe-atlas.docked){display:grid;grid-template-columns:minmax(0,1fr) 250px;grid-template-rows:minmax(0,1fr);overflow:hidden}
+.atlas-frame:has(.probe-atlas.docked) .atlas-canvas{height:100%;aspect-ratio:auto!important;min-width:0}
+.probe-atlas.docked{position:relative;inset:auto;display:grid;grid-template-columns:minmax(0,1fr);align-content:start;min-height:0;max-height:100%;overflow:auto;gap:16px;padding:12px;border-left:1px solid var(--line);border-top:0}
+.probe-atlas.narrow{pointer-events:auto}
+.probe-atlas.narrow .probe-row{min-height:28px;padding:6px 2px}
+.probe-atlas.narrow .probe-callout{max-width:100%;width:max-content}
+.probe-atlas.narrow:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.atlas .maplibregl-control-container{position:relative;z-index:20}
+.atlas-wrap:not(.atlas-compact) .atlas-frame>.atlas-canvas{height:100%;aspect-ratio:auto!important}
+.atlas-expanded .atlas-frame{overflow:hidden!important;scrollbar-gutter:auto!important}
+.atlas-compact .probe-atlas.narrow{max-height:50dvh;overflow:auto}
+.atlas-compact .atlas-frame{height:auto!important}
+.atlas-compact.atlas-expanded .atlas-frame{overflow:auto!important}
+.atlas-compact .atlas-frame>.atlas-canvas{height:auto;aspect-ratio:var(--atlas-ratio)!important}

@@ -1,0 +1,34 @@
+/* Append after existing probe styles. Keep the existing hard-light node pulse. */
+.probe-atlas {
+  --signal-tail: #bddf82;
+  --signal-tip: #edffcc;
+  --signal-flash-soft: rgba(197, 239, 105, .10);
+  --signal-flash: rgba(197, 239, 105, .19);
+}
+[data-theme=light] .probe-atlas {
+  --signal-tail: #60892c;
+  --signal-tip: #294817;
+  --signal-flash-soft: rgba(80, 122, 9, .07);
+  --signal-flash: rgba(80, 122, 9, .15);
+}
+.probe-signals {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  z-index: 6;
+  pointer-events: none;
+}
+.probe-signals *, .probe-signal { pointer-events: none; }
+.probe-signals path {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: butt;
+  stroke-linejoin: round;
+}
+.probe-signal-tail { stroke: var(--signal-tail); stroke-width: 1.15; }
+.probe-signal-tip { stroke: var(--signal-tip); stroke-width: 1.6; }
+@media(prefers-reduced-motion: reduce) {
+  .probe-signals { display: none; }
+}

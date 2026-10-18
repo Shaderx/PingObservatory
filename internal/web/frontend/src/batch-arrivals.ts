@@ -10,15 +10,15 @@ export type BatchArrivalTracker = {
   deliveryUnavailable: boolean;
 };
 
-export function batchArrivalKey(targetId: string, family: Family, method: Method) {
-  return `${targetId}|${family}|${method}`;
+export function batchArrivalKey(targetId: string, family: Family, method: Method, revision: number) {
+  return `${targetId}|${family}|${method}|${revision}`;
 }
 
 export function createBatchArrivalTracker(): BatchArrivalTracker {
   return { latestByKey: new Map(), arrivals: new Map(), initialized: false, deliveryUnavailable: false };
 }
 
-export function markPublicationUnavailable(previous: BatchArrivalTracker): BatchArrivalTracker {
+export function markDeliveryUnavailable(previous: BatchArrivalTracker): BatchArrivalTracker {
   return { ...previous, arrivals: new Map(), deliveryUnavailable: true };
 }
 
@@ -33,13 +33,14 @@ function canAnimate(target: Target, status: string) {
   return target.enabled && !['na', 'unsupported', 'unverified', 'disabled', 'unavailable', 'suspended'].includes(status);
 }
 
-export function acceptPublishedSnapshot(
+export function acceptLocalSnapshot(
   previous: BatchArrivalTracker,
   targets: Target[],
   now: number,
   motionAllowed = true,
 ): BatchArrivalTracker {
-  const latestByKey = new Map(previous.latestByKey);
+  const keys = new Set(targets.flatMap(target => target.observations.map(o => batchArrivalKey(target.id, o.family, o.method, target.revision))));
+  const latestByKey = new Map([...previous.latestByKey].filter(([key]) => keys.has(key)));
   const recovering = !previous.initialized || previous.deliveryUnavailable;
   const arrivals = new Map<string, number>();
 
@@ -51,7 +52,7 @@ export function acceptPublishedSnapshot(
 
   for (const target of targets) {
     for (const observation of target.observations) {
-      const key = batchArrivalKey(target.id, observation.family, observation.method);
+      const key = batchArrivalKey(target.id, observation.family, observation.method, target.revision);
       const completedAt = freshCompletedAt(observation.observed_at, now);
       if (completedAt === undefined) continue;
 
@@ -59,7 +60,7 @@ export function acceptPublishedSnapshot(
       if (!recovering && motionAllowed && canAnimate(target, observation.status) && prior !== undefined && completedAt > prior) {
         arrivals.set(key, now);
       }
-      // Keep the newest valid source timestamp. An old or invalid publication
+      // Keep the newest valid source timestamp. An old or invalid local snapshot
       // cannot move the baseline backward or make a later replay look new.
       if (prior === undefined || completedAt > prior) latestByKey.set(key, completedAt);
     }
