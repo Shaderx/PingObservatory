@@ -1,14 +1,22 @@
-# The Ping Observatory v0.1.0-rc.2
+# The Ping Observatory v0.1.0
 
-Release candidate for **Windows amd64 preview**. [Exact release source](https://github.com/Shaderx/PingObservatory/tree/v0.1.0-rc.2). Product code and embedded assets match tested commit [`be141f5cad1dd76529494e38bd016bbcee619a00`](https://github.com/Shaderx/PingObservatory/commit/be141f5cad1dd76529494e38bd016bbcee619a00); the release source adds documentation only. Final MVP acceptance remains pending.
+Full release for **Windows amd64**. [Exact release source](https://github.com/Shaderx/PingObservatory/tree/v0.1.0). Product code and embedded assets match reviewed and tested commit [`46f1c5b2bc5f5c07bd22d18b0ecfe5b0ca3a7f2d`](https://github.com/Shaderx/PingObservatory/commit/46f1c5b2bc5f5c07bd22d18b0ecfe5b0ca3a7f2d); the release source adds documentation only. Final cross-platform MVP acceptance remains pending.
 
-## Changes since rc.1
+## Changes since rc.2
+
+The atlas now loads the connector signal stylesheet in the shipped bundle. A local result can therefore show the travelling line as well as the pulse. The map adds **Set my location**: choose an approximate point, preview it, then confirm or cancel. Only a confirmed point is saved to local settings, rounded to a tenth of a degree. No GPS or browser geolocation permission is requested. An unset-origin reminder explains why latency-versus-distance colours are neutral; manual latitude/longitude settings remain available. A stale state poll cannot briefly undo a newly saved origin in the UI.
+
+Degraded, failure and unavailable row patterns have stronger contrast. Positive packet loss or failed-attempt rates have a small top tick; the bar fill remains proportional and the exact rate is in row help. The underlying collector and health decisions are unchanged.
+
+The 77 frontend tests, TypeScript build and isolated Chrome fixture pass. The fixture exercised real map rendering, connector paint, green/red reference colours, fresh and stale readings, measured loss versus local inability, ICMP/TCP/DNS distinctions, both themes, 390-pixel selection, failed saves, persistence and an intentionally delayed old state response. It made no external requests. An independent Sol source review approved the fix. This is local simulated acceptance, not an additional live endpoint test or a rerun of the earlier cloud Firefox suite.
+
+## Earlier rc.2 presentation
 
 The atlas has compact provider/method/timing labels, positive-loss miniature bars, distinct status patterns and reason tooltips, matching legends, stronger pulses, travelling connector signals and fading row highlights. A fair queue uses monotonic deadlines, per-location service rotation and demand pacing. Saved data and recovered or hidden snapshots do not replay as new results.
 
 Distance colours use the configured local origin and a disclosed heuristic. Regional grouping affects display only. Measured label/control rectangles trigger a scrollable reading list when labels cannot fit. Zoom controls remain reachable, manual pan/zoom survives resize/fullscreen, and narrow-frame sizing is corrected. Collector, settings, SQLite/history, rollups, catalogue and actual-destination tracking code are unchanged.
 
-Windows paused-package Chrome checks and cloud Firefox ESR presentation acceptance pass on the exact product. Cloud Linux startup and packaged assets pass. The cloud synthetic presentation harness returned HTTP 501 for history/settings deliberately, so it did not requalify those backend workflows. Existing backend evidence remains separate.
+Earlier rc.2 Windows paused-package Chrome checks and cloud Firefox ESR presentation acceptance passed on `be141f5`. Cloud Linux startup and packaged assets also passed for that earlier product. The cloud synthetic presentation harness returned HTTP 501 for history/settings deliberately, so it did not requalify those backend workflows. Existing backend evidence remains separate.
 
 ## What is included
 
@@ -30,21 +38,21 @@ Extract the Windows amd64 ZIP into a folder and run `PingObservatory.exe`. No Go
 
 The console prints the available loopback URL. Use `--data-dir "C:\path\to\separate-profile"` for an isolated profile. The default Windows profile is `%AppData%\PingObservatory`. A second process cannot share an open profile. If port 8742 is occupied, choose `--listen 127.0.0.1:0`.
 
-The binary is unsigned. Windows may display publisher or reputation prompts. This candidate does not include an installer, auto-start service or automatic executable updates. Catalogue updates are data-only. `--help`, `--licenses` and the local `/licenses.txt` page work without installing development tools.
+The binary is unsigned. Windows may display publisher or reputation prompts. This release does not include an installer, auto-start service or automatic executable updates. Catalogue updates are data-only. `--help`, `--licenses` and the local `/licenses.txt` page work without installing development tools.
 
 ## Data and upgrade limits
 
-Opening a SQLite schema-2 profile upgrades it to schema 3. Existing measurement bytes are preserved and unknown historical peers stay unknown. **Older schema-2 executables cannot reopen the upgraded profile.** For rollback testing, stop the application and copy the entire closed profile before opening it with this candidate, or use a separate `--data-dir`.
+Opening a SQLite schema-2 profile upgrades it to schema 3. Existing measurement bytes are preserved and unknown historical peers stay unknown. **Older schema-2 executables cannot reopen the upgraded profile.** For rollback testing, stop the application and copy the entire closed profile before opening it with this release, or use a separate `--data-dir`.
 
 Closed/asleep gaps remain N/A; observed probe failures are separate. Local destination history keeps at most 64 recent event details per series within retention, while the total accepted forward-time count can be larger. The default retention is 30 days, with a 4 GiB main database cap and visible capacity errors. Retention is not a guarantee that every permitted workload fits that cap. Details: [local destination tracking](https://github.com/Shaderx/PingObservatory/blob/51edfab96143b3b6051f65d02c29ee4be024ee35/docs/DESTINATIONS.md).
 
 ## Platform and acceptance limits
 
-- **Windows amd64:** the candidate is intended for preview review on the tested Windows environment. Native ICMP IPv4/IPv6, protocol loopback fixtures and desktop/mobile UI checks pass. No claim is made for untested Windows versions.
+- **Windows amd64:** this release is distributed for the tested Windows environment. Native ICMP IPv4/IPv6, protocol loopback fixtures and desktop/mobile UI checks pass. No claim is made for untested Windows versions.
 - **Linux amd64:** prior source tests, permission-denial behavior, local protocol/API/persistence checks and bounded storage/journal tests cover the unchanged backend. Linux startup and cloud Firefox presentation acceptance now pass. Successful native ICMP and full Linux workflow acceptance remain unverified. Linux binaries are excluded from this release's supported downloads.
 - **Windows/Linux arm64:** previous compilation evidence only; no runtime validation. These binaries are excluded from this release's supported downloads.
 - **macOS:** deferred.
 
-Active-clock interruption tests pass, but a physical machine suspend/resume acceptance run has not been performed for this candidate. No host power or security policy was changed. This is a release candidate for owner evaluation, not final MVP acceptance. No new live public endpoint verification was performed for this candidate.
+Active-clock interruption tests pass, but a physical machine suspend/resume acceptance run has not been performed for this release. No host power or security policy was changed. Full release classification applies to the Windows amd64 download; broader MVP acceptance remains open. No new live public endpoint verification was performed for this release.
 
-The application is `AGPL-3.0-only`. The Windows ZIP includes the licence and embedded third-party notices. This prerelease also supplies corresponding source, these notes and `SHA256SUMS.txt`. Windows binaries are unsigned. Only Windows amd64 is in this preview download set.
+The application is `AGPL-3.0-only`. The Windows ZIP includes the licence and embedded third-party notices. This release also supplies corresponding source, these notes and `SHA256SUMS.txt`. Windows binaries are unsigned. Only Windows amd64 is in this download set.

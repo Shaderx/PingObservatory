@@ -4,7 +4,7 @@ A standalone network latency map for Windows and Linux.
 
 ## Status
 
-A [Windows amd64 preview prerelease, v0.1.0-rc.2](https://github.com/Shaderx/PingObservatory/releases/tag/v0.1.0-rc.2), contains the reviewed standalone collector and updated atlas presentation. Its product code and embedded assets match tested commit `be141f5`; the release source adds documentation only. `main` still contains the earlier scaffold, so use the release tag or corresponding-source archive to build this preview. Final MVP acceptance remains open.
+A [Windows amd64 full release, v0.1.0](https://github.com/Shaderx/PingObservatory/releases/tag/v0.1.0), contains the reviewed standalone collector and atlas presentation. Its product code and embedded assets match tested commit `46f1c5b`; the release source adds documentation only. This update restores travelling connector styling, adds an approximate location picker on the map and makes loss/status cues clearer. Use the release tag or corresponding-source archive to build it. Cross-platform MVP acceptance remains open.
 
 ## MVP
 
@@ -27,7 +27,7 @@ go build -trimpath -o PingObservatory ./cmd/pingobservatory
 
 On Windows, use `go build -trimpath -o PingObservatory.exe ./cmd/pingobservatory` and run `PingObservatory.exe`. The application opens `http://127.0.0.1:8742`. Keep the application process running; closing the browser does not stop its one-minute staggered collector. Use `--open-browser=false` to print the URL without opening a browser, or `--listen 127.0.0.1:0` for an available port.
 
-Configuration, identity history, the last-valid catalogue and measurements are stored in the per-user configuration directory under `PingObservatory` (Windows `%AppData%`, Linux `$XDG_CONFIG_HOME` or `~/.config`). Use `--data-dir` for a separate profile. Set the origin location and user-provided IPv4 or IPv6 targets in the UI. Target changes require a new revision.
+Configuration, identity history, the last-valid catalogue and measurements are stored in the per-user configuration directory under `PingObservatory` (Windows `%AppData%`, Linux `$XDG_CONFIG_HOME` or `~/.config`). Use `--data-dir` for a separate profile. Pick an approximate origin on the map and confirm it locally to enable distance colours, or enter latitude/longitude in settings. Set user-provided IPv4 or IPv6 targets in the UI. Target changes require a new revision.
 
 The executable embeds the [version-3 master catalogue](catalogue/v3.json), so a fresh offline profile immediately displays 171 public definitions and 196 configured family series. There are 116 numeric-destination and 22 explicitly hostname-level historical success receipts; the remaining 58 families stay pending without automatic probing. Hostname-level evidence does not claim an unrecorded numeric peer. Local history starts empty; catalogue evidence does not create local measurements. User-provided targets are labelled separately and never claim catalogue verification.
 
@@ -41,7 +41,7 @@ Linux needs existing permission for ICMP ping sockets or raw sockets. If neither
 
 See [the plan](docs/PLAN.md), [implementation breakdown](docs/MVP.md), and [verification results](docs/TESTING.md). Windows native ICMP and protocol fixtures are tested. Linux startup and cloud Firefox presentation checks pass; successful Linux native ICMP, full Linux workflow acceptance and arm64 runtime checks remain pending.
 
-The [release notes](docs/RELEASE_NOTES.md) describe the Windows preview, presentation changes, profile migration and remaining platform limits. Linux and arm64 binaries are excluded from the supported download set. Physical suspend/resume and final product acceptance remain open.
+The [release notes](docs/RELEASE_NOTES.md) describe the Windows release, presentation changes, profile migration and remaining platform limits. Linux and arm64 binaries are excluded from the supported download set. Physical suspend/resume and cross-platform product acceptance remain open.
 
 ## Licence
 
