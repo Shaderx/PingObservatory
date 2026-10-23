@@ -159,19 +159,22 @@
 .probe-atlas.narrow .probe-callout{justify-self:start;align-self:start}
 
 /* Zero and unknown have no visible bar or empty suffix slot. Raw positive loss sets the fill. */
-.probe-loss-bar{display:inline-block;width:2px;height:10px;flex:0 0 2px;align-self:center}
+.probe-loss-bar{display:inline-block;width:4px;height:13px;flex:0 0 4px;align-self:center}
 .probe-loss-bar{position:relative;overflow:hidden;background:transparent;text-shadow:none}
 .probe-loss-fill{position:absolute;inset:0;background:var(--probe-loss-color);transform:scaleY(var(--probe-loss-scale));transform-origin:center bottom}
+.probe-loss-bar::after{content:'';position:absolute;left:0;top:0;width:4px;height:2px;background:var(--probe-loss-color)}
 .probe-loss-bar.stale .probe-loss-fill{opacity:.55}
 .probe-loss-bar.unavailable .probe-loss-fill{opacity:.2}
+.probe-loss-bar.stale::after{opacity:.55}
+.probe-loss-bar.unavailable::after{opacity:.2}
 
 /* Dedicated decorative children leave Tron overlays and all row geometry intact. */
 .probe-row{position:relative;isolation:isolate}
-.probe-status-pattern{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;--cue-alpha:.08;--cue-wash:.025;background-color:rgb(var(--cue-rgb)/var(--cue-wash))}
+.probe-status-pattern{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;--cue-alpha:.22;--cue-wash:.055;background-color:rgb(var(--cue-rgb)/var(--cue-wash))}
 .probe-status-pattern.performance{--cue-rgb:241 190 91;background-image:repeating-linear-gradient(135deg,rgb(var(--cue-rgb)/var(--cue-alpha)) 0 1px,transparent 1px 7px)}
 .probe-status-pattern.information{--cue-rgb:160 174 199;background-image:radial-gradient(circle,rgb(var(--cue-rgb)/var(--cue-alpha)) .6px,transparent .9px);background-size:6px 6px}
 .probe-status-pattern.failure{--cue-rgb:240 138 147;background-image:repeating-linear-gradient(0deg,rgb(var(--cue-rgb)/var(--cue-alpha)) 0 1px,transparent 1px 6px)}
-[data-theme=light] .probe-status-pattern{--cue-alpha:.06;--cue-wash:.015}
+[data-theme=light] .probe-status-pattern{--cue-alpha:.18;--cue-wash:.045}
 [data-theme=light] .probe-status-pattern.performance{--cue-rgb:133 94 17}
 [data-theme=light] .probe-status-pattern.information{--cue-rgb:82 107 136}
 [data-theme=light] .probe-status-pattern.failure{--cue-rgb:175 62 75}
@@ -197,3 +200,14 @@
 .atlas-compact .atlas-frame{height:auto!important}
 .atlas-compact.atlas-expanded .atlas-frame{overflow:auto!important}
 .atlas-compact .atlas-frame>.atlas-canvas{height:auto;aspect-ratio:var(--atlas-ratio)!important}
+
+/* The map origin is chosen explicitly and saved only after confirmation. */
+.origin-prompt{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap;padding:9px 20px;border-top:1px solid var(--line);color:var(--muted);font:11px/1.5 'Courier New',monospace}
+.origin-prompt-actions{display:flex;gap:8px;flex-wrap:wrap}
+.origin-prompt-actions button{border:1px solid var(--line);border-radius:4px;padding:6px 9px;color:var(--text);font:inherit}
+.origin-prompt-actions button:last-child{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+.origin-prompt-error{flex-basis:100%;color:var(--danger)}
+.origin-preview-marker{font:32px Georgia,serif;color:var(--amber);text-shadow:0 1px 4px var(--bg);pointer-events:none}
+.origin-picking .atlas .maplibregl-canvas{cursor:crosshair!important}
+.origin-picking .probe-geodot,.origin-picking .probe-atlas:not(.narrow) .probe-callout,.origin-picking .probe-atlas:not(.narrow) .probe-row{pointer-events:none}
+@media(max-width:800px){.origin-prompt{padding:9px 14px}.map-heading-actions{gap:6px}.map-heading-actions .atlas-maximize{font-size:10px;padding:6px 7px}}

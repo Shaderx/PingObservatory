@@ -2,15 +2,16 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import * as maplibregl from 'maplibre-gl';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import type { Family, Target } from './types';
+import type { Family, Point, Target } from './types';
 import { ENDPOINT_BOUNDS, MAP_ASPECT_RATIO } from './map-viewport';
 import { ProbeAtlas } from './ProbeAtlas';
 import { resizeAtlasViewport } from './map-movement';
+import { approximateOrigin } from './origin-picker';
 
 // Vite must bundle MapLibre 6's module worker and shared imports on this origin.
 maplibregl.setWorkerUrl(workerUrl);
 
-export function Atlas({ targets, registeredTargetIds, selected, onSelect, family, now, arrivals, motionEnabled, onMotionEnabledChange, theme, origin, accessAllowanceMS }: { targets: Target[]; registeredTargetIds: ReadonlySet<string>; selected: string; onSelect: (id: string) => void; family: Family; now: number; arrivals: ReadonlyMap<string, number>; motionEnabled: boolean; onMotionEnabledChange(enabled: boolean): void; theme: string; origin?: [number, number]; accessAllowanceMS?: number }) {
+export function Atlas({ targets, registeredTargetIds, selected, onSelect, family, now, arrivals, motionEnabled, onMotionEnabledChange, theme, origin, onSaveOrigin, originReady, originSaving, accessAllowanceMS }: { targets: Target[]; registeredTargetIds: ReadonlySet<string>; selected: string; onSelect: (id: string) => void; family: Family; now: number; arrivals: ReadonlyMap<string, number>; motionEnabled: boolean; onMotionEnabledChange(enabled: boolean): void; theme: string; origin?: [number, number]; onSaveOrigin(point: Point): Promise<void>; originReady: boolean; originSaving: boolean; accessAllowanceMS?: number }) {
   const container = useRef<HTMLDivElement>(null), map = useRef<maplibregl.Map | null>(null);
   const wrapper = useRef<HTMLDivElement>(null), maximizeButton = useRef<HTMLButtonElement>(null);
   const mounted = useRef(true), fullscreenRequest = useRef(false);
@@ -24,6 +25,16 @@ export function Atlas({ targets, registeredTargetIds, selected, onSelect, family
     observer.observe(wrapper.current); return () => observer.disconnect();
   }, []);
   const [ready, setReady] = useState(false), [failed, setFailed] = useState(false);
+  const [picking, setPicking] = useState(false), [preview, setPreview] = useState<Point | null>(null);
+  const [pickSaving, setPickSaving] = useState(false), [pickError, setPickError] = useState('');
+  const cancelPick = () => { setPicking(false); setPreview(null); setPickError(''); };
+  const confirmPick = async () => {
+    if (!preview || pickSaving) return;
+    setPickSaving(true); setPickError('');
+    try { await onSaveOrigin(preview); cancelPick(); }
+    catch (error) { setPickError(error instanceof Error ? error.message : 'Could not save the approximate location.'); }
+    finally { setPickSaving(false); }
+  };
   useEffect(() => {
     mounted.current = true;
     const changed = () => {
@@ -132,21 +143,38 @@ export function Atlas({ targets, registeredTargetIds, selected, onSelect, family
     const marker = new maplibregl.Marker({ element }).setLngLat(origin).addTo(map.current);
     return () => { marker.remove(); };
   }, [ready, origin?.[0], origin?.[1]]);
-  return <div ref={wrapper} style={{ '--atlas-ratio': MAP_ASPECT_RATIO } as CSSProperties} className={`atlas-wrap${frameWidth > 0 && frameWidth < 800 ? ' atlas-compact' : ''}${expanded ? ' atlas-expanded' : ''}${expandedFallback ? ' atlas-expanded-fallback' : ''}`} role={expanded ? 'dialog' : undefined} aria-modal={expanded ? true : undefined} aria-label={expanded ? 'Endpoint atlas' : undefined}>
-    <div className="map-heading"><div><span className="eyebrow">01 / THE ATLAS</span><h2>A world of endpoints.</h2></div><div className="map-heading-actions"><p>{targets.filter(t => t.geography.coordinates).length} mapped</p><button ref={maximizeButton} className="atlas-maximize" type="button" aria-expanded={expanded} onClick={() => void toggleFullscreen()}>{expanded ? 'Exit full screen' : 'Full screen'}</button></div></div>
+  useEffect(() => {
+    if (!ready || !map.current || !picking || preview) return;
+    const instance = map.current;
+    const clicked = (event: maplibregl.MapMouseEvent) => {
+      const point = approximateOrigin(event.lngLat.lng, event.lngLat.lat);
+      if (point) { setPreview(point); setPickError(''); }
+    };
+    instance.on('click', clicked);
+    return () => { instance.off('click', clicked); };
+  }, [ready, picking, preview]);
+  useEffect(() => {
+    if (!ready || !map.current || !preview) return;
+    const element = document.createElement('div'); element.className = 'origin-preview-marker'; element.textContent = '+'; element.title = 'Approximate location preview';
+    const marker = new maplibregl.Marker({ element }).setLngLat([preview.longitude, preview.latitude]).addTo(map.current);
+    return () => { marker.remove(); };
+  }, [ready, preview]);
+  return <div ref={wrapper} style={{ '--atlas-ratio': MAP_ASPECT_RATIO } as CSSProperties} className={`atlas-wrap${frameWidth > 0 && frameWidth < 800 ? ' atlas-compact' : ''}${expanded ? ' atlas-expanded' : ''}${expandedFallback ? ' atlas-expanded-fallback' : ''}${picking ? ' origin-picking' : ''}`} role={expanded ? 'dialog' : undefined} aria-modal={expanded ? true : undefined} aria-label={expanded ? 'Endpoint atlas' : undefined}>
+    <div className="map-heading"><div><span className="eyebrow">01 / THE ATLAS</span><h2>A world of endpoints.</h2></div><div className="map-heading-actions"><p>{targets.filter(t => t.geography.coordinates).length} mapped</p><button className="atlas-maximize" type="button" disabled={!originReady || !ready || failed || pickSaving} aria-pressed={picking} onClick={() => { if (picking) cancelPick(); else { setPreview(null); setPickError(''); setPicking(true); } }}>{picking ? 'Cancel location' : 'Set my location'}</button><button ref={maximizeButton} className="atlas-maximize" type="button" aria-expanded={expanded} onClick={() => void toggleFullscreen()}>{expanded ? 'Exit full screen' : 'Full screen'}</button></div></div>
+    {(!origin || picking || pickError) && <div className="origin-prompt" role="status"><span>{picking ? preview ? `Preview: ${preview.latitude.toFixed(1)}°, ${preview.longitude.toFixed(1)}°. Confirm or choose another point.` : 'Click an approximate point on the map. Drag and zoom still work.' : 'Set an approximate location to enable latency versus distance colours. Monitoring works without it.'}</span>{picking && preview && <div className="origin-prompt-actions"><button type="button" disabled={pickSaving} onClick={() => setPreview(null)}>Choose another point</button><button type="button" disabled={pickSaving || originSaving} onClick={() => void confirmPick()}>{pickSaving ? 'Saving…' : 'Confirm location'}</button></div>}{pickError && <span className="origin-prompt-error">{pickError}</span>}</div>}
     <div className={failed ? 'atlas-frame failed' : 'atlas-frame'} style={!expanded && frameWidth >= 800 ? { height: Math.max(300, frameWidth / MAP_ASPECT_RATIO) } : undefined}><div className="atlas-canvas" style={{ aspectRatio: MAP_ASPECT_RATIO }}><div ref={container} className="atlas" aria-label="Map of approximate endpoint regions. Select a marker to inspect measurements. Browse every target in the signal directory." /></div>
-      {ready && !failed && map.current && <ProbeAtlas map={map.current} targets={targets} registeredTargetIds={registeredTargetIds} selected={selected} onSelect={onSelect} family={family} now={now} arrivals={arrivals} motionEnabled={motionEnabled} theme={theme} origin={origin} accessAllowanceMS={accessAllowanceMS} />}
+      {ready && !failed && map.current && <ProbeAtlas map={map.current} targets={targets} registeredTargetIds={registeredTargetIds} selected={selected} onSelect={id => { if (!picking) onSelect(id); }} family={family} now={now} arrivals={arrivals} motionEnabled={motionEnabled} theme={theme} origin={origin} accessAllowanceMS={accessAllowanceMS} />}
       {failed && <div className="map-fallback"><span className="orb-icon">◎</span><h3>Explore through the directory</h3><p>Map view unavailable. Use the directory to explore targets and measurements.</p><a href="#directory">Open signal directory ↘</a></div>}
     </div>
     <div className="map-footer"><div className="map-key"><div className="progressive-legend">
       <span><i className="baseline-gradient"/>Latency vs distance reference</span>
-      <span><i className="legend-loss-bar"/>Bar: past-hour loss or failures</span>
+      <span><i className="legend-loss-bar"/>Bar: past-hour loss or failures; top tick = any positive rate</span>
       <span><i className="legend-status-pattern"/>Patterned row: hover or select for status</span>
       <span><i className="legend-ripple"/>Recent result</span>
       <span>+ = configured local origin</span><span>I = ICMP · U = UDP</span>
     </div><details className="map-legend-help"><summary>How to read the map</summary>
       <p>Colour compares fresh ICMP or UDP timing with an approximate distance reference from your configured local origin: green up to 150%, red from 300%. The reference is max(10 ms, distance in km x 0.01 + 10 ms), a display heuristic rather than a latency prediction or health test. Other methods, missing origin/locations and stale timings use a neutral colour.</p>
-      <p>The bar shows past-hour packet loss or failed attempts; only positive rates have a bar, and its fill keeps the original precision. Small positive rates remain visible in row help. An unavailable rate remains unknown.</p>
+      <p>The bar shows past-hour packet loss or failed attempts; only positive rates have a bar. Its fill is proportional, and a small top tick marks any positive rate, including tiny values. Read the row help for the precise rate. An unavailable rate remains unknown.</p>
       <p>Diagonal amber lines mark degraded timing or loss. Blue-gray dots mark stale, unknown, unverified or unavailable results. Rose horizontal lines mark a measured network failure; local inability to measure uses information dots. Hover, focus or select an individual row for its reason.</p>
       <p>Elevated timing requires a fresh result and a fresh, positive 24-hour baseline, with both at least 50% and at least 10 milliseconds increase. Pulses highlight newly completed local results; saved history is never replayed as a new arrival. ICMP, UDP, TCP, HTTPS and DNS identify the probe method.</p>
     </details></div>
